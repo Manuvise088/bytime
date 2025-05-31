@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByTime</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1 id="header-title">ByTime</h1>
+        <div id="account-section">
+            <button id="account-btn">
+                <span class="material-icons">science</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="main-content">
+    </main>
+
+    <nav>
+        <button class="nav-btn active" data-section="home">
+            <span class="material-icons">home</span>
+            <span>Home</span>
+        </button>
+    </nav>
+
+    <div id="timer-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Nuovo Timer</h2>
+            <input type="text" id="timer-name" placeholder="Nome del timer (opzionale)">
+            
+            <div class="time-input">
+                <input type="number" id="hours" min="0" max="23" placeholder="00">
+                <span>:</span>
+                <input type="number" id="minutes" min="0" max="59" placeholder="00">
+                <span>:</span>
+                <input type="number" id="seconds" min="0" max="59" placeholder="00">
+            </div>
+            
+            <button id="start-timer">Avvia Timer</button>
+        </div>
+    </div>
+
+    <div id="alarm-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Nuova Sveglia</h2>
+            <input type="text" id="alarm-name" placeholder="Nome sveglia (opzionale)">
+            
+            <div style="margin: 20px 0;">
+                <input type="time" id="alarm-time">
+            </div>
+            
+            <div class="repeat-options">
+                <h3>Ripeti</h3>
+                <div class="days">
+                    <button data-day="0">L</button>
+                    <button data-day="1">M</button>
+                    <button data-day="2">M</button>
+                    <button data-day="3">G</button>
+                    <button data-day="4">V</button>
+                    <button data-day="5">S</button>
+                    <button data-day="6">D</button>
+                </div>
+            </div>
+            
+            <button id="save-alarm">Salva Sveglia</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

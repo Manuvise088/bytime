@@ -1,0 +1,445 @@
+:root {
+    --primary-color: #5782c9;
+    --secondary-color: #34A853;
+    --accent-color: #EA4335;
+    --light-gray: #2c2c2c;
+    --dark-gray: #ffffff;
+    --text-gray: #ffffff;
+    --modal-bg: rgba(0, 0, 0, 0.4);
+    background-color: black;
+    color: white;
+    font-weight: bold;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    color: white;
+    padding-bottom: 70px;
+    overflow-y: scroll; /* Abilita lo scorrimento */
+    -ms-overflow-style: none;  /* Nasconde la scrollbar in IE/Edge */
+    scrollbar-width: none;  /* Nasconde la scrollbar in Firefox */
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+#create-first-timer, #create-first-alarm {
+    background-color: #3367d6;
+    border-radius: 10px;
+    margin-bottom: -10px;
+    color: white;
+    display: flex;
+    margin: 0 auto;
+    align-items: center;
+}
+#create-first-timer span, #create-first-alarm span {
+    color: white;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 0 0 15px 15px;
+}
+
+nav {
+    display: flex;
+    background-color: var(--light-gray);
+    border-top: 1px solid #e0e0e0;
+    border-radius: 15px 15px 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.nav-btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--dark-gray);
+    font-size: 0.8rem;
+    border-radius: 15px;
+}
+
+.nav-btn.active {
+    color: var(--primary-color);
+}
+.nav-btn .material-icons {
+    margin-bottom: 4px;
+    font-size: 24px;
+}
+
+main {
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+}
+
+.card {
+    background: #333;
+    border-radius: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress-bar {
+    height: 4px;
+    background-color: #444;
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background-color: var(--secondary-color);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#account-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#account-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.play-btn {
+    color: var(--primary-color);
+}
+
+.time-display {
+    margin: 4px 0;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+.separator {
+    height: 1px;
+    background-color: #444;
+    margin: 1.5rem 0;
+}
+
+.fab {
+    position: fixed;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #3367d68e;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    border: none;
+    z-index: 10;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 100px;
+    backdrop-filter: blur(100px);
+    -webkit-backdrop-filter: blur(100px);
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+#new-timer {
+    bottom: 85px;
+    right: 20px;
+}
+
+#new-alarm {
+    bottom: 85px;
+    right: 80px;
+}
+
+.alarm-status {
+    display: flex;
+    align-items: center;
+}
+
+.alarm-status .material-icons {
+    margin-right: 8px;
+}
+
+.alarm-status .active {
+    color: var(--accent-color);
+}
+
+.alarm-status .inactive {
+    color: var(--text-gray);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--modal-bg);
+}
+
+.modal-content {
+    background-color: #333;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: white;
+}
+
+.time-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin: 20px 0;
+    font-size: 1.2rem;
+}
+
+.time-input input {
+    width: 60px;
+    padding: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #444;
+    color: white;
+}
+
+#alarm-time {
+    padding: 10px;
+    font-size: 1.2rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #444;
+    color: white;
+    width: 100%;
+}
+
+.repeat-options {
+    margin: 20px 0;
+}
+
+.days {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.days button {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 1px solid #444;
+    background: #333;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s;
+}
+
+.days button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.days button:hover {
+    background-color: #444;
+}
+
+#timer-name, #alarm-name {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #444;
+    color: white;
+}
+
+#start-timer, #save-alarm {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#start-timer:hover, #save-alarm:hover {
+    background-color: #3367d6;
+}
+
+.current-time {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.timezone {
+    text-align: center;
+    color: var(--text-gray);
+    margin-bottom: 20px;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-gray);
+    padding: 40px 20px;
+}
+
+.empty-state .material-icons {
+    font-size: 3rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #444;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: var(--text-gray);
+    cursor: pointer;
+    font-size: 1rem;
+    position: relative;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.alarm-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.delete-alarm-btn {
+    color: var(--accent-color);
+}
+
+.section-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 0.9rem;
+}
+
+.section-btn .material-icons {
+    margin-right: 5px;
+    font-size: 18px;
+}
+
+nav .nav-btn[data-section="timers"] {
+    display: none;
+}
