@@ -13,7 +13,7 @@
         <h1 id="header-title">ByTime</h1>
         <div id="account-section">
             <button id="account-btn">
-                <span class="material-icons">science</span>
+                <span class="material-icons">settings</span>
             </button>
         </div>
     </header>
@@ -26,8 +26,63 @@
             <span class="material-icons">home</span>
             <span>Home</span>
         </button>
+        <button class="nav-btn" data-section="timers">
+            <span class="material-icons">alarm</span>
+            <span>Timer e Sveglie</span>
+        </button>
     </nav>
-
+    <!-- Aggiungi questo prima degli altri modal -->
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <div class="settings-header">
+            <button id="back-btn" class="icon-btn">
+                <span class="material-icons">arrow_back</span>
+            </button>
+            <h2>Impostazioni</h2>
+        </div>
+        
+        <div class="settings-section">
+            <h3>Tema</h3>
+            <div class="theme-options">
+                <button class="theme-option" data-theme="default">
+                    <div class="theme-preview default"></div>
+                    <span>Predefinito</span>
+                </button>
+                <button class="theme-option" data-theme="green">
+                    <div class="theme-preview green"></div>
+                    <span>Verde</span>
+                </button>
+                <button class="theme-option" data-theme="red">
+                    <div class="theme-preview red"></div>
+                    <span>Rosso</span>
+                </button>
+                <button class="theme-option" data-theme="purple">
+                    <div class="theme-preview purple"></div>
+                    <span>Viola</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h3>Lingua</h3>
+            <select id="language-select" class="settings-select">
+                <option value="it">Italiano</option>
+            </select>
+        </div>
+        
+        <div class="settings-section">
+            <h3>Informazioni</h3>
+            <div class="info-item">
+                <span>Versione</span>
+                <span>1.0.0</span>
+            </div>
+            <div class="info-item">
+                <span>Sviluppatore</span>
+                <span>Visentin Manuel</span>
+            </div>
+        </div>
+    </div>
+</div>
     <div id="timer-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>

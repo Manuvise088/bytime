@@ -3,47 +3,43 @@ let timers = JSON.parse(localStorage.getItem('timers')) || [];
 let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
 let activeTimer = null;
 let currentSection = 'home';
-let currentLocation = null;
-let currentTimezone = null;
-
+let currentTheme = localStorage.getItem('theme') || 'default';
 
 const mainContent = document.getElementById('main-content');
 const headerTitle = document.getElementById('header-title');
 const accountBtn = document.getElementById('account-btn');
 const timerModal = document.getElementById('timer-modal');
 const alarmModal = document.getElementById('alarm-modal');
+const settingsModal = document.getElementById('settings-modal');
 const closeButtons = document.getElementsByClassName('close');
 
-
 document.addEventListener('DOMContentLoaded', function() {
+    applyTheme();
     loadSection(currentSection);
     setupEventListeners();
-    requestLocation();
     
-
     const savedActiveTimer = localStorage.getItem('activeTimer');
     if (savedActiveTimer) {
         activeTimer = JSON.parse(savedActiveTimer);
         startTimerCountdown(activeTimer);
     }
     
- 
     checkAlarms();
 });
 
 function setupEventListeners() {
-
+    // Navigation buttons
     document.querySelectorAll('.nav-btn').forEach(button => {
         button.addEventListener('click', function() {
             const section = this.dataset.section;
             loadSection(section);
             
-
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
         });
     });
 
+    // Timer and alarm creation buttons
     document.addEventListener('click', function(e) {
         if (e.target.id === 'new-timer' || e.target.closest('#new-timer')) {
             timerModal.style.display = 'block';
@@ -56,31 +52,47 @@ function setupEventListeners() {
         }
     });
     
-
+    // Modal close buttons
     Array.from(closeButtons).forEach(button => {
         button.addEventListener('click', function() {
             this.closest('.modal').style.display = 'none';
         });
     });
     
-
+    // Timer and alarm creation
     document.getElementById('start-timer').addEventListener('click', createNewTimer);
-    
-
     document.getElementById('save-alarm').addEventListener('click', createNewAlarm);
     
-
+    // Alarm repeat days
     document.querySelectorAll('.days button').forEach(button => {
         button.addEventListener('click', function() {
             this.classList.toggle('active');
         });
     });
     
-
+    // Close modals when clicking outside
     window.addEventListener('click', function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
         }
+    });
+    
+    // Settings modal
+    accountBtn.addEventListener('click', () => {
+        settingsModal.style.display = 'block';
+        loadSettings();
+    });
+    
+    document.getElementById('back-btn').addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+    });
+    
+    // Theme options
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const theme = this.dataset.theme;
+            setTheme(theme);
+        });
     });
 }
 
@@ -183,7 +195,7 @@ function loadHomeSection() {
         </button>
     `;
     
-
+    // Setup event listeners for dynamic content
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -199,14 +211,12 @@ function loadHomeSection() {
         });
     });
     
-
     document.querySelectorAll('.section-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             const section = this.dataset.section;
             loadSection(section);
             
-
             document.querySelectorAll('.nav-btn').forEach(navBtn => {
                 navBtn.classList.remove('active');
                 if (navBtn.dataset.section === section) {
@@ -227,7 +237,7 @@ function loadTimersSection() {
         </div>
     `;
     
-
+    // Timers tab
     html += `
         <div id="timers-tab" class="tab-content active">
             <div class="section-title">
@@ -326,25 +336,22 @@ function loadTimersSection() {
     
     mainContent.innerHTML = html;
     
-
     updateCurrentTime();
     
-
+    // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const tab = this.dataset.tab;
             
-
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
-
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(`${tab}-tab`).classList.add('active');
         });
     });
     
-
+    // Timer controls
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -360,7 +367,7 @@ function loadTimersSection() {
         });
     });
     
-
+    // Alarm controls
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -399,11 +406,8 @@ function checkAlarms() {
         
         const [alarmHours, alarmMinutes] = alarm.time.split(':');
         
-
         if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
-
             if (!alarm.days || alarm.days.includes(currentDay)) {
-
                 if (Notification.permission === 'granted') {
                     new Notification(alarm.name || 'Sveglia', {
                         body: `È ora! (${alarm.time})`
@@ -421,7 +425,6 @@ function checkAlarms() {
         }
     });
     
-
     setTimeout(checkAlarms, 60000 - now.getSeconds() * 1000 - now.getMilliseconds());
 }
 
@@ -461,7 +464,7 @@ function createNewTimer() {
         loadSection(currentSection);
     }
     
-
+    // Reset form
     document.getElementById('hours').value = '';
     document.getElementById('minutes').value = '';
     document.getElementById('seconds').value = '';
@@ -499,7 +502,7 @@ function createNewAlarm() {
         loadSection(currentSection);
     }
     
-
+    // Reset form
     document.getElementById('alarm-time').value = '';
     document.getElementById('alarm-name').value = '';
     document.querySelectorAll('.days button').forEach(btn => {
@@ -514,12 +517,10 @@ function toggleTimer(timer) {
         activeTimer = null;
         localStorage.removeItem('activeTimer');
     } else {
-
         if (activeTimer) {
             clearInterval(activeTimer.interval);
         }
         
-
         const now = new Date().getTime();
         const endTime = now + (timer.duration * 1000);
         
@@ -548,7 +549,6 @@ function startTimerCountdown(timer) {
             activeTimer = null;
             localStorage.removeItem('activeTimer');
             
-
             if (Notification.permission === 'granted') {
                 new Notification('Timer completato!');
             } else if (Notification.permission !== 'denied') {
@@ -632,7 +632,6 @@ function formatTime(time) {
             seconds.toString().padStart(2, '0')
         ].join(':');
     } else if (time instanceof Date) {
-
         return time.toLocaleTimeString('it-IT', {
             hour: '2-digit',
             minute: '2-digit',
@@ -650,4 +649,49 @@ function formatAlarmTime(timeStr) {
 function formatDays(days) {
     const dayNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
     return days.map(day => dayNames[day]).join(', ');
+}
+
+function loadSettings() {
+    // Set selected theme
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.classList.toggle('active', option.dataset.theme === currentTheme);
+    });
+}
+
+function setTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem('theme', theme);
+    applyTheme();
+    loadSettings();
+}
+
+function applyTheme() {
+    const root = document.documentElement;
+    
+    switch(currentTheme) {
+        case 'green':
+            root.style.setProperty('--primary-color', '#2E7D32');
+            root.style.setProperty('--secondary-color', '#66BB6A');
+            root.style.setProperty('--accent-color', '#FF7043');
+            break;
+        case 'red':
+            root.style.setProperty('--primary-color', '#C62828');
+            root.style.setProperty('--secondary-color', '#EF5350');
+            root.style.setProperty('--accent-color', '#FFA000');
+            break;
+        case 'purple':
+            root.style.setProperty('--primary-color', '#6A1B9A');
+            root.style.setProperty('--secondary-color', '#AB47BC');
+            root.style.setProperty('--accent-color', '#26C6DA');
+            break;
+        case 'dark':
+            root.style.setProperty('--primary-color', '#121212');
+            root.style.setProperty('--secondary-color', '#1E1E1E');
+            root.style.setProperty('--accent-color', '#BB86FC');
+            break;
+        default: // default theme
+            root.style.setProperty('--primary-color', '#5782c9');
+            root.style.setProperty('--secondary-color', '#34A853');
+            root.style.setProperty('--accent-color', '#EA4335');
+    }
 }
