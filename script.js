@@ -1,22 +1,55 @@
+// script.js
 let currentUser = null;
 let timers = JSON.parse(localStorage.getItem('timers')) || [];
 let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
+let cronometers = JSON.parse(localStorage.getItem('cronometers')) || []; 
 let activeTimer = null;
+let stopwatch = {
+    running: false,
+    startTime: 0,
+    elapsed: 0,
+    laps: []
+};
 let currentSection = 'home';
 let currentTheme = localStorage.getItem('theme') || 'default';
+let notificationPermission = false;
+let serviceWorkerRegistration = null;
+let deferredPrompt = null;
 
 const mainContent = document.getElementById('main-content');
 const headerTitle = document.getElementById('header-title');
 const accountBtn = document.getElementById('account-btn');
+const backBtn = document.getElementById('back-btn');
 const timerModal = document.getElementById('timer-modal');
 const alarmModal = document.getElementById('alarm-modal');
-const settingsModal = document.getElementById('settings-modal');
-const closeButtons = document.getElementsByClassName('close');
+const addBtn = document.getElementById('add-btn');
+const addMenu = document.getElementById('add-menu');
+const addTimerMenu = document.getElementById('add-timer-menu');
+const addAlarmMenu = document.getElementById('add-alarm-menu');
 
 document.addEventListener('DOMContentLoaded', function() {
     applyTheme();
     loadSection(currentSection);
     setupEventListeners();
+
+    if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+            notificationPermission = permission === 'granted';
+        });
+    }
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(registration => {
+            serviceWorkerRegistration = registration;
+        }).catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    }
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
     
     const savedActiveTimer = localStorage.getItem('activeTimer');
     if (savedActiveTimer) {
@@ -24,11 +57,21 @@ document.addEventListener('DOMContentLoaded', function() {
         startTimerCountdown(activeTimer);
     }
     
+    const savedStopwatch = localStorage.getItem('stopwatch');
+    if (savedStopwatch) {
+        const parsed = JSON.parse(savedStopwatch);
+        stopwatch = {
+            running: false,
+            startTime: parsed.startTime,
+            elapsed: parsed.elapsed,
+            laps: parsed.laps || []
+        };
+    }
+    
     checkAlarms();
 });
 
 function setupEventListeners() {
-    // Navigation buttons
     document.querySelectorAll('.nav-btn').forEach(button => {
         button.addEventListener('click', function() {
             const section = this.dataset.section;
@@ -36,64 +79,70 @@ function setupEventListeners() {
             
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
+            
+            backBtn.style.display = section === 'home' ? 'none' : 'flex';
         });
     });
 
-    // Timer and alarm creation buttons
-    document.addEventListener('click', function(e) {
-        if (e.target.id === 'new-timer' || e.target.closest('#new-timer')) {
-            timerModal.style.display = 'block';
-        }
+    backBtn.addEventListener('click', () => {
+        loadSection('home');
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.section === 'home') {
+                btn.classList.add('active');
+            }
+        });
+        backBtn.style.display = 'none';
+    });
+
+    addBtn.addEventListener('click', toggleAddMenu);
+    addTimerMenu.addEventListener('click', () => {
+        timerModal.style.display = 'block';
+        addMenu.classList.remove('show');
+        addBtn.classList.remove('menu-open');
+    });
+    addAlarmMenu.addEventListener('click', () => {
+        alarmModal.style.display = 'block';
+        addMenu.classList.remove('show');
+        addBtn.classList.remove('menu-open');
     });
     
-    document.addEventListener('click', function(e) {
-        if (e.target.id === 'new-alarm' || e.target.closest('#new-alarm')) {
-            alarmModal.style.display = 'block';
-        }
-    });
-    
-    // Modal close buttons
-    Array.from(closeButtons).forEach(button => {
+    Array.from(document.getElementsByClassName('close')).forEach(button => {
         button.addEventListener('click', function() {
             this.closest('.modal').style.display = 'none';
         });
     });
     
-    // Timer and alarm creation
     document.getElementById('start-timer').addEventListener('click', createNewTimer);
     document.getElementById('save-alarm').addEventListener('click', createNewAlarm);
     
-    // Alarm repeat days
     document.querySelectorAll('.days button').forEach(button => {
         button.addEventListener('click', function() {
             this.classList.toggle('active');
         });
     });
     
-    // Close modals when clicking outside
     window.addEventListener('click', function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
         }
+        
+        if (!event.target.closest('#add-btn') && !event.target.closest('.add-menu')) {
+            addMenu.classList.remove('show');
+            addBtn.classList.remove('menu-open');
+        }
     });
     
-    // Settings modal
     accountBtn.addEventListener('click', () => {
-        settingsModal.style.display = 'block';
-        loadSettings();
+        loadSection('settings');
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        backBtn.style.display = 'flex';
     });
-    
-    document.getElementById('back-btn').addEventListener('click', () => {
-        settingsModal.style.display = 'none';
-    });
-    
-    // Theme options
-    document.querySelectorAll('.theme-option').forEach(option => {
-        option.addEventListener('click', function() {
-            const theme = this.dataset.theme;
-            setTheme(theme);
-        });
-    });
+}
+
+function toggleAddMenu() {
+    addMenu.classList.toggle('show');
+    addBtn.classList.toggle('menu-open');
 }
 
 function loadSection(section) {
@@ -104,8 +153,17 @@ function loadSection(section) {
         case 'home':
             loadHomeSection();
             break;
+        case 'cronometers':
+            loadStopwatchSection();
+            break;
         case 'timers':
             loadTimersSection();
+            break;
+        case 'alarms':
+            loadAlarmsSection();
+            break;
+        case 'settings':
+            loadSettingsSection();
             break;
     }
 }
@@ -113,7 +171,10 @@ function loadSection(section) {
 function getSectionTitle(section) {
     const titles = {
         'home': 'Home',
-        'timers': 'Timer e Sveglie'
+        'cronometers': 'Cronometro',
+        'timers': 'Timer e Sveglie',
+        'alarms': 'Sveglie',
+        'settings': 'Impostazioni'
     };
     return titles[section] || 'ByTime';
 }
@@ -124,7 +185,7 @@ function loadHomeSection() {
             <h2>Timer recenti</h2>
             <a href="#" class="section-btn" data-section="timers">
                 <span class="material-icons">timer</span>
-                <span>Timer</span>
+                <span>Vedi tutti</span>
             </a>
         </div>
         
@@ -137,7 +198,7 @@ function loadHomeSection() {
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <button class="icon-btn play-btn">
-                            <span class="material-icons">play_arrow</span>
+                            <span class="material-icons">${timer.id === activeTimer?.id ? 'pause' : 'play_arrow'}</span>
                         </button>
                     </div>
                     ${timer.id === activeTimer?.id ? 
@@ -153,17 +214,13 @@ function loadHomeSection() {
             </div>`
         }
         
-        <button class="fab" id="new-timer">
-            <span class="material-icons">timer</span>
-        </button>
-        
         <div class="separator"></div>
         
         <div class="section-title">
             <h2>Sveglie recenti</h2>
             <a href="#" class="section-btn" data-section="timers">
                 <span class="material-icons">alarm</span>
-                <span>Sveglie</span>
+                <span>Vedi tutti</span>
             </a>
         </div>
         
@@ -176,9 +233,8 @@ function loadHomeSection() {
                             <p class="time-display">${formatAlarmTime(alarm.time)} ${alarm.days ? `(${formatDays(alarm.days)})` : ''}</p>
                         </div>
                         <div class="alarm-status">
-                            <span class="material-icons ${alarm.active ? 'active' : 'inactive'}">${alarm.active ? 'notifications_active' : 'notifications_off'}</span>
-                            <button class="icon-btn">
-                                <span class="material-icons">more_vert</span>
+                            <button class="icon-btn toggle-alarm-btn">
+                                <span class="material-icons ${alarm.active ? 'active' : 'inactive'}">${alarm.active ? 'notifications_active' : 'notifications_off'}</span>
                             </button>
                         </div>
                     </div>
@@ -189,13 +245,8 @@ function loadHomeSection() {
                 <p>Nessuna sveglia impostata</p>
             </div>`
         }
-        
-        <button class="fab" id="new-alarm">
-            <span class="material-icons">alarm_add</span>
-        </button>
     `;
     
-    // Setup event listeners for dynamic content
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -204,8 +255,8 @@ function loadHomeSection() {
         });
     });
     
-    document.querySelectorAll('.alarm-status .material-icons').forEach(icon => {
-        icon.addEventListener('click', function() {
+    document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
             toggleAlarm(alarmId);
         });
@@ -214,19 +265,81 @@ function loadHomeSection() {
     document.querySelectorAll('.section-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            const section = this.dataset.section;
-            loadSection(section);
-            
+            loadSection(this.dataset.section);
             document.querySelectorAll('.nav-btn').forEach(navBtn => {
                 navBtn.classList.remove('active');
-                if (navBtn.dataset.section === section) {
+                if (navBtn.dataset.section === this.dataset.section) {
                     navBtn.classList.add('active');
                 }
             });
+            backBtn.style.display = 'flex';
         });
     });
 }
 
+function loadStopwatchSection() {
+    mainContent.innerHTML = `
+        <div class="section-title">
+            <h2>Cronometri recenti</h2>
+            <a href="#" class="section-btn" data-section="cronometers">
+                <span class="material-icons">timer</span>
+                <span>Vedi tutti</span>
+            </a>
+        </div>
+        
+        <div class="stopwatch-card">
+            <div class="stopwatch-display" id="stopwatch-display">${formatStopwatchTime(stopwatch.elapsed)}</div>
+            
+            <div class="stopwatch-controls">
+                <button id="stopwatch-start-stop" class="stopwatch-btn ${stopwatch.running ? 'stop' : 'start'}">
+                    <span class="material-icons">${stopwatch.running ? 'pause' : 'play_arrow'}</span>
+                </button>
+                <button id="stopwatch-lap-reset" class="stopwatch-btn ${stopwatch.running ? 'lap' : 'reset'}">
+                    <span class="material-icons">${stopwatch.running ? 'flag' : 'replay'}</span>
+                </button>
+            </div>
+            
+            ${stopwatch.laps.length > 0 ? `
+                <div class="laps-container" id="laps-container">
+                    <div class="laps-header">
+                        <span>Giro</span>
+                        <span>Tempo</span>
+                    </div>
+                    ${stopwatch.laps.slice(0, 3).map((lap, index) => `
+                        <div class="lap-item">
+                            <span>Giro ${index + 1}</span>
+                            <span>${formatStopwatchTime(lap)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    const startStopBtn = document.getElementById('stopwatch-start-stop');
+    const lapResetBtn = document.getElementById('stopwatch-lap-reset');
+
+    startStopBtn.addEventListener('click', toggleStopwatch);
+    lapResetBtn.addEventListener('click', stopwatch.running ? addLap : resetStopwatch);
+
+    if (stopwatch.running) {
+        startStopwatchUpdate();
+    }
+
+    document.querySelectorAll('.section-btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            loadSection(this.dataset.section);
+            document.querySelectorAll('.nav-btn').forEach(navBtn => {
+                navBtn.classList.remove('active');
+                if (navBtn.dataset.section === this.dataset.section) {
+                    navBtn.classList.add('active');
+                }
+            });
+            backBtn.style.display = 'flex';
+        });
+    });
+}
 function loadTimersSection() {
     let html = `
         <div class="current-time" id="current-time">${formatTime(new Date())}</div>
@@ -237,7 +350,6 @@ function loadTimersSection() {
         </div>
     `;
     
-    // Timers tab
     html += `
         <div id="timers-tab" class="tab-content active">
             <div class="section-title">
@@ -284,7 +396,6 @@ function loadTimersSection() {
     html += `
         </div>
         
-        <!-- Alarm tab content -->
         <div id="alarms-tab" class="tab-content">
             <div class="section-title">
                 <h2>Le tue sveglie</h2>
@@ -325,12 +436,8 @@ function loadTimersSection() {
     html += `
         </div>
         
-        <button class="fab" id="new-timer">
-            <span class="material-icons">timer</span>
-        </button>
-        
-        <button class="fab" id="new-alarm">
-            <span class="material-icons">alarm_add</span>
+        <button class="fab" id="add-btn">
+            <span class="material-icons">add</span>
         </button>
     `;
     
@@ -338,7 +445,6 @@ function loadTimersSection() {
     
     updateCurrentTime();
     
-    // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const tab = this.dataset.tab;
@@ -351,7 +457,6 @@ function loadTimersSection() {
         });
     });
     
-    // Timer controls
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -367,7 +472,6 @@ function loadTimersSection() {
         });
     });
     
-    // Alarm controls
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -393,46 +497,284 @@ function loadTimersSection() {
             alarmModal.style.display = 'block';
         });
     }
+    
+    // Reimposta gli event listener per il pulsante add
+    addBtn.addEventListener('click', toggleAddMenu);
 }
 
-function checkAlarms() {
-    const now = new Date();
-    const currentHours = now.getHours().toString().padStart(2, '0');
-    const currentMinutes = now.getMinutes().toString().padStart(2, '0');
-    const currentDay = now.getDay();
+function loadAlarmsSection() {
+    mainContent.innerHTML = `
+        <div class="section-header">
+            <h2>Sveglie</h2>
+            <button id="add-alarm-btn" class="icon-btn">
+                <span class="material-icons">add</span>
+            </button>
+        </div>
+        
+        ${alarms.length > 0 ? 
+            alarms.map(alarm => `
+                <div class="card" data-id="${alarm.id}">
+                    <div class="card-content">
+                        <div>
+                            <h3>${alarm.name || 'Sveglia'}</h3>
+                            <p class="time-display">${formatAlarmTime(alarm.time)} ${alarm.days ? `(${formatDays(alarm.days)})` : ''}</p>
+                        </div>
+                        <div class="alarm-actions">
+                            <button class="icon-btn toggle-alarm-btn">
+                                <span class="material-icons ${alarm.active ? 'active' : 'inactive'}">${alarm.active ? 'notifications_active' : 'notifications_off'}</span>
+                            </button>
+                            <button class="icon-btn delete-alarm-btn">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('') : 
+            `<div class="empty-state">
+                <span class="material-icons">alarm</span>
+                <p>Nessuna sveglia impostata</p>
+                <button id="create-first-alarm" class="icon-btn" style="color: white; margin-top: 20px;">
+                    <span class="material-icons">add</span> Crea la tua prima sveglia
+                </button>
+            </div>`
+        }
+    `;
     
-    alarms.forEach(alarm => {
-        if (!alarm.active) return;
-        
-        const [alarmHours, alarmMinutes] = alarm.time.split(':');
-        
-        if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
-            if (!alarm.days || alarm.days.includes(currentDay)) {
-                if (Notification.permission === 'granted') {
-                    new Notification(alarm.name || 'Sveglia', {
-                        body: `È ora! (${alarm.time})`
-                    });
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            new Notification(alarm.name || 'Sveglia', {
-                                body: `È ora! (${alarm.time})`
-                            });
-                        }
-                    });
+    document.getElementById('add-alarm-btn')?.addEventListener('click', () => {
+        alarmModal.style.display = 'block';
+    });
+    
+    document.getElementById('create-first-alarm')?.addEventListener('click', () => {
+        alarmModal.style.display = 'block';
+    });
+    
+    document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const alarmId = this.closest('.card').dataset.id;
+            toggleAlarm(alarmId);
+        });
+    });
+    
+    document.querySelectorAll('.delete-alarm-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const alarmId = this.closest('.card').dataset.id;
+            deleteAlarm(alarmId);
+        });
+    });
+}
+
+function loadSettingsSection() {
+    document.querySelector('.fab').style.display = 'none';
+    mainContent.innerHTML = `
+        <div class="settings-page">
+            <div class="settings-section">
+                <h3>Tema</h3>
+                <div class="theme-options">
+                    <button class="theme-option ${currentTheme === 'default' ? 'active' : ''}" data-theme="default">
+                        <div class="theme-preview default"></div>
+                        <span>Predefinito</span>
+                    </button>
+                    <button class="theme-option ${currentTheme === 'green' ? 'active' : ''}" data-theme="green">
+                        <div class="theme-preview green"></div>
+                        <span>Verde</span>
+                    </button>
+                    <button class="theme-option ${currentTheme === 'red' ? 'active' : ''}" data-theme="red">
+                        <div class="theme-preview red"></div>
+                        <span>Rosso</span>
+                    </button>
+                    <button class="theme-option ${currentTheme === 'purple' ? 'active' : ''}" data-theme="purple">
+                        <div class="theme-preview purple"></div>
+                        <span>Viola</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Notifiche</h3>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="notifications-toggle" ${notificationPermission ? 'checked' : ''}>
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Abilita notifiche</span>
+
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Informazioni</h3>
+                <div class="info-item">
+                    <span>Versione</span>
+                    <span>1.1.0</span>
+                </div>
+                <div class="info-item">
+                    <span>Sviluppatore</span>
+                    <span>Visentin Manuel</span>
+                </div>
+                <a href="mailto:mvisentin2008@gmail.com"<button class="segnala"><span class="material-icons">bug_report</span>Segnala un bug</button>
+            </div>
+        </div>
+    `;
+    
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const theme = this.dataset.theme;
+            setTheme(theme);
+        });
+    });
+    
+    document.getElementById('notifications-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            Notification.requestPermission().then(permission => {
+                notificationPermission = permission === 'granted';
+                if (!notificationPermission) {
+                    this.checked = false;
                 }
-            }
+            });
         }
     });
     
-    setTimeout(checkAlarms, 60000 - now.getSeconds() * 1000 - now.getMilliseconds());
+    document.getElementById('install-btn')?.addEventListener('click', () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+            });
+        }
+    });
 }
 
-function updateCurrentTime() {
-    if (currentSection === 'timers') {
-        document.getElementById('current-time').textContent = formatTime(new Date());
-        setTimeout(updateCurrentTime, 1000);
+// Funzioni per il cronometro
+function toggleStopwatch() {
+    if (stopwatch.running) {
+        stopStopwatch();
+    } else {
+        startStopwatch();
     }
+}
+
+function startStopwatch() {
+    if (!stopwatch.running) {
+        stopwatch.running = true;
+        stopwatch.startTime = Date.now() - stopwatch.elapsed;
+        startStopwatchUpdate();
+        saveStopwatch();
+        
+        const startStopBtn = document.getElementById('stopwatch-start-stop');
+        const lapResetBtn = document.getElementById('stopwatch-lap-reset');
+        
+        if (startStopBtn) {
+            startStopBtn.className = 'stopwatch-btn stop';
+            startStopBtn.innerHTML = '<span class="material-icons">pause</span>';
+        }
+        
+        if (lapResetBtn) {
+            lapResetBtn.className = 'stopwatch-btn lap';
+            lapResetBtn.innerHTML = '<span class="material-icons">flag</span>';
+        }
+    }
+}
+
+function stopStopwatch() {
+    if (stopwatch.running) {
+        stopwatch.running = false;
+        stopwatch.elapsed = Date.now() - stopwatch.startTime;
+        saveStopwatch();
+        
+        const startStopBtn = document.getElementById('stopwatch-start-stop');
+        const lapResetBtn = document.getElementById('stopwatch-lap-reset');
+        
+        if (startStopBtn) {
+            startStopBtn.className = 'stopwatch-btn start';
+            startStopBtn.innerHTML = '<span class="material-icons">play_arrow</span>';
+        }
+        
+        if (lapResetBtn) {
+            lapResetBtn.className = 'stopwatch-btn reset';
+            lapResetBtn.innerHTML = '<span class="material-icons">replay</span>';
+        }
+    }
+}
+
+function resetStopwatch() {
+    stopwatch = {
+        running: false,
+        startTime: 0,
+        elapsed: 0,
+        laps: []
+    };
+    saveStopwatch();
+    updateStopwatchDisplay();
+    
+    const lapsContainer = document.getElementById('laps-container');
+    if (lapsContainer) {
+        lapsContainer.innerHTML = '';
+    }
+}
+
+function addLap() {
+    if (stopwatch.running) {
+        const lapTime = Date.now() - stopwatch.startTime;
+        stopwatch.laps.push(lapTime);
+        saveStopwatch();
+        
+        const lapsContainer = document.getElementById('laps-container');
+        if (lapsContainer) {
+            if (stopwatch.laps.length === 1) {
+                lapsContainer.innerHTML = `
+                    <div class="laps-header">
+                        <span>Giro</span>
+                        <span>Tempo</span>
+                    </div>
+                `;
+            }
+            
+            const lapItem = document.createElement('div');
+            lapItem.className = 'lap-item';
+            lapItem.innerHTML = `
+                <span>Giro ${stopwatch.laps.length}</span>
+                <span>${formatStopwatchTime(lapTime)}</span>
+            `;
+            lapsContainer.appendChild(lapItem);
+        }
+    }
+}
+
+function startStopwatchUpdate() {
+    if (stopwatch.running) {
+        updateStopwatchDisplay();
+        setTimeout(startStopwatchUpdate, 10);
+    }
+}
+
+function updateStopwatchDisplay() {
+    const display = document.getElementById('stopwatch-display');
+    if (display) {
+        const elapsed = stopwatch.running ? Date.now() - stopwatch.startTime : stopwatch.elapsed;
+        display.textContent = formatStopwatchTime(elapsed);
+    }
+}
+
+function formatStopwatchTime(ms) {
+    const date = new Date(ms);
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+    const milliseconds = Math.floor(date.getUTCMilliseconds() / 10).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+}
+
+function saveStopwatch() {
+    localStorage.setItem('stopwatch', JSON.stringify({
+        startTime: stopwatch.startTime,
+        elapsed: stopwatch.elapsed,
+        laps: stopwatch.laps
+    }));
 }
 
 function createNewTimer() {
@@ -464,7 +806,6 @@ function createNewTimer() {
         loadSection(currentSection);
     }
     
-    // Reset form
     document.getElementById('hours').value = '';
     document.getElementById('minutes').value = '';
     document.getElementById('seconds').value = '';
@@ -498,11 +839,10 @@ function createNewAlarm() {
     saveAlarms();
     alarmModal.style.display = 'none';
     
-    if (currentSection === 'home' || currentSection === 'timers') {
+    if (currentSection === 'home' || currentSection === 'alarms') {
         loadSection(currentSection);
     }
     
-    // Reset form
     document.getElementById('alarm-time').value = '';
     document.getElementById('alarm-name').value = '';
     document.querySelectorAll('.days button').forEach(btn => {
@@ -512,13 +852,14 @@ function createNewAlarm() {
 
 function toggleTimer(timer) {
     if (activeTimer && activeTimer.id === timer.id) {
-        // Pause the timer
         clearInterval(activeTimer.interval);
         activeTimer = null;
         localStorage.removeItem('activeTimer');
+        closeAllNotifications();
     } else {
         if (activeTimer) {
             clearInterval(activeTimer.interval);
+            closeAllNotifications();
         }
         
         const now = new Date().getTime();
@@ -526,6 +867,7 @@ function toggleTimer(timer) {
         
         activeTimer = {
             id: timer.id,
+            name: timer.name,
             endTime: endTime,
             duration: timer.duration
         };
@@ -540,6 +882,8 @@ function toggleTimer(timer) {
 }
 
 function startTimerCountdown(timer) {
+    showNotification('Timer avviato', `Timer "${timer.name || 'Senza nome'}" avviato`);
+    
     timer.interval = setInterval(() => {
         const now = new Date().getTime();
         const remaining = timer.endTime - now;
@@ -549,15 +893,7 @@ function startTimerCountdown(timer) {
             activeTimer = null;
             localStorage.removeItem('activeTimer');
             
-            if (Notification.permission === 'granted') {
-                new Notification('Timer completato!');
-            } else if (Notification.permission !== 'denied') {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        new Notification('Timer completato!');
-                    }
-                });
-            }
+            showNotification('Timer completato!', `Il timer "${timer.name || 'Senza nome'}" è scaduto`, true);
             
             if (currentSection === 'home' || currentSection === 'timers') {
                 loadSection(currentSection);
@@ -570,7 +906,43 @@ function startTimerCountdown(timer) {
                 bar.style.width = `${calculateProgress(timer)}%`;
             });
         }
+        
+        if (document.hidden) {
+            updateTimerNotification(timer, remaining);
+        }
     }, 1000);
+}
+
+function checkAlarms() {
+    const now = new Date();
+    const currentHours = now.getHours().toString().padStart(2, '0');
+    const currentMinutes = now.getMinutes().toString().padStart(2, '0');
+    const currentDay = now.getDay();
+    
+    alarms.forEach(alarm => {
+        if (!alarm.active) return;
+        
+        const [alarmHours, alarmMinutes] = alarm.time.split(':');
+        
+        if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
+            if (!alarm.days || alarm.days.includes(currentDay)) {
+                showNotification(
+                    alarm.name || 'Sveglia', 
+                    `È ora! (${alarm.time})`, 
+                    true
+                );
+            }
+        }
+    });
+    
+    setTimeout(checkAlarms, 60000 - now.getSeconds() * 1000 - now.getMilliseconds());
+}
+
+function updateCurrentTime() {
+    if (currentSection === 'timers') {
+        document.getElementById('current-time').textContent = formatTime(new Date());
+        setTimeout(updateCurrentTime, 1000);
+    }
 }
 
 function calculateProgress(timer) {
@@ -621,7 +993,6 @@ function generateId() {
 
 function formatTime(time) {
     if (typeof time === 'number') {
-        // It's a duration in seconds
         const hours = Math.floor(time / 3600);
         const minutes = Math.floor((time % 3600) / 60);
         const seconds = time % 60;
@@ -651,18 +1022,10 @@ function formatDays(days) {
     return days.map(day => dayNames[day]).join(', ');
 }
 
-function loadSettings() {
-    // Set selected theme
-    document.querySelectorAll('.theme-option').forEach(option => {
-        option.classList.toggle('active', option.dataset.theme === currentTheme);
-    });
-}
-
 function setTheme(theme) {
     currentTheme = theme;
     localStorage.setItem('theme', theme);
     applyTheme();
-    loadSettings();
 }
 
 function applyTheme() {
@@ -689,9 +1052,39 @@ function applyTheme() {
             root.style.setProperty('--secondary-color', '#1E1E1E');
             root.style.setProperty('--accent-color', '#BB86FC');
             break;
-        default: // default theme
+        default:
             root.style.setProperty('--primary-color', '#5782c9');
             root.style.setProperty('--secondary-color', '#34A853');
             root.style.setProperty('--accent-color', '#EA4335');
+    }
+}
+
+function showNotification(title, body, requireInteraction = false) {
+    if (!('Notification' in window)) return;
+    
+    if (Notification.permission === 'granted') {
+        const options = {
+            body: body,
+            icon: '/icons/icon-192x192.png',
+            badge: '/icons/badge-72x72.png',
+            vibrate: [200, 100, 200],
+            requireInteraction: requireInteraction
+        };
+        
+        if (serviceWorkerRegistration) {
+            serviceWorkerRegistration.showNotification(title, options);
+        } else {
+            new Notification(title, options);
+        }
+    }
+}
+
+function closeAllNotifications() {
+    if ('serviceWorker' in navigator && serviceWorkerRegistration) {
+        serviceWorkerRegistration.getNotifications().then(notifications => {
+            notifications.forEach(notification => {
+                notification.close();
+            });
+        });
     }
 }

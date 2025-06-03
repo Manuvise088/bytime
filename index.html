@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#5782c9">
 </head>
 <body>
     <header>
@@ -30,59 +32,76 @@
             <span class="material-icons">alarm</span>
             <span>Timer e Sveglie</span>
         </button>
+        <button class="nav-btn" data-section="cronometers">
+            <span class="material-icons">timer</span>
+            <span>Cronometro</span>
+        </button>
     </nav>
-    <!-- Aggiungi questo prima degli altri modal -->
-<div id="settings-modal" class="modal">
-    <div class="modal-content">
-        <div class="settings-header">
-            <button id="back-btn" class="icon-btn">
-                <span class="material-icons">arrow_back</span>
-            </button>
-            <h2>Impostazioni</h2>
-        </div>
-        
-        <div class="settings-section">
-            <h3>Tema</h3>
-            <div class="theme-options">
-                <button class="theme-option" data-theme="default">
-                    <div class="theme-preview default"></div>
-                    <span>Predefinito</span>
+
+    <div id="add-menu" class="add-menu">
+        <button class="add-menu-item" id="add-timer-menu">
+            <span class="material-icons">timer</span>
+            <span>Timer</span>
+        </button>
+        <button class="add-menu-item" id="add-alarm-menu">
+            <span class="material-icons">alarm_add</span>
+            <span>Sveglia</span>
+        </button>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="settings-header">
+                <button id="back-btn" class="icon-btn">
+                    <span class="material-icons">arrow_back</span>
                 </button>
-                <button class="theme-option" data-theme="green">
-                    <div class="theme-preview green"></div>
-                    <span>Verde</span>
-                </button>
-                <button class="theme-option" data-theme="red">
-                    <div class="theme-preview red"></div>
-                    <span>Rosso</span>
-                </button>
-                <button class="theme-option" data-theme="purple">
-                    <div class="theme-preview purple"></div>
-                    <span>Viola</span>
-                </button>
+                <h2>Impostazioni</h2>
             </div>
-        </div>
-        
-        <div class="settings-section">
-            <h3>Lingua</h3>
-            <select id="language-select" class="settings-select">
-                <option value="it">Italiano</option>
-            </select>
-        </div>
-        
-        <div class="settings-section">
-            <h3>Informazioni</h3>
-            <div class="info-item">
-                <span>Versione</span>
-                <span>1.0.0</span>
+            
+            <div class="settings-section">
+                <h3>Tema</h3>
+                <div class="theme-options">
+                    <button class="theme-option" data-theme="default">
+                        <div class="theme-preview default"></div>
+                        <span>Predefinito</span>
+                    </button>
+                    <button class="theme-option" data-theme="green">
+                        <div class="theme-preview green"></div>
+                        <span>Verde</span>
+                    </button>
+                    <button class="theme-option" data-theme="red">
+                        <div class="theme-preview red"></div>
+                        <span>Rosso</span>
+                    </button>
+                    <button class="theme-option" data-theme="purple">
+                        <div class="theme-preview purple"></div>
+                        <span>Viola</span>
+                    </button>
+                </div>
             </div>
-            <div class="info-item">
-                <span>Sviluppatore</span>
-                <span>Visentin Manuel</span>
+            
+            <div class="settings-section">
+                <h3>Lingua</h3>
+                <select id="language-select" class="settings-select">
+                    <option value="it">Italiano</option>
+                </select>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Informazioni</h3>
+                <div class="info-item">
+                    <span>Versione</span>
+                    <span>1.1.0</span>
+                </div>
+                <div class="info-item">
+                    <span>Sviluppatore</span>
+                    <span>Visentin Manuel</span>
+                    <a href="mailto:mvisentin2008@gmail.com"<button class="segnala"><span class="material-icons">bug_report</span>Segnala un bug</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
     <div id="timer-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -128,6 +147,11 @@
         </div>
     </div>
 
+    <button class="fab" id="add-btn">
+        <span class="material-icons">add</span>
+    </button>
+
     <script src="script.js"></script>
+    <script src="sw.js"></script>
 </body>
 </html>
