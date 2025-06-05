@@ -639,3 +639,24 @@ main {
     backdrop-filter: blur(100px);
     -webkit-backdrop-filter: blur(100px);
 }
+
+#stopwatch-display {
+    text-align: center;
+    font-size: 7vh;
+}
+
+.stopwatch-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.stopwatch-controls button {
+    margin-left: 10px;
+    border-radius: 100px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: var(--primary-color);
+    border: none;
+}

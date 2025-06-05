@@ -280,10 +280,6 @@ function loadHomeSection() {
 function loadStopwatchSection() {
     mainContent.innerHTML = `
         <div class="section-title">
-            <h2>Cronometri recenti</h2>
-            <a href="#" class="section-btn" data-section="cronometers">
-                <span class="material-icons">timer</span>
-                <span>Vedi tutti</span>
             </a>
         </div>
         
