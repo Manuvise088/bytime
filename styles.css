@@ -660,3 +660,107 @@ main {
     background-color: var(--primary-color);
     border: none;
 }
+/* Aggiungi alla sezione settings */
+.accessibility-description {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+/* Stile per lo switch di accessibilità */
+.switch-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.switch-container span {
+    margin-left: 10px;
+    font-size: 0.95rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #666;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+/* Stili per modalità accessibilità */
+body.accessibility-mode {
+    --primary-color: #1565C0;
+    --secondary-color: #0D47A1;
+    --accent-color: #FF6D00;
+}
+
+body.accessibility-mode .card,
+body.accessibility-mode .modal-content,
+body.accessibility-mode .add-menu,
+body.accessibility-mode .settings-select,
+body.accessibility-mode #timer-name,
+body.accessibility-mode #alarm-name,
+body.accessibility-mode .time-input input,
+body.accessibility-mode #alarm-time,
+body.accessibility-mode .days button {
+    border-radius: 0 !important;
+}
+
+body.accessibility-mode .nav-btn,
+body.accessibility-mode .nav-btn .material-icons,
+body.accessibility-mode .tab-btn.active::after,
+body.accessibility-mode .progress,
+body.accessibility-mode .progress-bar,
+body.accessibility-mode #add-btn,
+body.accessibility-mode .stopwatch-controls button {
+    border-radius: 0 !important;
+}
+
+body.accessibility-mode {
+    font-weight: bold;
+}
+
+body.accessibility-mode .card {
+    border: 2px solid #444;
+}
+
+body.accessibility-mode .time-display {
+    font-size: 1rem;
+}
