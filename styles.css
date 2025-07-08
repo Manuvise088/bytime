@@ -1071,12 +1071,17 @@ body.accessibility-mode .time-display {
 .account-details {
     display: flex;
     align-items: center;
-    gap: 8vh;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
-#icon_account {
-    font-size: 10vh !important;
-    color: white;
+.user-avatar, #icon_account {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    font-size: 60px;
+    color: var(--primary-color);
 }
 
 .account-text h3 {
@@ -1086,11 +1091,14 @@ body.accessibility-mode .time-display {
 }
 
 .account-type {
-    margin: 4px 0 0;
-    font-size: 0.85rem;
-    color: #aaa;
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
 }
 
+#change-username-btn {
+    margin-top: 8px;
+}
 .btn-secondary.small {
     padding: 8px 12px;
     font-size: 0.9rem;

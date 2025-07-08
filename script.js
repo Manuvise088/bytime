@@ -248,30 +248,32 @@ function showUsernamePrompt() {
         saveButton.classList.toggle('disabled', !username);
     });
 
-    // Save user data
-    document.getElementById('save-username-btn').addEventListener('click', function() {
-        const username = usernameInput.value.trim();
-        if (!username) return;
-        
-        currentUser = username;
-        localStorage.setItem('username', username);
-        
-        // Save image if present
-        if (avatarFile) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                localStorage.setItem('userAvatar', event.target.result);
-                userAvatar = event.target.result;
-                restoreUI();
-                loadSection('home');
-            };
-            reader.readAsDataURL(avatarFile);
-        } else {
+// Save user data
+document.getElementById('save-username-btn').addEventListener('click', function() {
+    const username = usernameInput.value.trim();
+    if (!username) return;
+    
+    currentUser = username;
+    localStorage.setItem('username', username);
+    
+    // Handle avatar update
+    if (avatarFile) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            localStorage.setItem('userAvatar', event.target.result);
+            userAvatar = event.target.result;
             restoreUI();
             loadSection('home');
-        }
-    });
-    
+        };
+        reader.readAsDataURL(avatarFile);
+    } else {
+        // Explicitly remove the avatar if no file is selected
+        localStorage.removeItem('userAvatar');
+        userAvatar = null;
+        restoreUI();
+        loadSection('home');
+    }
+});
     // Skip username setup
     document.getElementById('skip-username-btn').addEventListener('click', function() {
         currentUser = 'Guest';
@@ -895,19 +897,12 @@ function loadSettingsSection() {
     document.querySelector('.fab').style.display = 'none';
     mainContent.innerHTML = `
         <div class="settings-page">
-            <div class="settings-header">
-                <button id="settings-back-btn" class="icon-btn back-btn">
-                    <span class="material-icons">arrow_back</span>
-                </button>
-                <h3>Torna indietro</h3>
-            </div>
-            
             <div class="settings-section">
                 <h4>Account</h4>
                 <div class="account-details">
                     ${userAvatar ? 
                         `<img src="${userAvatar}" alt="Avatar" class="user-avatar">` : 
-                        `<span id="icon_account" class="material-icons">account_circle</span>`
+                        `<span class="material-icons">account_circle</span>`
                     }
                     <div class="account-text">
                         <h3>${currentUser || 'Utente'}</h3>
@@ -919,7 +914,6 @@ function loadSettingsSection() {
                     Modifica
                 </button>
             </div>
-            
             <div class="settings-section">
                 <h4>Tema</h4>
                 <div class="theme-options">
@@ -969,7 +963,7 @@ function loadSettingsSection() {
                 <h4>Informazioni</h4>
                 <div class="info-item">
                     <span>Versione</span>
-                    <span>1.3.0</span>
+                    <span>1.3.1</span>
                 </div>
                 <div class="info-item">
                     <span>Sviluppatore</span>
