@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function showUsernamePrompt() {
     document.querySelector('nav').style.display = 'none';
     document.getElementById('add-btn').style.display = 'none';
-    
+    document.getElementById('account-btn').style.display = 'none';
     mainContent.innerHTML = `
         <div class="username-page">
             <div class="username-header">
@@ -396,6 +396,20 @@ function loadSection(section) {
     currentSection = section;
     headerTitle.textContent = getSectionTitle(section);
     
+    // Handle back button visibility
+    if (section === 'home' || section === 'settings') {
+        backBtn.style.display = 'none';
+    } else {
+        backBtn.style.display = 'flex';
+    }
+    
+    // Handle account button visibility
+    if (section === 'settings') {
+        accountBtn.style.display = 'none';
+    } else {
+        accountBtn.style.display = 'flex';
+    }
+    
     switch(section) {
         case 'home':
             loadHomeSection();
@@ -527,91 +541,40 @@ function loadTimersSection() {
     document.querySelector('.fab').style.display = 'flex';
     
     mainContent.innerHTML = `
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="timers">Timer</button>
-            <button class="tab-btn" data-tab="alarms">Sveglie</button>
-        </div>
-        
-        <div class="tab-content active" id="timers-tab">
-            ${timers.length > 0 ? 
-                timers.map(timer => `
-                    <div class="card" data-id="${timer.id}">
-                        <div class="card-content">
-                            <div>
-                                <h3>${timer.name || 'Timer'}</h3>
-                                <p class="time-display">${formatTime(timer.duration)}</p>
-                            </div>
-                            <div class="timer-actions">
-                                <button class="icon-btn play-btn">
-                                    <span class="material-icons">${timer.id === activeTimer?.id ? 'pause' : 'play_arrow'}</span>
-                                </button>
-                                <button class="icon-btn delete-timer-btn">
-                                    <span class="material-icons">delete</span>
-                                </button>
-                            </div>
+        ${timers.length > 0 ? 
+            timers.map(timer => `
+                <div class="card" data-id="${timer.id}">
+                    <div class="card-content">
+                        <div>
+                            <h3>${timer.name || 'Timer'}</h3>
+                            <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
-                        ${timer.id === activeTimer?.id ? 
-                            `<div class="progress-bar">
-                                <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
-                            </div>` : ''
-                        }
-                    </div>
-                `).join('') : 
-                `<div class="empty-state">
-                    <span class="material-icons">timer</span>
-                    <p>Nessun timer impostato</p>
-                    <button id="create-first-timer" class="btn-primary">
-                        <span class="material-icons">add</span>
-                        Crea il tuo primo timer
-                    </button>
-                </div>`
-            }
-        </div>
-        
-        <div class="tab-content" id="alarms-tab">
-            ${alarms.length > 0 ? 
-                alarms.map(alarm => `
-                    <div class="card" data-id="${alarm.id}">
-                        <div class="card-content">
-                            <div>
-                                <h3>${alarm.name || 'Sveglia'}</h3>
-                                <p class="time-display">${formatAlarmTime(alarm.time)} ${alarm.days ? `(${formatDays(alarm.days)})` : ''}</p>
-                            </div>
-                            <div class="alarm-actions">
-                                <button class="icon-btn toggle-alarm-btn">
-                                    <span class="material-icons ${alarm.active ? 'active' : 'inactive'}">${alarm.active ? 'notifications_active' : 'notifications_off'}</span>
-                                </button>
-                                <button class="icon-btn delete-alarm-btn">
-                                    <span class="material-icons">delete</span>
-                                </button>
-                            </div>
+                        <div class="timer-actions">
+                            <button class="icon-btn play-btn">
+                                <span class="material-icons">${timer.id === activeTimer?.id ? 'pause' : 'play_arrow'}</span>
+                            </button>
+                            <button class="icon-btn delete-timer-btn">
+                                <span class="material-icons">delete</span>
+                            </button>
                         </div>
                     </div>
-                `).join('') : 
-                `<div class="empty-state">
-                    <span class="material-icons">alarm</span>
-                    <p>Nessuna sveglia impostata</p>
-                    <button id="create-first-alarm" class="btn-primary">
-                        <span class="material-icons">add</span>
-                        Crea la tua prima sveglia
-                    </button>
-                </div>`
-            }
-        </div>
+                    ${timer.id === activeTimer?.id ? 
+                        `<div class="progress-bar">
+                            <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
+                        </div>` : ''
+                    }
+                </div>
+            `).join('') : 
+            `<div class="empty-state">
+                <span class="material-icons">timer</span>
+                <p>Nessun timer impostato</p>
+                <button id="create-first-timer" class="btn-primary">
+                    <span class="material-icons">add</span>
+                    Crea il tuo primo timer
+                </button>
+            </div>`
+        }
     `;
-
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabId = this.dataset.tab;
-            
-            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(`${tabId}-tab`).classList.add('active');
-        });
-    });
 
     // Timer controls
     document.querySelectorAll('.play-btn').forEach(btn => {
@@ -630,6 +593,46 @@ function loadTimersSection() {
         });
     });
 
+    // Create first timer button
+    document.getElementById('create-first-timer')?.addEventListener('click', function() {
+        timerModal.style.display = 'block';
+    });
+}
+
+function loadAlarmsSection() {
+    document.querySelector('.fab').style.display = 'flex';
+    
+    mainContent.innerHTML = `
+        ${alarms.length > 0 ? 
+            alarms.map(alarm => `
+                <div class="card" data-id="${alarm.id}">
+                    <div class="card-content">
+                        <div>
+                            <h3>${alarm.name || 'Sveglia'}</h3>
+                            <p class="time-display">${formatAlarmTime(alarm.time)} ${alarm.days ? `(${formatDays(alarm.days)})` : ''}</p>
+                        </div>
+                        <div class="alarm-actions">
+                            <button class="icon-btn toggle-alarm-btn">
+                                <span class="material-icons ${alarm.active ? 'active' : 'inactive'}">${alarm.active ? 'notifications_active' : 'notifications_off'}</span>
+                            </button>
+                            <button class="icon-btn delete-alarm-btn">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('') : 
+            `<div class="empty-state">
+                <span class="material-icons">alarm</span>
+                <p>Nessuna sveglia impostata</p>
+                <button id="create-first-alarm" class="btn-primary">
+                    <span class="material-icons">add</span>
+                    Crea la tua prima sveglia
+                </button>
+            </div>`
+        }
+    `;
+
     // Toggle alarm
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -644,11 +647,6 @@ function loadTimersSection() {
             const alarmId = this.closest('.card').dataset.id;
             deleteAlarm(alarmId);
         });
-    });
-
-    // Create first timer button
-    document.getElementById('create-first-timer')?.addEventListener('click', function() {
-        timerModal.style.display = 'block';
     });
 
     // Create first alarm button
@@ -895,6 +893,7 @@ function capitalizeFirstLetter(string) {
 
 function loadSettingsSection() {
     document.querySelector('.fab').style.display = 'none';
+    document.getElementById('account-btn').style.display = 'none';
     mainContent.innerHTML = `
         <div class="settings-page">
             <div class="settings-section">
