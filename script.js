@@ -32,7 +32,6 @@ const addAlarmMenu = document.getElementById('add-alarm-menu');
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     applyTheme();
-    
     if (!currentUser) {
         showUsernamePrompt();
     } else {
@@ -87,19 +86,24 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function showUsernamePrompt() {
+    const isEditing = !!currentUser; // Verifica se l'utente esiste già
     document.querySelector('nav').style.display = 'none';
     document.getElementById('add-btn').style.display = 'none';
     document.getElementById('account-btn').style.display = 'none';
+    
     mainContent.innerHTML = `
         <div class="username-page">
             <div class="username-header">
-                <h1>Benvenuto in ByTime</h1>
-                <p>Personalizza la tua esperienza</p>
+                <h1>${isEditing ? 'Modifica il tuo profilo' : 'Benvenuto in ByTime'}</h1>
+                <p>${isEditing ? 'Aggiorna il tuo nome e la tua immagine' : 'Personalizza la tua esperienza'}</p>
             </div>
             
             <div class="avatar-section">
                 <div class="avatar-preview" id="avatar-preview">
-                    <span class="material-icons default-avatar">account_circle</span>
+                    ${userAvatar ? 
+                        `<img src="${userAvatar}" alt="Avatar">` : 
+                        `<span class="material-icons default-avatar">account_circle</span>`
+                    }
                 </div>
                 <label for="avatar-upload" class="btn-upload">
                     <span class="material-icons">add_a_photo</span>
@@ -118,18 +122,19 @@ function showUsernamePrompt() {
                         maxlength="20"
                         autocomplete="off"
                         autocapitalize="words"
+                        value="${currentUser || ''}"
                     >
                     <div class="input-border"></div>
                 </div>
                 
                 <div class="username-actions">
-                    <button id="save-username-btn" class="btn-primary" disabled>
+                    <button id="save-username-btn" class="btn-primary" ${isEditing ? '' : 'disabled'}>
                         <span class="material-icons">check</span>
-                        Conferma
+                        ${isEditing ? 'Salva modifiche' : 'Conferma'}
                     </button>
                     <button id="skip-username-btn" class="btn-secondary">
-                        <span class="material-icons">arrow_forward</span>
-                        Salta e continua
+                        <span class="material-icons">${isEditing ? 'arrow_back' : 'arrow_forward'}</span>
+                        ${isEditing ? 'Torna indietro' : 'Salta e continua'}
                     </button>
                 </div>
             </div>
@@ -213,12 +218,15 @@ function showUsernamePrompt() {
         }
     `;
     document.head.appendChild(style);
-
     let avatarFile = null;
     const avatarPreview = document.getElementById('avatar-preview');
     const avatarUpload = document.getElementById('avatar-upload');
     const usernameInput = document.getElementById('username-input');
     const saveButton = document.getElementById('save-username-btn');
+
+    if (isEditing) {
+        saveButton.disabled = !currentUser;
+    }
 
     // Handle image upload
     avatarUpload.addEventListener('change', function(e) {
@@ -248,45 +256,63 @@ function showUsernamePrompt() {
         saveButton.classList.toggle('disabled', !username);
     });
 
-// Save user data
-document.getElementById('save-username-btn').addEventListener('click', function() {
-    const username = usernameInput.value.trim();
-    if (!username) return;
-    
-    currentUser = username;
-    localStorage.setItem('username', username);
-    
-    // Handle avatar update
-    if (avatarFile) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            localStorage.setItem('userAvatar', event.target.result);
-            userAvatar = event.target.result;
+ document.getElementById('save-username-btn').addEventListener('click', function() {
+        const username = usernameInput.value.trim();
+        if (!username) return;
+        
+        currentUser = username;
+        localStorage.setItem('username', username);
+        
+        // Handle avatar update
+        if (avatarFile) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                localStorage.setItem('userAvatar', event.target.result);
+                userAvatar = event.target.result;
+                restoreUI();
+                if (isEditing) {
+                    loadSection('settings'); // Torna alle impostazioni se stava modificando
+                } else {
+                    loadSection('home');
+                }
+            };
+            reader.readAsDataURL(avatarFile);
+        } else {
+            // Se stiamo modificando e non selezioniamo una nuova immagine, mantieni quella esistente
+            if (!isEditing) {
+                localStorage.removeItem('userAvatar');
+                userAvatar = null;
+            }
+            restoreUI();
+            if (isEditing) {
+                loadSection('settings'); // Torna alle impostazioni se stava modificando
+            } else {
+                loadSection('home');
+            }
+        }
+    });
+
+    // Skip username setup o torna indietro
+    document.getElementById('skip-username-btn').addEventListener('click', function() {
+        if (isEditing) {
+            // Torna alle impostazioni se stava modificando
+            restoreUI();
+            loadSection('settings');
+        } else {
+            // Comportamento originale per nuovo utente
+            currentUser = 'Guest';
+            localStorage.setItem('username', 'Guest');
+            localStorage.removeItem('userAvatar');
+            userAvatar = null;
             restoreUI();
             loadSection('home');
-        };
-        reader.readAsDataURL(avatarFile);
-    } else {
-        // Explicitly remove the avatar if no file is selected
-        localStorage.removeItem('userAvatar');
-        userAvatar = null;
-        restoreUI();
-        loadSection('home');
-    }
-});
-    // Skip username setup
-    document.getElementById('skip-username-btn').addEventListener('click', function() {
-        currentUser = 'Guest';
-        localStorage.setItem('username', 'Guest');
-        localStorage.removeItem('userAvatar');
-        userAvatar = null;
-        restoreUI();
-        loadSection('home');
+        }
     });
 
     function restoreUI() {
         document.querySelector('nav').style.display = 'flex';
         document.getElementById('add-btn').style.display = 'flex';
+        document.getElementById('account-btn').style.display = 'flex';
         document.head.removeChild(style);
     }
 }
@@ -306,12 +332,13 @@ function getGreeting() {
     } else if (hours > 18 && hours <= 22) {
         return `Buonasera, ${currentUser}!`;
     } else {
-        return `Buona notte, ${currentUser}!`;
+        return `Buonanotte, ${currentUser}!`;
     }
 }
 
+
 function setupEventListeners() {
-    // Navigation buttons
+
     document.querySelectorAll('.nav-btn').forEach(button => {
         button.addEventListener('click', function() {
             const section = this.dataset.section;
@@ -319,12 +346,9 @@ function setupEventListeners() {
             
             document.querySelectorAll('.nav-btn').forEach(navBtn => navBtn.classList.remove('active'));
             this.classList.add('active');
-            
-            backBtn.style.display = section === 'home' ? 'none' : 'flex';
         });
     });
 
-    // Back button
     backBtn.addEventListener('click', () => {
         loadSection('home');
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -333,16 +357,15 @@ function setupEventListeners() {
                 btn.classList.add('active');
             }
         });
-        backBtn.style.display = 'none';
     });
 
-    // Add button menu
     addBtn.addEventListener('click', toggleAddMenu);
     addTimerMenu.addEventListener('click', () => {
         timerModal.style.display = 'block';
         addMenu.classList.remove('show');
         addBtn.classList.remove('menu-open');
     });
+
     addAlarmMenu.addEventListener('click', () => {
         alarmModal.style.display = 'block';
         addMenu.classList.remove('show');
@@ -440,7 +463,7 @@ function loadHomeSection() {
             <h1>${getGreeting()}</h1>
         </div>
         
-        <div class="section-title">
+        <div class="section-title-home">
             <h2>Timer recenti</h2>
             <a href="#" class="section-btn" data-section="timers">
                 <span class="material-icons">timer</span>
@@ -475,7 +498,7 @@ function loadHomeSection() {
         
         <div class="separator"></div>
         
-        <div class="section-title">
+        <div class="section-title-home">
             <h2>Sveglie recenti</h2>
             <a href="#" class="section-btn" data-section="alarms">
                 <span class="material-icons">alarm</span>
@@ -887,280 +910,395 @@ async function loadWeatherData() {
     }
 }
 
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 function loadSettingsSection() {
     document.querySelector('.fab').style.display = 'none';
     document.getElementById('account-btn').style.display = 'none';
     mainContent.innerHTML = `
         <div class="settings-page">
             <div class="settings-section">
-                <h4>Account</h4>
-                <div class="account-details">
-                    ${userAvatar ? 
-                        `<img src="${userAvatar}" alt="Avatar" class="user-avatar">` : 
-                        `<span class="material-icons">account_circle</span>`
-                    }
-                    <div class="account-text">
-                        <h3>${currentUser || 'Utente'}</h3>
-                        <p class="account-type">Account locale</p>
+                <h2 class="section-title">Account</h2>
+                <div class="section-content">
+                    <div class="account-details">
+                        ${userAvatar ? 
+                            `<img src="${userAvatar}" alt="Avatar" class="user-avatar">` : 
+                            `<span class="material-icons">account_circle</span>`
+                        }
+                        <div class="account-text">
+                            <h3>${currentUser || 'Utente'}</h3>
+                            <p class="account-type">Account locale</p>
+                        </div>
+                    </div>
+                    <button id="change-username-btn" class="btn-secondary small">
+                        <span class="material-icons">edit</span>
+                        Modifica
+                    </button>
+                </div>
+            </div>
+            
+            <div class="settings-divider"></div>
+            
+            <div class="settings-section">
+                <h2 class="section-title">Aspetto</h2>
+                <div class="section-content">
+                    <div class="settings-group">
+                        <h4 class="group-title">Tema dell'app</h4>
+                        <div class="theme-options">
+                            <button class="theme-option ${currentTheme === 'default' ? 'active' : ''}" data-theme="default">
+                                <div class="theme-preview default"></div>
+                                <span>Predefinito</span>
+                            </button>
+                            <button class="theme-option ${currentTheme === 'green' ? 'active' : ''}" data-theme="green">
+                                <div class="theme-preview green"></div>
+                                <span>Verde</span>
+                            </button>
+                            <button class="theme-option ${currentTheme === 'red' ? 'active' : ''}" data-theme="red">
+                                <div class="theme-preview red"></div>
+                                <span>Rosso</span>
+                            </button>
+                            <button class="theme-option ${currentTheme === 'purple' ? 'active' : ''}" data-theme="purple">
+                                <div class="theme-preview purple"></div>
+                                <span>Viola</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <button id="change-username-btn" class="btn-secondary small">
-                    <span class="material-icons">edit</span>
-                    Modifica
-                </button>
             </div>
+            
+            <div class="settings-divider"></div>
+            
             <div class="settings-section">
-                <h4>Tema</h4>
-                <div class="theme-options">
-                    <button class="theme-option ${currentTheme === 'default' ? 'active' : ''}" data-theme="default">
-                        <div class="theme-preview default"></div>
-                        <span>Predefinito</span>
-                    </button>
-                    <button class="theme-option ${currentTheme === 'green' ? 'active' : ''}" data-theme="green">
-                        <div class="theme-preview green"></div>
-                        <span>Verde</span>
-                    </button>
-                    <button class="theme-option ${currentTheme === 'red' ? 'active' : ''}" data-theme="red">
-                        <div class="theme-preview red"></div>
-                        <span>Rosso</span>
-                    </button>
-                    <button class="theme-option ${currentTheme === 'purple' ? 'active' : ''}" data-theme="purple">
-                        <div class="theme-preview purple"></div>
-                        <span>Viola</span>
-                    </button>
+                <h2 class="section-title">Preferenze</h2>
+                <div class="section-content">
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">Notifiche</h4>
+                                <p class="group-description">Attiva o disattiva le notifiche push per timer e sveglie</h4>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="notifications-toggle" ${notificationPermission ? 'checked' : ''}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">Localizzazione</h4>
+                                <p class="group-description">Condividi la posizione per informazioni locali precise</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="location-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="settings-section">
-                <h4>Notifiche</h4>
-                <div class="switch-container">
-                    <label class="switch">
-                        <input type="checkbox" id="notifications-toggle" ${notificationPermission ? 'checked' : ''}>
-                        <span class="slider round"></span>
-                    </label>
-                    <span>Abilita notifiche</span>
-                </div>
-            </div>
+            <div class="settings-divider"></div>
             
             <div class="settings-section">
-                <h4>Localizzazione</h4>
-                <div class="switch-container">
-                    <label class="switch">
-                        <input type="checkbox" id="location-toggle">
-                        <span class="slider round"></span>
-                    </label>
-                    <span>Abilita geolocalizzazione</span>
+                <h2 class="section-title">Informazioni</h2>
+                <div class="section-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span>Versione</span>
+                            <span>1.3.2</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Sviluppatore</span>
+                            <span>Visentin Manuel</span>
+                        </div>
+                    </div>
+                    <a href="mailto:mvisentin2008@gmail.com">
+                        <button class="segnala">
+                            <span class="material-icons">bug_report</span>
+                            Segnala un bug
+                        </button>
+                    </a>
                 </div>
-                <p class="location-hint">Per visualizzare informazioni precise su alba e tramonto</p>
-            </div>
-            
-            <div class="settings-section">
-                <h4>Informazioni</h4>
-                <div class="info-item">
-                    <span>Versione</span>
-                    <span>1.3.1</span>
-                </div>
-                <div class="info-item">
-                    <span>Sviluppatore</span>
-                    <span>Visentin Manuel</span>
-                </div>
-                <a href="mailto:mvisentin2008@gmail.com">
-                    <button class="segnala">
-                        <span class="material-icons">bug_report</span>
-                        Segnala un bug
-                    </button>
-                </a>
             </div>
         </div>
     `;
 
-    // Add styles for settings section
     const style = document.createElement('style');
-    style.textContent = `
-        .settings-page {
-            padding: 20px;
-        }
-        .settings-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .settings-header h3 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: var(--text-primary);
-        }
-        #settings-back-btn {
-            background: none;
-            border: none;
-            color: var(--primary-color);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background-color 0.3s;
-            background-color: white;
-        }
-        .settings-section {
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .settings-section:last-child {
-            border-bottom: none;
-        }
-        .settings-section h4 {
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-        .account-details {
-            display: flex;
-            align-items: center;
-            gap: 3vh;
-            margin-bottom: 16px;
-        }
-        .user-avatar, #icon_account {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            font-size: 60px;
-            color: var(--primary-color);
-        }
-        #icon_account {
-            margin-right: 5vh;
-        }
-        .account-text h3 {
-            margin: 0;
-            font-size: 1.2rem;
-        }
-        .account-type {
-            margin: 0;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        .theme-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .theme-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: none;
-            cursor: pointer;
-        }
-        .theme-preview {
-            border-radius: 2vh;
-        }
-        .theme-preview.default {
-            background-color: #5782c9;
-        }
-        .theme-preview.green {
-            background-color: #2E7D32;
-        }
-        .theme-preview.red {
-            background-color: #C62828;
-        }
-        .theme-preview.purple {
-            background-color: #6A1B9A;
-        }
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-        }
-        input:checked + .slider {
-            background-color: var(--primary-color);
-        }
-        input:checked + .slider:before {
-            transform: translateX(16px);
-        }
-        .slider.round {
-            border-radius: 34px;
-        }
-        .slider.round:before {
-            border-radius: 50%;
-        }
-        .location-hint {
-            margin-top: 8px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .segnala, .segnala a {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 16px;
-            padding: 8px 16px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-    `;
-    document.head.appendChild(style);
+style.textContent = `
+    .settings-page {
+        padding: 0;
+    }
+    
+    .settings-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+    }
+    
+    .settings-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    #settings-back-btn {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: background-color 0.3s;
+        background-color: white;
+    }
+    
+    .settings-section {
+        padding: 1.5rem 1rem;
+        margin-bottom: 0;
+    }
+    
+    .settings-divider {
+        height: 8px;
+        background-color: #2a2a2a;
+        margin: 0;
+        border-radius: 2vh;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title::before {
+        content: '';
+        display: inline-block;
+        width: 4px;
+        height: 1.1rem;
+        background-color: var(--primary-color);
+        margin-right: 0.8rem;
+        border-radius: 2px;
+    }
+    
+    .section-content {
+        padding: 0 0.5rem;
+    }
+    
+    .account-details {
+        display: flex;
+        align-items: center;
+        gap: 3vh;
+        margin-bottom: 16px;
+    }
+    
+    .user-avatar, #icon_account {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        font-size: 60px;
+        color: var(--primary-color);
+    }
+    
+    #icon_account {
+        margin-right: 5vh;
+    }
+    
+    .account-text h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+    
+    .account-type {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .settings-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .settings-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .group-title {
+        font-size: 1rem;
+        margin: 0 0 0.3rem 0;
+        color: white;
+    }
+    
+    .group-description {
+        font-size: 0.85rem;
+        color: #aaa;
+        margin: 0;
+    }
+    
+    .theme-options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .theme-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: none;
+        cursor: pointer;
+    }
+    
+    .theme-preview {
+        border-radius: 2vh;
+    }
+    
+    .theme-preview.default {
+        background-color: #5782c9;
+    }
+    
+    .theme-preview.green {
+        background-color: #2E7D32;
+    }
+    
+    .theme-preview.red {
+        background-color: #C62828;
+    }
+    
+    .theme-preview.purple {
+        background-color: #6A1B9A;
+    }
+    
+    .switch-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 0;
+    }
+    
+    .switch-container:last-child {
+        border-bottom: none;
+    }
+    
+    .switch-info {
+        flex: 1;
+        margin-right: 1rem;
+    }
+    
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 24px;
+        width: 24px;
+        left: 4px;
+        top: 3px;
+        background-color: white;
+        transition: .4s;
+    }
+    
+    input:checked + .slider {
+        background-color: var(--primary-color);
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(16px);
+    }
+    
+    .slider.round {
+        border-radius: 34px;
+    }
+    
+    .slider.round:before {
+        border-radius: 50%;
+    }
+    
+    .location-hint {
+        margin-top: 8px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #444;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-item span:first-child {
+        color: #aaa;
+    }
+    
+    .info-item span:last-child {
+        color: white;
+        font-weight: normal;
+    }
+    
+    .segnala, .segnala a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 1.5rem;
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        text-decoration: none;
+        width: 100%;
+        justify-content: center;
+    }
+`;
+document.head.appendChild(style);
 
-    // Back button in settings
-    document.getElementById('settings-back-btn').addEventListener('click', () => {
-        loadSection('home');
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.section === 'home') {
-                btn.classList.add('active');
-            }
-        });
-        backBtn.style.display = 'none';
-        document.head.removeChild(style);
+    document.getElementById('account-btn').style.display = 'none';
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.section === 'settings') {
+            btn.classList.add('active');
+        }
     });
 
     // Theme selection

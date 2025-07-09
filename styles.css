@@ -10,9 +10,11 @@
     color: white;
     font-weight: bold;
 }
+
 .material.icons {
     color: white;
 }
+
 body {
     font-family: 'Varela Round', sans-serif;
     margin: 0;
@@ -30,6 +32,7 @@ body {
 body::-webkit-scrollbar {
     display: none;
 }
+
 #create-first-timer, #create-first-alarm {
     display: inline-flex;
     align-items: center;
@@ -37,20 +40,23 @@ body::-webkit-scrollbar {
     border-radius: 100px;
     padding-top: 5px;
     padding-bottom: 5px;
-    padding-left: 15px:
+    padding-left: 15px;
     padding-right: 15px;
     background-color: var(--primary-color);
     color: white;
     border: none;
     font-size: 2vh;
 }
+
 #create-first-timer span, #create-first-alarm span {
     color: white;
     margin-top: 5px;
 }
+
 body button {
     font-family: 'Varela Round', sans-serif;
 }
+
 header {
     display: flex;
     justify-content: space-between;
@@ -125,7 +131,6 @@ nav {
     z-index: 1;
 }
 
-
 .nav-btn.active {
     color: var(--primary-color);
 }
@@ -139,7 +144,6 @@ nav {
     background-color: color-mix(in srgb, var(--primary-color) 16%, transparent);
 }
 
-
 .nav-btn.active:active .material-icons {
     background-color: color-mix(in srgb, var(--primary-color) 24%, transparent);
 }
@@ -148,10 +152,14 @@ main {
     padding: 1rem;
     overflow-y: auto;
 }
-
-.section-title {
+.section-title-home {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+}
+.section-title {
+    display: flex;
     align-items: center;
     margin: 1rem 0;
 }
@@ -204,9 +212,12 @@ main {
     padding: 8px;
     border-radius: 20px;
     background-color: rgba(255, 255, 255, 0.2);
-}#icon_account {
+}
+
+#icon_account {
     width: 3vh !important;
 }
+
 .icon-btn {
     background: none;
     border: none;
@@ -235,7 +246,6 @@ main {
     background-color: #444;
     margin: 1.5rem 0;
 }
-
 
 #new-timer {
     bottom: 85px;
@@ -329,6 +339,7 @@ main {
     color: white;
     width: 95%;
 }
+
 .repeat-options {
     margin: 20px 0;
 }
@@ -467,13 +478,16 @@ main {
     margin-left: 10px;
     font-size: 0.9rem;
 }
+
 a {
     text-decoration: none !important;
 }
+
 .section-btn .material-icons {
     margin-right: 5px;
     font-size: 18px;
 }
+
 .settings-header {
     display: flex;
     align-items: center;
@@ -487,7 +501,6 @@ a {
 .settings-section {
     margin-bottom: 25px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #444;
     height: 100%;
 }
 
@@ -517,6 +530,7 @@ a {
     margin-bottom: 8px;
     transition: transform 0.2s;
 }
+
 .theme-preview:hover {
     transform: scale(1.05);
 }
@@ -609,7 +623,6 @@ a {
     transition-duration: 0.3s;
     align-items: center;
     display: flex;
-    
 }
 
 .add-menu-item .material-icons {
@@ -648,6 +661,7 @@ a {
     align-items: center;
     justify-content: center;
 }
+
 .stopwatch-controls button {
     margin-left: 10px;
     border-radius: 100px;
@@ -658,6 +672,7 @@ a {
     background-color: var(--primary-color);
     border: none;
 }
+
 .segnala {
     display: inline-flex;
     align-items: center;
@@ -665,15 +680,17 @@ a {
     border-radius: 100px;
     padding-top: 5px;
     padding-bottom: 5px;
-    padding-left: 15px:
+    padding-left: 15px;
     padding-right: 15px;
     background-color: var(--primary-color);
     color: white;
     border: none;
 }
+
 .segnala span {
-	margin-right: 5px;
+    margin-right: 5px;
 }
+
 .accessibility-description {
     font-size: 0.8rem;
     color: #aaa;
@@ -682,26 +699,22 @@ a {
 
 .switch-container {
     display: flex;
-    align-items: center;
-    margin-bottom: 5px;
+    justify-content: space-between;
+    margin-bottom: 15px;
 }
 
 .switch-container span {
-    margin-left: 10px;
     font-size: 0.95rem;
+    margin-right: 10px;
+    flex-grow: 1;
 }
 
 .switch {
     position: relative;
     display: inline-block;
-    width: 42px;
-    height: 24px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+    width: 22px;
+    height: 11px;
+    margin-left: 10px;
 }
 
 .slider {
@@ -713,27 +726,23 @@ a {
     bottom: 0;
     background-color: #666;
     transition: .4s;
-    border-radius: 24px;
+    border-radius: 20px;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
     background-color: white;
     transition: .4s;
     border-radius: 50%;
 }
 
-input:checked + .slider {
-    background-color: var(--primary-color);
-}
-
 input:checked + .slider:before {
-    transform: translateX(18px);
+    transform: translateX(16px);
 }
 
 body.accessibility-mode {
@@ -775,6 +784,7 @@ body.accessibility-mode .card {
 body.accessibility-mode .time-display {
     font-size: 1rem;
 }
+
 .username-page {
     display: flex;
     flex-direction: column;
@@ -918,25 +928,39 @@ body.accessibility-mode .time-display {
         margin: 0 auto;
     }
 }
+
+/* Updated Feed Section Styles */
 .feed-page {
-    padding: 20px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.clock-weather-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
 }
 
 .clock-display {
+    background: #333;
+    border-radius: 15px;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 30px;
+    justify-content: center;
 }
 
 .analog-clock {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
-    background-color: #f5f5f5;
-    border: 10px solid var(--primary-color);
+    background-color: #444;
+    border: 8px solid var(--primary-color);
     position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .clock-face {
@@ -950,47 +974,81 @@ body.accessibility-mode .time-display {
     bottom: 50%;
     left: 50%;
     transform-origin: 50% 100%;
-    background-color: #333;
     border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
 .hour-hand {
     width: 6px;
-    height: 60px;
+    height: 50px;
     margin-left: -3px;
+    background-color: white;
+    z-index: 3;
 }
 
 .minute-hand {
     width: 4px;
-    height: 80px;
+    height: 70px;
     margin-left: -2px;
+    background-color: white;
+    z-index: 2;
 }
 
 .second-hand {
     width: 2px;
-    height: 90px;
+    height: 80px;
     margin-left: -1px;
     background-color: var(--accent-color);
+    z-index: 1;
+}
+
+.clock-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+}
+
+.digital-clock-container {
+    text-align: center;
 }
 
 .digital-clock {
     font-size: 3rem;
     font-weight: bold;
-    margin: 20px 0;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.digital-date {
+    font-size: 1rem;
+    color: var(--text-gray);
+    margin-top: 0.5rem;
 }
 
 .clock-style-toggle {
     display: flex;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 1.5rem;
 }
 
 .style-btn {
-    padding: 8px 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     border: none;
-    border-radius: 20px;
-    background-color: #eee;
+    background-color: #444;
+    color: white;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
 
 .style-btn.active {
@@ -998,53 +1056,344 @@ body.accessibility-mode .time-display {
     color: white;
 }
 
-.timezone-section {
-    margin-bottom: 30px;
+.style-btn .material-icons {
+    font-size: 20px;
 }
 
-.timezone-search {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+.weather-section {
+    background: #333;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-.timezone-search input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.timezone-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.timezone-item {
+.weather-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
+    margin-bottom: 1rem;
 }
 
-.timezone-time {
-    font-weight: bold;
-    margin: 0 15px;
+.weather-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 1.2rem;
 }
 
-.local-info {
-    margin-top: 30px;
+.weather-container {
+    min-height: 200px;
+    position: relative;
 }
 
-.info-grid {
+.weather-current {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
+
+.weather-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.weather-icon img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.weather-temp {
+    text-align: center;
+}
+
+.temp-value {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+    line-height: 1;
+}
+
+.temp-feels {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    margin-top: 0.3rem;
+}
+
+.weather-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-description {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    text-transform: capitalize;
+}
+
+.weather-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+
+.weather-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.weather-stat .material-icons {
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+.weather-hourly {
+    margin-top: 1.5rem;
+}
+
+.weather-hourly h4 {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hourly-scroll {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) #444;
+}
+
+.hourly-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.hourly-scroll::-webkit-scrollbar-track {
+    background: #444;
+    border-radius: 2px;
+}
+
+.hourly-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 2px;
+}
+
+.hourly-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+    flex-shrink: 0;
+}
+
+.hourly-item span:first-child {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+}
+
+.hourly-item img {
+    width: 30px;
+    height: 30px;
+    margin: 0.3rem 0;
+}
+
+.hourly-item span:last-child {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.hourly-item small {
+    font-size: 0.7rem;
+    color: var(--text-gray);
+}
+
+.news-section {
+    background: #333;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.news-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.news-title h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.news-selector {
+    padding: 8px 12px;
+    border-radius: 20px;
+    background-color: #444;
+    color: white;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.news-container {
+    min-height: 300px;
+    position: relative;
+}
+
+.news-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+}
+
+.news-item {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 1rem;
+    background: #444;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.news-item:hover {
+    transform: translateY(-2px);
+}
+
+.news-image {
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.news-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+}
+
+.news-content {
+    padding: 0.8rem 0.8rem 0.8rem 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-content p {
+    margin: 0 0 0.8rem 0;
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    line-height: 1.4;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.news-footer small {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.news-link {
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.news-link .material-icons {
+    font-size: 0.9rem;
+    margin-left: 0.3rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.weather-loading,
+.news-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+}
+
+.weather-loading p,
+.news-loading p {
+    margin-top: 1rem;
+    color: var(--text-gray);
+}
+
+@media (max-width: 768px) {
+    .clock-weather-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .news-item {
+        grid-template-columns: 1fr;
+    }
+    
+    .news-image {
+        height: 180px;
+    }
+}
+
 .btn-primary.disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -1058,6 +1407,7 @@ body.accessibility-mode .time-display {
     background-color: #cccccc;
     color: #666666;
 }
+
 .account-info {
     display: flex;
     align-items: center;
@@ -1099,6 +1449,7 @@ body.accessibility-mode .time-display {
 #change-username-btn {
     margin-top: 8px;
 }
+
 .btn-secondary.small {
     padding: 8px 12px;
     font-size: 0.9rem;
@@ -1110,6 +1461,7 @@ body.accessibility-mode .time-display {
 .btn-secondary.small .material-icons {
     font-size: 18px;
 }
+
 .user-avatar {
     width: 48px;
     height: 48px;
