@@ -5,6 +5,8 @@ let cronometers = JSON.parse(localStorage.getItem('cronometers')) || [];
 let activeTimer = null;
 let clockStyle = localStorage.getItem('clockStyle') || 'digital';
 let timezones = JSON.parse(localStorage.getItem('timezones')) || [];
+let timerGroups = JSON.parse(localStorage.getItem('timerGroups')) || [{ id: 'all', name: 'Tutti i timer', isDefault: true }];
+let showTimerGroups = localStorage.getItem('showTimerGroups') === 'true' || false;
 let stopwatch = {
     running: false,
     startTime: 0,
@@ -32,6 +34,7 @@ const addAlarmMenu = document.getElementById('add-alarm-menu');
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     applyTheme();
+    initializeTimerGroups()
     if (!currentUser) {
         showUsernamePrompt();
     } else {
@@ -85,8 +88,13 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAlarms();
 });
 
+function saveTimerGroups() {
+    localStorage.setItem('timerGroups', JSON.stringify(timerGroups));
+    localStorage.setItem('showTimerGroups', showTimerGroups);
+}
+
 function showUsernamePrompt() {
-    const isEditing = !!currentUser; // Verifica se l'utente esiste già
+    const isEditing = !!currentUser;
     document.querySelector('nav').style.display = 'none';
     document.getElementById('add-btn').style.display = 'none';
     document.getElementById('account-btn').style.display = 'none';
@@ -458,6 +466,14 @@ function loadSection(section) {
 }
 
 function loadHomeSection() {
+    const groupNames = {
+        'all': 'Tutti',
+        'work': 'Lavoro',
+        'personal': 'Personale',
+        'fitness': 'Fitness',
+        'study': 'Studio'
+    };
+
     mainContent.innerHTML = `
         <div class="greeting">
             <h1>${getGreeting()}</h1>
@@ -473,10 +489,12 @@ function loadHomeSection() {
         
         ${timers.length > 0 ? 
             timers.slice(0, 3).map(timer => `
-                <div class="card" data-id="${timer.id}">
+                <div class="card home-timer-item" data-id="${timer.id}">
                     <div class="card-content">
-                        <div>
+                        <div class="timer-info">
                             <h3>${timer.name || 'Timer'}</h3>
+                            ${timer.group && timer.group !== 'all' ? 
+                                `<span class="timer-badge">${groupNames[timer.group] || timer.group}</span>` : ''}
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <button class="icon-btn play-btn">
@@ -563,13 +581,49 @@ function loadHomeSection() {
 function loadTimersSection() {
     document.querySelector('.fab').style.display = 'flex';
     
-    mainContent.innerHTML = `
-        ${timers.length > 0 ? 
-            timers.map(timer => `
-                <div class="card" data-id="${timer.id}">
+    const groupNames = {
+        'all': 'Tutti',
+        'work': 'Lavoro',
+        'personal': 'Personale',
+        'fitness': 'Fitness',
+        'study': 'Studio'
+    };
+
+    let timersToShow = timers;
+    let groupFilter = 'all';
+    
+    mainContent.innerHTML = '';
+    
+    if (showTimerGroups && timerGroups.length > 1) {
+        mainContent.innerHTML += `
+            <div class="group-selector">
+                ${timerGroups.map(group => `
+                    <button class="group-btn ${groupFilter === group.id ? 'active' : ''}" data-group="${group.id}">
+                        ${group.name}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+        
+        document.querySelectorAll('.group-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                groupFilter = this.dataset.group;
+                loadTimersSection();
+            });
+        });
+        
+        timersToShow = filterTimersByGroup(groupFilter);
+    }
+    
+    mainContent.innerHTML += `
+        ${timersToShow.length > 0 ? 
+            timersToShow.map(timer => `
+                <div class="card timer-item" data-id="${timer.id}">
                     <div class="card-content">
-                        <div>
+                        <div class="timer-info">
                             <h3>${timer.name || 'Timer'}</h3>
+                            ${timer.group && timer.group !== 'all' ? 
+                                `<span class="timer-badge">${groupNames[timer.group] || timer.group}</span>` : ''}
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <div class="timer-actions">
@@ -598,7 +652,7 @@ function loadTimersSection() {
             </div>`
         }
     `;
-
+    
     // Timer controls
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -622,6 +676,16 @@ function loadTimersSection() {
     });
 }
 
+function getGroupColor(groupId) {
+    const colors = {
+        'all': '#5782c9',
+        'work': '#4CAF50',
+        'personal': '#9C27B0',
+        'fitness': '#FF9800',
+        'study': '#2196F3'
+    };
+    return colors[groupId] || '#607D8B';
+}
 function loadAlarmsSection() {
     document.querySelector('.fab').style.display = 'flex';
     
@@ -1153,17 +1217,21 @@ function loadSettingsSection() {
             <div class="settings-section">
                 <h2 class="section-title">Preferenze</h2>
                 <div class="section-content">
+                    <!-- Notifiche -->
                     <div class="settings-group">
                         <div class="switch-container">
                             <div class="switch-info">
                                 <h4 class="group-title">Notifiche</h4>
-                                <p class="group-description">Attiva o disattiva le notifiche push per timer e sveglie</h4>
+                                <p class="group-description">Attiva o disattiva le notifiche push per timer e sveglie</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="notifications-toggle" ${notificationPermission ? 'checked' : ''}>
                                 <span class="slider round"></span>
                             </label>
                         </div>
+                    </div>
+                    
+                    <!-- Localizzazione -->
                     <div class="settings-group">
                         <div class="switch-container">
                             <div class="switch-info">
@@ -1172,6 +1240,20 @@ function loadSettingsSection() {
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="location-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Gruppi timer -->
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">Gruppi timer</h4>
+                                <p class="group-description">Organizza i timer in categorie personalizzate</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="timer-groups-toggle" ${showTimerGroups ? 'checked' : ''}>
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -1187,7 +1269,7 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>Versione</span>
-                            <span>1.4.0</span>
+                            <span>1.4.2</span>
                         </div>
                         <div class="info-item">
                             <span>Sviluppatore</span>
@@ -1204,7 +1286,8 @@ function loadSettingsSection() {
             </div>
         </div>
     `;
-
+    
+    
     const style = document.createElement('style');
 style.textContent = `
     .settings-page {
@@ -1485,6 +1568,14 @@ document.head.appendChild(style);
         }
     });
 
+        document.getElementById('timer-groups-toggle')?.addEventListener('change', function() {
+        showTimerGroups = this.checked;
+        saveTimerGroups();
+        if (currentSection === 'timers') {
+            loadSection('timers');
+        }
+    });
+
     // Theme selection
     document.querySelectorAll('.theme-option').forEach(option => {
         option.addEventListener('click', function() {
@@ -1650,19 +1741,21 @@ function createNewTimer() {
     const minutes = parseInt(document.getElementById('minutes').value) || 0;
     const seconds = parseInt(document.getElementById('seconds').value) || 0;
     const name = document.getElementById('timer-name').value;
+    const groupSelect = document.getElementById('timer-group');
+    const group = groupSelect ? groupSelect.value : 'all';
     
     if (hours === 0 && minutes === 0 && seconds === 0) {
         alert('Inserisci un tempo valido');
         return;
     }
     
-    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
     const duration = hours * 3600 + minutes * 60 + seconds;
     
     const timer = {
         id: generateId(),
         name: name,
         duration: duration,
+        group: group,
         createdAt: new Date().toISOString()
     };
     
@@ -1681,6 +1774,25 @@ function createNewTimer() {
     document.getElementById('timer-name').value = '';
 }
 
+
+function filterTimersByGroup(groupId) {
+    if (groupId === 'all') return timers;
+    return timers.filter(timer => timer.group === groupId);
+}
+
+function initializeTimerGroups() {
+    if (!localStorage.getItem('timerGroups')) {
+        timerGroups = [
+            { id: 'all', name: 'Tutti i timer', isDefault: true },
+            { id: 'work', name: 'Lavoro', isDefault: false },
+            { id: 'personal', name: 'Personale', isDefault: false },
+            { id: 'fitness', name: 'Fitness', isDefault: false },
+            { id: 'study', name: 'Studio', isDefault: false }
+        ];
+        localStorage.setItem('timerGroups', JSON.stringify(timerGroups));
+    }
+    showTimerGroups = localStorage.getItem('showTimerGroups') === 'true' || false;
+}
 function createNewAlarm() {
     const time = document.getElementById('alarm-time').value;
     const name = document.getElementById('alarm-name').value;
