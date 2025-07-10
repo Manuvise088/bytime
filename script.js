@@ -728,66 +728,129 @@ function loadStopwatchSection() {
         startStopwatchUpdate();
     }
 }
+function formatStopwatchTimeShort(ms) {
+    const date = new Date(ms);
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const seconds = date.getUTCSeconds();
+    
+    if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+    } else if (minutes > 0) {
+        return `${minutes}m ${seconds}s`;
+    }
+    return `${seconds}s`;
+}
+
+function calculateUsageDays() {
+    const timestamps = [];
+    
+    // Aggiungi timestamp da timer
+    timers.forEach(timer => {
+        timestamps.push(new Date(timer.createdAt).getTime());
+    });
+    
+    // Aggiungi timestamp da sveglie
+    alarms.forEach(alarm => {
+        timestamps.push(new Date(alarm.createdAt).getTime());
+    });
+    
+    // Aggiungi timestamp da cronometro se usato
+    if (stopwatch.elapsed > 0) {
+        const now = new Date().getTime();
+        timestamps.push(now - stopwatch.elapsed);
+    }
+    
+    if (timestamps.length === 0) return "Oggi";
+    
+    const oldestDate = new Date(Math.min(...timestamps));
+    const diffTime = Math.abs(new Date() - oldestDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays === 0 ? "Oggi" : `${diffDays} giorni`;
+}
 
 function loadFeedSection() {
     document.querySelector('.fab').style.display = 'none';
     
     mainContent.innerHTML = `
-        <div class="feed-page">
-            <div class="clock-display">
-                <div id="clock" class="${clockStyle}">
-                    ${clockStyle === 'analog' ? `
-                        <div class="analog-clock">
-                            <div class="clock-face">
-                                <div class="hand hour-hand"></div>
-                                <div class="hand minute-hand"></div>
-                                <div class="hand second-hand"></div>
-                            </div>
-                        </div>
-                    ` : `
-                        <div class="digital-clock" id="local-time">
-                            ${formatTime(new Date())}
-                        </div>
-                    `}
+        <div class="weather-page">
+            <!-- Current Weather - Maggiore gerarchia -->
+            <div class="weather-current-section">
+                <div class="weather-header">
+                    <h2><span class="material-icons">cloud</span> Meteo Attuale</h2>
+                    <button id="refresh-weather" class="icon-btn">
+                        <span class="material-icons">refresh</span>
+                    </button>
                 </div>
-                <div class="clock-style-toggle">
-                    <button class="style-btn ${clockStyle === 'digital' ? 'active' : ''}" data-style="digital">Digitale</button>
-                    <button class="style-btn ${clockStyle === 'analog' ? 'active' : ''}" data-style="analog">Analogico</button>
-                </div>
-            </div>
-            
-            <div class="weather-section">
-                <h3>Meteo locale</h3>
-                <div id="weather-container" class="weather-container">
+                
+                <div id="weather-content" class="weather-content">
                     <div class="weather-loading">
-                        <span class="material-icons">cloud</span>
+                        <span class="material-icons spinning">autorenew</span>
                         <p>Caricamento dati meteo...</p>
                     </div>
                 </div>
             </div>
             
-            <div class="local-info">
-                <h3>Informazioni locali</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="material-icons">calendar_today</span>
+            <!-- Weather Forecast - Disposizione verticale e scrollabile -->
+            <div class="forecast-section">
+                <h2><span class="material-icons">calendar_today</span> Previsioni</h2>
+                <div id="forecast-content" class="forecast-content">
+                    <div class="forecast-loading">
+                        <span class="material-icons spinning">autorenew</span>
+                        <p>Caricamento previsioni...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sun Times Section -->
+            <div class="sun-section">
+                <h2><span class="material-icons">wb_sunny</span> Sole</h2>
+                <div class="sun-cards">
+                    <div class="sun-card">
+                        <span class="material-icons">brightness_7</span>
                         <div>
-                            <span id="local-date">${new Date().toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                            <small id="local-time-full">${new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit', second:'2-digit'})}</small>
+                            <span>Alba</span>
+                            <strong id="sunrise-time">--:--</strong>
                         </div>
                     </div>
-                    <div class="info-item">
-                        <span class="material-icons">brightness_5</span>
+                    <div class="sun-card">
+                        <span class="material-icons">brightness_3</span>
                         <div>
-                            <div id="sun-times">Caricamento dati sole...</div>
-                            <small id="location-status" class="status-text"></small>
+                            <span>Tramonto</span>
+                            <strong id="sunset-time">--:--</strong>
                         </div>
                     </div>
-                    <div class="info-item">
-                        <span class="material-icons">location_on</span>
+                </div>
+                <p class="location-info" id="location-status">Determinando la posizione...</p>
+            </div>
+            
+            <!-- Weather Stats - Stile simile alla sezione Sole -->
+            <div class="weather-stats-section">
+                <h2><span class="material-icons">insights</span> Statistiche Meteo</h2>
+                <div id="weather-stats" class="weather-stats">
+                    <div class="stat-card">
                         <div>
-                            <span id="local-location">${Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, ' ')}</span>
-                            <small id="local-coords">Caricamento coordinate...</small>
+                            <span>Record massimo</span>
+                            <strong id="max-temp">--°</strong>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <span>Record minimo</span>
+                            <strong id="min-temp">--°</strong>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <span>Umidità media</span>
+                            <strong id="avg-humidity">--%</strong>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <span>Vento massimo</span>
+                            <strong id="max-wind">-- km/h</strong>
                         </div>
                     </div>
                 </div>
@@ -795,48 +858,25 @@ function loadFeedSection() {
         </div>
     `;
 
-    const clockElement = document.getElementById('clock');
-    const styleButtons = document.querySelectorAll('.style-btn');
-    
-    // Clock style toggle
-    styleButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            styleButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            clockStyle = this.dataset.style;
-            localStorage.setItem('clockStyle', clockStyle);
-            
-            if (clockStyle === 'digital') {
-                clockElement.innerHTML = `
-                    <div class="digital-clock" id="local-time">
-                        ${formatTime(new Date())}
-                    </div>
-                `;
-            } else {
-                clockElement.innerHTML = `
-                    <div class="analog-clock">
-                        <div class="clock-face">
-                            <div class="hand hour-hand"></div>
-                            <div class="hand minute-hand"></div>
-                            <div class="hand second-hand"></div>
-                        </div>
-                    </div>
-                `;
-                updateClock();
-            }
-        });
-    });
-
-    // Initialize info sections
-    updateLocalInfo();
-    updateClock();
-    loadSunTimesWithFallback();
-    updateLocalCoordinates();
+    // Carica i dati meteo attuali
     loadWeatherData();
+    
+    // Carica gli orari di alba/tramonto
+    loadSunTimesWithFallback();
+    
+    // Carica le previsioni meteo
+    loadWeatherForecast();
+    
+    // Pulsante refresh meteo
+    document.getElementById('refresh-weather')?.addEventListener('click', function() {
+        loadWeatherData();
+        loadWeatherForecast();
+    });
 }
 
-async function loadWeatherData() {
-    const weatherContainer = document.getElementById('weather-container');
+// Modifica la funzione loadWeatherForecast per adattarsi al nuovo layout
+async function loadWeatherForecast() {
+    const forecastContainer = document.getElementById('forecast-content');
     
     try {
         const position = await new Promise((resolve, reject) => {
@@ -848,57 +888,184 @@ async function loadWeatherData() {
 
         const { latitude, longitude } = position.coords;
         
-        // Use OpenWeatherMap API
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=83b3ef42d80b78619a949ea0617b1eb5`);
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297`);
         const data = await response.json();
         
-        if (data.cod === 200) {
-            const weather = {
-                temp: Math.round(data.main.temp),
-                feels_like: Math.round(data.main.feels_like),
-                description: data.weather[0].description,
-                icon: data.weather[0].icon,
-                humidity: data.main.humidity,
-                wind: Math.round(data.wind.speed * 3.6),
-                city: data.name
-            };
+        if (data.cod === "200") {
+            const dailyForecasts = {};
+            data.list.forEach(item => {
+                const date = new Date(item.dt * 1000);
+                const day = date.toLocaleDateString('it-IT', { weekday: 'long' });
+                
+                if (!dailyForecasts[day]) {
+                    dailyForecasts[day] = {
+                        temps: [],
+                        icons: [],
+                        descriptions: []
+                    };
+                }
+                
+                dailyForecasts[day].temps.push(item.main.temp);
+                dailyForecasts[day].icons.push(item.weather[0].icon);
+                dailyForecasts[day].descriptions.push(item.weather[0].description);
+            });
             
-            weatherContainer.innerHTML = `
-                <div class="weather-current">
-                    <div class="weather-main">
-                        <div class="weather-icon">
-                            <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
+            const forecastHTML = Object.keys(dailyForecasts).map(day => {
+                const dayData = dailyForecasts[day];
+                const avgTemp = Math.round(dayData.temps.reduce((a, b) => a + b, 0) / dayData.temps.length);
+                
+                const iconCounts = {};
+                dayData.icons.forEach(icon => {
+                    iconCounts[icon] = (iconCounts[icon] || 0) + 1;
+                });
+                const mostCommonIcon = Object.keys(iconCounts).reduce((a, b) => 
+                    iconCounts[a] > iconCounts[b] ? a : b
+                );
+                
+                const descCounts = {};
+                dayData.descriptions.forEach(desc => {
+                    descCounts[desc] = (descCounts[desc] || 0) + 1;
+                });
+                const mostCommonDesc = Object.keys(descCounts).reduce((a, b) => 
+                    descCounts[a] > descCounts[b] ? a : b
+                );
+                
+                return `
+                    <div class="forecast-day">
+                        <div class="forecast-day-header">
+                            <span class="day-name">${day}</span>
+                            <span class="day-temp">${avgTemp}°</span>
                         </div>
-                        <div class="weather-temp">
-                            <span class="temp-value">${weather.temp}°</span>
-                            <span class="temp-feels">Percepiti ${weather.feels_like}°</span>
+                        <div class="forecast-day-details">
+                            <img src="https://openweathermap.org/img/wn/${mostCommonIcon}.png" alt="${mostCommonDesc}">
+                            <span class="day-desc">${capitalizeFirstLetter(mostCommonDesc)}</span>
                         </div>
                     </div>
-                    <div class="weather-details">
-                        <div class="weather-description">${capitalizeFirstLetter(weather.description)}</div>
-                        <div class="weather-city">${weather.city}</div>
-                    </div>
-                </div>
-                <div class="weather-stats">
-                    <div class="weather-stat">
-                        <span class="material-icons">water_drop</span>
-                        <span>${weather.humidity}%</span>
-                    </div>
-                    <div class="weather-stat">
-                        <span class="material-icons">air</span>
-                        <span>${weather.wind} km/h</span>
-                    </div>
+                `;
+            }).join('');
+            
+            forecastContainer.innerHTML = `
+                <div class="forecast-scroll">
+                    ${forecastHTML}
                 </div>
             `;
+            
+            updateWeatherStats(data);
         } else {
+            throw new Error(data.message || 'Errore nel recupero previsioni');
+        }
+    } catch (error) {
+        console.error("Errore nel recupero previsioni:", error);
+        forecastContainer.innerHTML = `
+            <div class="weather-error">
+                <span class="material-icons">error</span>
+                <p>Impossibile caricare le previsioni</p>
+                <button id="retry-forecast-btn" class="btn-secondary small">
+                    <span class="material-icons">refresh</span>
+                    Riprova
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('retry-forecast-btn')?.addEventListener('click', loadWeatherForecast);
+    }
+}
+
+function updateWeatherStats(forecastData) {
+    const temps = forecastData.list.map(item => item.main.temp);
+    const humidities = forecastData.list.map(item => item.main.humidity);
+    const winds = forecastData.list.map(item => item.wind.speed * 3.6);
+    
+    document.getElementById('max-temp').textContent = `${Math.round(Math.max(...temps))}°`;
+    document.getElementById('min-temp').textContent = `${Math.round(Math.min(...temps))}°`;
+    document.getElementById('avg-humidity').textContent = `${Math.round(humidities.reduce((a, b) => a + b, 0) / humidities.length)}%`;
+    document.getElementById('max-wind').textContent = `${Math.round(Math.max(...winds))} km/h`;
+}
+
+async function loadWeatherData() {
+    const weatherContainer = document.getElementById('weather-content');
+    weatherContainer.innerHTML = `
+        <div class="weather-loading">
+            <span class="material-icons spinning">autorenew</span>
+            <p>Caricamento dati meteo...</p>
+        </div>
+    `;
+
+    try {
+        const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                resolve, 
+                reject, 
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+
+        const { latitude, longitude } = position.coords;
+        
+        // Aggiungi timestamp per evitare cache
+        const timestamp = Date.now();
+        const response = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297&_=${timestamp}`
+        );
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.cod !== 200) {
             throw new Error(data.message || 'Errore nel recupero dati meteo');
         }
+
+        const weather = {
+            temp: Math.round(data.main.temp),
+            feels_like: Math.round(data.main.feels_like),
+            description: data.weather[0].description,
+            icon: data.weather[0].icon,
+            humidity: data.main.humidity,
+            wind: Math.round(data.wind.speed * 3.6),
+            city: data.name || "Posizione sconosciuta"
+        };
+        
+        weatherContainer.innerHTML = `
+            <div class="weather-current">
+                <div class="weather-main">
+                    <div class="weather-icon">
+                        <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
+                    </div>
+                    <div class="weather-temp">
+                        <span class="temp-value">${weather.temp}°</span>
+                        <span class="temp-feels">Percepiti ${weather.feels_like}°</span>
+                    </div>
+                </div>
+                <div class="weather-details">
+                    <div class="weather-description">${capitalizeFirstLetter(weather.description)}</div>
+                    <div class="weather-city">${weather.city}</div>
+                </div>
+            </div>
+            <div class="weather-stats">
+                <div class="weather-stat">
+                    <span class="material-icons">water_drop</span>
+                    <span>${weather.humidity}%</span>
+                </div>
+                <div class="weather-stat">
+                    <span class="material-icons">air</span>
+                    <span>${weather.wind} km/h</span>
+                </div>
+            </div>
+        `;
+
     } catch (error) {
         console.error("Errore nel recupero dati meteo:", error);
         weatherContainer.innerHTML = `
             <div class="weather-error">
                 <span class="material-icons">error</span>
-                <p>Impossibile caricare i dati meteo</p>
+                <p>${getUserFriendlyError(error)}</p>
                 <button id="retry-weather-btn" class="btn-secondary small">
                     <span class="material-icons">refresh</span>
                     Riprova
@@ -908,6 +1075,23 @@ async function loadWeatherData() {
         
         document.getElementById('retry-weather-btn')?.addEventListener('click', loadWeatherData);
     }
+}
+
+function getUserFriendlyError(error) {
+    if (error.message.includes('timeout')) {
+        return "Timeout durante la geolocalizzazione";
+    } else if (error.message.includes('denied')) {
+        return "Permesso di geolocalizzazione negato";
+    } else if (error.message.includes('unavailable')) {
+        return "Geolocalizzazione non disponibile";
+    } else if (error.message.includes('404')) {
+        return "Dati meteo non trovati per questa posizione";
+    }
+    return "Impossibile caricare i dati meteo";
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function loadSettingsSection() {
@@ -1003,7 +1187,7 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>Versione</span>
-                            <span>1.3.2</span>
+                            <span>1.4.0</span>
                         </div>
                         <div class="info-item">
                             <span>Sviluppatore</span>
@@ -1771,12 +1955,12 @@ function closeAllNotifications() {
 
 async function loadSunTimesWithFallback() {
     const statusEl = document.getElementById('location-status');
-    const sunTimesEl = document.getElementById('sun-times');
+    const sunriseEl = document.getElementById('sunrise-time');
+    const sunsetEl = document.getElementById('sunset-time');
     
     if (navigator.geolocation) {
         try {
             statusEl.textContent = "Ricerca posizione in corso...";
-            statusEl.className = "status-text";
             
             const position = await new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(
@@ -1792,56 +1976,42 @@ async function loadSunTimesWithFallback() {
 
             const { latitude, longitude } = position.coords;
             
-            const times = await getSunriseSunset(latitude, longitude);
+            // Usa l'API di OpenWeatherMap per ottenere i dati del sole
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297`);
+            const data = await response.json();
             
-            if (times) {
-                sunTimesEl.textContent = `${formatTime(times.sunrise)} | ${formatTime(times.sunset)}`;
-                statusEl.textContent = "Posizione rilevata";
-                statusEl.className = "status-text success";
+            if (data.sys) {
+                const sunriseTime = new Date(data.sys.sunrise * 1000);
+                const sunsetTime = new Date(data.sys.sunset * 1000);
+                
+                sunriseEl.textContent = sunriseTime.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+                sunsetEl.textContent = sunsetTime.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+                
+                statusEl.textContent = data.name || "Posizione rilevata";
             } else {
                 throw new Error("Dati alba/tramonto non disponibili");
             }
         } catch (error) {
             console.error("Errore geolocalizzazione:", error);
-            
-            try {
-                statusEl.textContent = "Ricerca posizione approssimata...";
-                const ipLocation = await fetchApproximateLocation();
-                
-                if (ipLocation) {
-                    const times = await getSunriseSunset(ipLocation.lat, ipLocation.lon);
-                    if (times) {
-                        sunTimesEl.textContent = `Alba: ~${formatTime(times.sunrise)} | Tramonto: ~${formatTime(times.sunset)}`;
-                        statusEl.textContent = ipLocation.city || "Posizione approssimativa";
-                        statusEl.className = "status-text warning";
-                    } else {
-                        throw new Error("Dati alba/tramonto non disponibili");
-                    }
-                } else {
-                    throw new Error("Impossibile determinare la posizione via IP");
-                }
-            } catch (ipError) {
-                console.error("Errore posizione IP:", ipError);
-                
-                showDefaultItalianTimes();
-                statusEl.textContent = "Attiva la geolocalizzazione per orari precisi";
-                statusEl.className = "status-text error";
-                
-                const retryBtn = document.createElement('button');
-                retryBtn.id = 'retry-location-btn';
-                retryBtn.className = 'location-btn small';
-                retryBtn.innerHTML = '<span class="material-icons">refresh</span> Riprova';
-                retryBtn.addEventListener('click', () => {
-                    requestLocationPermission();
-                });
-                statusEl.appendChild(retryBtn);
-            }
+            showDefaultItalianTimes();
+            statusEl.textContent = "Posizione approssimativa (Italia)";
         }
     } else {
         showDefaultItalianTimes();
-        statusEl.textContent = "Geolocalizzazione non supportata dal tuo browser";
-        statusEl.className = "status-text error";
+        statusEl.textContent = "Geolocalizzazione non supportata";
     }
+}
+
+function showDefaultItalianTimes() {
+    const now = new Date();
+    const month = now.getMonth();
+    const isSummer = month >= 4 && month <= 9;
+    
+    const sunriseTime = isSummer ? '05:45' : '07:30';
+    const sunsetTime = isSummer ? '20:30' : '17:45';
+    
+    document.getElementById('sunrise-time').textContent = sunriseTime;
+    document.getElementById('sunset-time').textContent = sunsetTime;
 }
 
 async function requestLocationPermission() {
