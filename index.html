@@ -120,20 +120,26 @@
         </div>
     </div>
 
-    <div id="timer-modal" class="modal">
+    <div class="modal" id="timer-modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Nuovo Timer</h2>
             <input type="text" id="timer-name" placeholder="Nome del timer (opzionale)">
             
             <div class="time-input">
-                <input type="number" id="hours" min="0" max="23" placeholder="00">
+                <input type="number" id="hours" placeholder="HH" min="0" max="99">
                 <span>:</span>
-                <input type="number" id="minutes" min="0" max="59" placeholder="00">
+                <input type="number" id="minutes" placeholder="MM" min="0" max="59">
                 <span>:</span>
-                <input type="number" id="seconds" min="0" max="59" placeholder="00">
+                <input type="number" id="seconds" placeholder="SS" min="0" max="59">
             </div>
-            
+            <select id="timer-group" class="settings-select">
+                <option value="all">Tutti i timer</option>
+                <option value="work">Lavoro</option>
+                <option value="personal">Personale</option>
+                <option value="fitness">Fitness</option>
+                <option value="study">Studio</option>
+            </select>
             <button id="start-timer">Avvia Timer</button>
         </div>
     </div>
