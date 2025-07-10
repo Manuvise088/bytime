@@ -2198,9 +2198,11 @@ body.accessibility-mode .time-display {
     color: var(--text-gray);
     margin-bottom: 1rem;
 }
-
+.weather-stats-section {
+    display: none;
+}
 .weather-stats {
-    display: flex;
+    display: none;
     justify-content: center;
     gap: 2rem;
     margin-top: 1rem;
@@ -2208,7 +2210,6 @@ body.accessibility-mode .time-display {
 }
 
 .weather-stat {
-    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.3rem;
@@ -2238,11 +2239,11 @@ body.accessibility-mode .time-display {
     
     .weather-stats {
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 0.5rem;
     }
     
     .weather-stat {
-        min-width: 45%;
+        min-width: 40%;
     }
 }
 
