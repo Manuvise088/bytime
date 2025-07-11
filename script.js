@@ -933,7 +933,103 @@ function loadFeedSection() {
         loadWeatherForecast();
     });
 }
+async function loadWeatherForecast() {
+    const forecastContainer = document.getElementById('forecast-content');
+    forecastContainer.innerHTML = `
+        <div class="forecast-loading">
+            <span class="material-icons spinning">autorenew</span>
+            <p>Caricamento previsioni...</p>
+        </div>
+    `;
 
+    try {
+        const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            });
+        });
+
+        const { latitude, longitude } = position.coords;
+        const response = await fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297`
+        );
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        if (data.cod !== "200") throw new Error(data.message || 'Errore nel recupero previsioni');
+
+        // Group forecasts by day and find the most representative forecast for each day
+        const dailyForecasts = {};
+        data.list.forEach(forecast => {
+            const date = new Date(forecast.dt * 1000);
+            const dayKey = date.toLocaleDateString('it-IT');
+            
+            if (!dailyForecasts[dayKey]) {
+                dailyForecasts[dayKey] = {
+                    date: date,
+                    forecasts: [],
+                    minTemp: Infinity,
+                    maxTemp: -Infinity,
+                    mainCondition: null,
+                    icon: null,
+                    description: null
+                };
+            }
+            
+            // Update min/max temps
+            dailyForecasts[dayKey].minTemp = Math.min(dailyForecasts[dayKey].minTemp, forecast.main.temp_min);
+            dailyForecasts[dayKey].maxTemp = Math.max(dailyForecasts[dayKey].maxTemp, forecast.main.temp_max);
+            
+            // Keep track of forecasts for this day
+            dailyForecasts[dayKey].forecasts.push(forecast);
+            
+            // For the icon, use the forecast at 12:00 if available, or the first one
+            const hours = date.getHours();
+            if (hours === 12 || !dailyForecasts[dayKey].icon) {
+                dailyForecasts[dayKey].mainCondition = forecast.weather[0].main;
+                dailyForecasts[dayKey].icon = forecast.weather[0].icon;
+                dailyForecasts[dayKey].description = forecast.weather[0].description;
+            }
+        });
+
+        forecastContainer.innerHTML = `
+            <div class="forecast-days">
+                ${Object.values(dailyForecasts).slice(0, 5).map(day => `
+                    <div class="forecast-day">
+                        <div class="forecast-day-header">
+                            <span class="day-name">${day.date.toLocaleDateString('it-IT', { weekday: 'long' })}</span>
+                            <div class="day-weather">
+                                <img src="https://openweathermap.org/img/wn/${day.icon}.png" alt="${day.mainCondition}">
+                                <span>${Math.round(day.minTemp)}° / ${Math.round(day.maxTemp)}°</span>
+                            </div>
+                        </div>
+                        <div class="forecast-day-description">
+                            ${capitalizeFirstLetter(day.description)}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+    } catch (error) {
+        console.error("Errore nel recupero previsioni:", error);
+        forecastContainer.innerHTML = `
+            <div class="forecast-error">
+                <span class="material-icons">error</span>
+                <p>${getUserFriendlyError(error)}</p>
+                <button id="retry-forecast-btn" class="btn-secondary small">
+                    <span class="material-icons">refresh</span>
+                    Riprova
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('retry-forecast-btn')?.addEventListener('click', loadWeatherForecast);
+    }
+}
 async function loadWeatherData() {
     const weatherContainer = document.getElementById('weather-content');
     weatherContainer.innerHTML = `
@@ -1163,157 +1259,10 @@ function getWeatherEffect(condition) {
 
     return effects[condition] || effects.default;
 }
-
-// Funzioni helper per creare elementi dinamici
-function createRainDrops(count) {
-    let css = '';
-    for (let i = 0; i < count; i++) {
-        const left = Math.random() * 100;
-        const delay = Math.random() * 2;
-        const duration = 0.5 + Math.random() * 1.5;
-        css += `
-            .rain-effect:after {
-                content: '';
-                position: absolute;
-                left: ${left}%;
-                top: -20px;
-                width: 1px;
-                height: ${10 + Math.random() * 20}px;
-                background: rgba(255,255,255,0.4);
-                animation: rainDrop ${duration}s linear ${delay}s infinite;
-                transform: rotate(${5 + Math.random() * 10}deg);
-            }
-        `;
-    }
-    return css;
-}
-
-function createSnowFlakes(count) {
-    let css = '';
-    for (let i = 0; i < count; i++) {
-        const left = Math.random() * 100;
-        const size = 2 + Math.random() * 4;
-        const delay = Math.random() * 5;
-        const duration = 5 + Math.random() * 10;
-        css += `
-            .snow-effect:before {
-                content: '';
-                position: absolute;
-                left: ${left}%;
-                top: -10px;
-                width: ${size}px;
-                height: ${size}px;
-                background: white;
-                border-radius: 50%;
-                filter: blur(1px);
-                animation: snowFall ${duration}s linear ${delay}s infinite;
-            }
-        `;
-    }
-    return css;
-}
-
-function createSunRays(count) {
-    let css = '';
-    for (let i = 0; i < count; i++) {
-        const angle = (360 / count) * i;
-        const length = 30 + Math.random() * 20;
-        css += `
-            .sun-effect:before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 2px;
-                height: ${length}%;
-                background: rgba(255,255,0,0.1);
-                transform-origin: 0 0;
-                transform: rotate(${angle}deg) translateY(-50%);
-                animation: sunRaySpin 20s linear infinite;
-            }
-        `;
-    }
-    return css;
-}
-function updateWeatherEffect(condition) {
-    const effectElement = document.getElementById('weather-effect');
-    effectElement.className = 'weather-effect'; // Resetta le classi
-    
-    // Aggiungi la classe appropriata in base alle condizioni
-    if (condition.includes('rain')) {
-        effectElement.classList.add('rain');
-        addRainDrops(20);
-    } else if (condition.includes('snow')) {
-        effectElement.classList.add('snow');
-        addSnowFlakes(30);
-    } else if (condition.includes('clear')) {
-        effectElement.classList.add('sun');
-        addSunRays(8);
-    } else if (condition.includes('cloud')) {
-        effectElement.classList.add('clouds');
-    } else if (condition.includes('thunder')) {
-        effectElement.classList.add('thunder');
-    }
-}
-
-// Funzioni helper per elementi dinamici
-function addRainDrops(count) {
-    const effectElement = document.getElementById('weather-effect');
-    effectElement.innerHTML = '';
-    
-    for (let i = 0; i < count; i++) {
-        const drop = document.createElement('div');
-        drop.className = 'rain-drop';
-        drop.style.left = `${Math.random() * 100}%`;
-        drop.style.animationDuration = `${0.5 + Math.random() * 1.5}s`;
-        drop.style.animationDelay = `${Math.random() * 2}s`;
-        drop.style.height = `${10 + Math.random() * 20}px`;
-        effectElement.appendChild(drop);
-    }
-}
-
-function addSnowFlakes(count) {
-    const effectElement = document.getElementById('weather-effect');
-    effectElement.innerHTML = '';
-    
-    for (let i = 0; i < count; i++) {
-        const flake = document.createElement('div');
-        flake.className = 'snow-flake';
-        flake.style.left = `${Math.random() * 100}%`;
-        flake.style.width = `${2 + Math.random() * 4}px`;
-        flake.style.height = flake.style.width;
-        flake.style.animationDuration = `${5 + Math.random() * 10}s`;
-        flake.style.animationDelay = `${Math.random() * 5}s`;
-        effectElement.appendChild(flake);
-    }
-}
-
-function addSunRays(count) {
-    const effectElement = document.getElementById('weather-effect');
-    effectElement.innerHTML = '';
-    
-    for (let i = 0; i < count; i++) {
-        const ray = document.createElement('div');
-        ray.className = 'sun-ray';
-        ray.style.transform = `rotate(${(360 / count) * i}deg)`;
-        ray.style.height = `${30 + Math.random() * 20}%`;
-        effectElement.appendChild(ray);
-    }
-}
-
-function updateWeatherStats(forecastData) {
-    const temps = forecastData.list.map(item => item.main.temp);
-    const humidities = forecastData.list.map(item => item.main.humidity);
-    const winds = forecastData.list.map(item => item.wind.speed * 3.6);
-    
-    document.getElementById('max-temp').textContent = `${Math.round(Math.max(...temps))}°`;
-    document.getElementById('min-temp').textContent = `${Math.round(Math.min(...temps))}°`;
-    document.getElementById('avg-humidity').textContent = `${Math.round(humidities.reduce((a, b) => a + b, 0) / humidities.length)}%`;
-    document.getElementById('max-wind').textContent = `${Math.round(Math.max(...winds))} km/h`;
-}
-
 async function loadWeatherData() {
     const weatherContainer = document.getElementById('weather-content');
+    const weatherEffect = document.getElementById('weather-effect');
+    
     weatherContainer.innerHTML = `
         <div class="weather-loading">
             <span class="material-icons spinning">autorenew</span>
@@ -1336,7 +1285,6 @@ async function loadWeatherData() {
 
         const { latitude, longitude } = position.coords;
         
-        // Aggiungi timestamp per evitare cache
         const timestamp = Date.now();
         const response = await fetch(
             `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297&_=${timestamp}`
@@ -1359,33 +1307,39 @@ async function loadWeatherData() {
             icon: data.weather[0].icon,
             humidity: data.main.humidity,
             wind: Math.round(data.wind.speed * 3.6),
-            city: data.name || "Posizione sconosciuta"
+            city: data.name || "Posizione sconosciuta",
+            condition: data.weather[0].main.toLowerCase()
         };
         
+        // Aggiorna l'effetto meteorologico
+        updateWeatherEffect(weather.condition);
+        
         weatherContainer.innerHTML = `
-            <div class="weather-current">
-                <div class="weather-main">
-                    <div class="weather-icon">
-                        <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
+            <div class="weather-effect-container">
+                <div class="weather-current">
+                    <div class="weather-main">
+                        <div class="weather-icon">
+                            <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
+                        </div>
+                        <div class="weather-temp">
+                            <span class="temp-value">${weather.temp}°</span>
+                            <span class="temp-feels">Percepiti ${weather.feels_like}°</span>
+                        </div>
                     </div>
-                    <div class="weather-temp">
-                        <span class="temp-value">${weather.temp}°</span>
-                        <span class="temp-feels">Percepiti ${weather.feels_like}°</span>
+                    <div class="weather-details">
+                        <div class="weather-description">${capitalizeFirstLetter(weather.description)}</div>
+                        <div class="weather-city">${weather.city}</div>
                     </div>
                 </div>
-                <div class="weather-details">
-                    <div class="weather-description">${capitalizeFirstLetter(weather.description)}</div>
-                    <div class="weather-city">${weather.city}</div>
-                </div>
-            </div>
-            <div class="weather-stats">
-                <div class="weather-stat">
-                    <span class="material-icons">water_drop</span>
-                    <span>${weather.humidity}%</span>
-                </div>
-                <div class="weather-stat">
-                    <span class="material-icons">air</span>
-                    <span>${weather.wind} km/h</span>
+                <div class="weather-stats">
+                    <div class="weather-stat">
+                        <span class="material-icons">water_drop</span>
+                        <span>${weather.humidity}%</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="material-icons">air</span>
+                        <span>${weather.wind} km/h</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -1404,6 +1358,70 @@ async function loadWeatherData() {
         `;
         
         document.getElementById('retry-weather-btn')?.addEventListener('click', loadWeatherData);
+    }
+}
+
+function updateWeatherEffect(condition) {
+    const effectElement = document.getElementById('weather-effect');
+    effectElement.innerHTML = '';
+    effectElement.className = 'weather-effect';
+    
+    // Aggiungi la classe appropriata in base alle condizioni
+    if (condition.includes('rain')) {
+        effectElement.classList.add('rain');
+        addRainDrops(30);
+    } else if (condition.includes('snow')) {
+        effectElement.classList.add('snow');
+        addSnowFlakes(30);
+    } else if (condition.includes('clear')) {
+        effectElement.classList.add('sun');
+        addSunRays(8);
+    } else if (condition.includes('cloud')) {
+        effectElement.classList.add('clouds');
+    } else if (condition.includes('thunder')) {
+        effectElement.classList.add('thunder');
+    }
+}
+
+// Funzioni helper per elementi dinamici
+function addRainDrops(count) {
+    const effectElement = document.getElementById('weather-effect');
+    
+    for (let i = 0; i < count; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        drop.style.left = `${Math.random() * 100}%`;
+        drop.style.animationDuration = `${0.5 + Math.random() * 1.5}s`;
+        drop.style.animationDelay = `${Math.random() * 2}s`;
+        drop.style.height = `${10 + Math.random() * 20}px`;
+        effectElement.appendChild(drop);
+    }
+}
+
+function addSnowFlakes(count) {
+    const effectElement = document.getElementById('weather-effect');
+    
+    for (let i = 0; i < count; i++) {
+        const flake = document.createElement('div');
+        flake.className = 'snow-flake';
+        flake.style.left = `${Math.random() * 100}%`;
+        flake.style.width = `${2 + Math.random() * 4}px`;
+        flake.style.height = flake.style.width;
+        flake.style.animationDuration = `${5 + Math.random() * 10}s`;
+        flake.style.animationDelay = `${Math.random() * 5}s`;
+        effectElement.appendChild(flake);
+    }
+}
+
+function addSunRays(count) {
+    const effectElement = document.getElementById('weather-effect');
+    
+    for (let i = 0; i < count; i++) {
+        const ray = document.createElement('div');
+        ray.className = 'sun-ray';
+        ray.style.transform = `rotate(${(360 / count) * i}deg) translateY(-50%)`;
+        ray.style.height = `${30 + Math.random() * 20}%`;
+        effectElement.appendChild(ray);
     }
 }
 
