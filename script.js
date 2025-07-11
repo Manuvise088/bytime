@@ -32,7 +32,6 @@ const addMenu = document.getElementById('add-menu');
 const addTimerMenu = document.getElementById('add-timer-menu');
 const addAlarmMenu = document.getElementById('add-alarm-menu');
 
-// Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     applyTheme();
     initializeTimerGroups()
@@ -154,7 +153,6 @@ function showUsernamePrompt() {
         </div>
     `;
 
-    // Add styles for avatar section
     const style = document.createElement('style');
     style.textContent = `
         .username-page {
@@ -839,16 +837,18 @@ function loadFeedSection() {
     document.querySelector('.fab').style.display = 'none';
     
     mainContent.innerHTML = `
-        <div class="weather-page">
-            <!-- Current Weather - Maggiore gerarchia -->
-            <div class="weather-current-section">
-                <div class="weather-header">
-                    <h2><span class="material-icons">cloud</span> Meteo Attuale</h2>
-                    <button id="refresh-weather" class="icon-btn">
-                        <span class="material-icons">refresh</span>
-                    </button>
-                </div>
-                
+    <div class="weather-page">
+        <!-- Current Weather - Maggiore gerarchia -->
+        <div class="weather-current-section">
+            <div class="weather-header">
+                <h2><span class="material-icons">cloud</span> Meteo Attuale</h2>
+                <button id="refresh-weather" class="icon-btn">
+                    <span class="material-icons">refresh</span>
+                </button>
+            </div>
+            
+            <div class="weather-container">
+                <div id="weather-effect" class="weather-effect"></div>
                 <div id="weather-content" class="weather-content">
                     <div class="weather-loading">
                         <span class="material-icons spinning">autorenew</span>
@@ -856,18 +856,19 @@ function loadFeedSection() {
                     </div>
                 </div>
             </div>
-            
-            <!-- Weather Forecast - Disposizione verticale e scrollabile -->
-            <div class="forecast-section">
-                <h2><span class="material-icons">calendar_today</span> Previsioni</h2>
-                <div id="forecast-content" class="forecast-content">
-                    <div class="forecast-loading">
-                        <span class="material-icons spinning">autorenew</span>
-                        <p>Caricamento previsioni...</p>
-                    </div>
+        </div>
+        
+        <!-- Weather Forecast - Disposizione verticale e scrollabile -->
+        <div class="forecast-section">
+            <h2><span class="material-icons">calendar_today</span> Previsioni</h2>
+            <div id="forecast-content" class="forecast-content">
+                <div class="forecast-loading">
+                    <span class="material-icons spinning">autorenew</span>
+                    <p>Caricamento previsioni...</p>
                 </div>
             </div>
-            
+        </div>
+    </div>
             <!-- Sun Times Section -->
             <div class="sun-section">
                 <h2><span class="material-icons">wb_sunny</span> Sole</h2>
@@ -923,116 +924,380 @@ function loadFeedSection() {
         </div>
     `;
 
-    // Carica i dati meteo attuali
     loadWeatherData();
-    
-    // Carica gli orari di alba/tramonto
     loadSunTimesWithFallback();
-    
-    // Carica le previsioni meteo
     loadWeatherForecast();
     
-    // Pulsante refresh meteo
     document.getElementById('refresh-weather')?.addEventListener('click', function() {
         loadWeatherData();
         loadWeatherForecast();
     });
 }
 
-// Modifica la funzione loadWeatherForecast per adattarsi al nuovo layout
-async function loadWeatherForecast() {
-    const forecastContainer = document.getElementById('forecast-content');
-    
+async function loadWeatherData() {
+    const weatherContainer = document.getElementById('weather-content');
+    weatherContainer.innerHTML = `
+        <div class="weather-loading">
+            <span class="material-icons spinning">autorenew</span>
+            <p>Caricamento dati meteo...</p>
+        </div>
+    `;
+
     try {
         const position = await new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-                enableHighAccuracy: true,
-                timeout: 10000
-            });
+            navigator.geolocation.getCurrentPosition(
+                resolve, 
+                reject, 
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
         });
 
         const { latitude, longitude } = position.coords;
         
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297`);
+        const timestamp = Date.now();
+        const response = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297&_=${timestamp}`
+        );
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         
-        if (data.cod === "200") {
-            const dailyForecasts = {};
-            data.list.forEach(item => {
-                const date = new Date(item.dt * 1000);
-                const day = date.toLocaleDateString('it-IT', { weekday: 'long' });
-                
-                if (!dailyForecasts[day]) {
-                    dailyForecasts[day] = {
-                        temps: [],
-                        icons: [],
-                        descriptions: []
-                    };
-                }
-                
-                dailyForecasts[day].temps.push(item.main.temp);
-                dailyForecasts[day].icons.push(item.weather[0].icon);
-                dailyForecasts[day].descriptions.push(item.weather[0].description);
-            });
-            
-            const forecastHTML = Object.keys(dailyForecasts).map(day => {
-                const dayData = dailyForecasts[day];
-                const avgTemp = Math.round(dayData.temps.reduce((a, b) => a + b, 0) / dayData.temps.length);
-                
-                const iconCounts = {};
-                dayData.icons.forEach(icon => {
-                    iconCounts[icon] = (iconCounts[icon] || 0) + 1;
-                });
-                const mostCommonIcon = Object.keys(iconCounts).reduce((a, b) => 
-                    iconCounts[a] > iconCounts[b] ? a : b
-                );
-                
-                const descCounts = {};
-                dayData.descriptions.forEach(desc => {
-                    descCounts[desc] = (descCounts[desc] || 0) + 1;
-                });
-                const mostCommonDesc = Object.keys(descCounts).reduce((a, b) => 
-                    descCounts[a] > descCounts[b] ? a : b
-                );
-                
-                return `
-                    <div class="forecast-day">
-                        <div class="forecast-day-header">
-                            <span class="day-name">${day}</span>
-                            <span class="day-temp">${avgTemp}°</span>
+        if (data.cod !== 200) {
+            throw new Error(data.message || 'Errore nel recupero dati meteo');
+        }
+
+        const weather = {
+            temp: Math.round(data.main.temp),
+            feels_like: Math.round(data.main.feels_like),
+            description: data.weather[0].description,
+            icon: data.weather[0].icon,
+            humidity: data.main.humidity,
+            wind: Math.round(data.wind.speed * 3.6),
+            city: data.name || "Posizione sconosciuta",
+            condition: data.weather[0].main.toLowerCase()
+        };
+        
+        const weatherEffects = getWeatherEffect(weather.condition);
+        
+        weatherContainer.innerHTML = `
+            <div class="weather-effect-container">
+                ${weatherEffects.animation}
+                <div class="weather-current">
+                    <div class="weather-main">
+                        <div class="weather-icon">
+                            <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
                         </div>
-                        <div class="forecast-day-details">
-                            <img src="https://openweathermap.org/img/wn/${mostCommonIcon}.png" alt="${mostCommonDesc}">
-                            <span class="day-desc">${capitalizeFirstLetter(mostCommonDesc)}</span>
+                        <div class="weather-temp">
+                            <span class="temp-value">${weather.temp}°</span>
+                            <span class="temp-feels">Percepiti ${weather.feels_like}°</span>
                         </div>
                     </div>
-                `;
-            }).join('');
-            
-            forecastContainer.innerHTML = `
-                <div class="forecast-scroll">
-                    ${forecastHTML}
+                    <div class="weather-details">
+                        <div class="weather-description">${capitalizeFirstLetter(weather.description)}</div>
+                        <div class="weather-city">${weather.city}</div>
+                    </div>
                 </div>
-            `;
-            
-            updateWeatherStats(data);
-        } else {
-            throw new Error(data.message || 'Errore nel recupero previsioni');
-        }
+                <div class="weather-stats">
+                    <div class="weather-stat">
+                        <span class="material-icons">water_drop</span>
+                        <span>${weather.humidity}%</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="material-icons">air</span>
+                        <span>${weather.wind} km/h</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        const style = document.createElement('style');
+        style.textContent = weatherEffects.css;
+        document.head.appendChild(style);
+
     } catch (error) {
-        console.error("Errore nel recupero previsioni:", error);
-        forecastContainer.innerHTML = `
+        console.error("Errore nel recupero dati meteo:", error);
+        weatherContainer.innerHTML = `
             <div class="weather-error">
                 <span class="material-icons">error</span>
-                <p>Impossibile caricare le previsioni</p>
-                <button id="retry-forecast-btn" class="btn-secondary small">
+                <p>${getUserFriendlyError(error)}</p>
+                <button id="retry-weather-btn" class="btn-secondary small">
                     <span class="material-icons">refresh</span>
                     Riprova
                 </button>
             </div>
         `;
         
-        document.getElementById('retry-forecast-btn')?.addEventListener('click', loadWeatherForecast);
+        document.getElementById('retry-weather-btn')?.addEventListener('click', loadWeatherData);
+    }
+}
+
+function getWeatherEffect(condition) {
+    const effects = {
+        rain: {
+            animation: `<div class="weather-effect"></div>`,
+            css: `
+                .weather-effect {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: 0;
+                    overflow: hidden;
+                }
+                ${createRainDrops(30)}
+                @keyframes rainDrop {
+                    0% { transform: translateY(-20px); }
+                    100% { transform: translateY(calc(100vh + 20px)); }
+                }
+            `
+        },
+        snow: {
+            animation: `<div class="weather-effect"></div>`,
+            css: `
+                .weather-effect {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: 0;
+                    overflow: hidden;
+                }
+                ${createSnowFlakes(30)}
+                @keyframes snowFall {
+                    0% { transform: translateY(-10px) rotate(0deg); }
+                    100% { transform: translateY(calc(100vh + 10px)) rotate(360deg); }
+                }
+            `
+        },
+        clear: {
+            animation: `<div class="weather-effect"></div>`,
+            css: `
+                .weather-effect {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: 0;
+                    background: radial-gradient(
+                        circle at center,
+                        rgba(255,255,0,0.1) 0%,
+                        rgba(255,255,0,0) 70%
+                    );
+                    animation: sunGlow 3s ease-in-out infinite alternate;
+                }
+                ${createSunRays(8)}
+                @keyframes sunGlow {
+                    0% { opacity: 0.3; }
+                    100% { opacity: 0.6; }
+                }
+                @keyframes sunRaySpin {
+                    0% { transform: rotate(0deg) translateY(-50%); }
+                    100% { transform: rotate(360deg) translateY(-50%); }
+                }
+            `
+        },
+        clouds: {
+            animation: `<div class="weather-effect"></div>`,
+            css: `
+                .weather-effect {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: 0;
+                    background: linear-gradient(
+                        90deg,
+                        rgba(255,255,255,0) 0%,
+                        rgba(255,255,255,0.1) 50%,
+                        rgba(255,255,255,0) 100%
+                    );
+                    animation: cloudsMove 20s linear infinite;
+                }
+                @keyframes cloudsMove {
+                    0% { background-position: 0 0; }
+                    100% { background-position: 100% 0; }
+                }
+            `
+        },
+        thunderstorm: {
+            animation: `<div class="weather-effect thunder-effect"></div>`,
+            css: `
+                .thunder-effect {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: white;
+                    animation: thunderFlash 8s linear infinite;
+                    opacity: 0;
+                }
+                @keyframes thunderFlash {
+                    0%, 85%, 100% { opacity: 0; }
+                    5% { opacity: 0.8; }
+                    6% { opacity: 0; }
+                    10% { opacity: 0.5; }
+                    11% { opacity: 0; }
+                }
+            `
+        },
+        default: {
+            animation: '',
+            css: ''
+        }
+    };
+
+    return effects[condition] || effects.default;
+}
+
+// Funzioni helper per creare elementi dinamici
+function createRainDrops(count) {
+    let css = '';
+    for (let i = 0; i < count; i++) {
+        const left = Math.random() * 100;
+        const delay = Math.random() * 2;
+        const duration = 0.5 + Math.random() * 1.5;
+        css += `
+            .rain-effect:after {
+                content: '';
+                position: absolute;
+                left: ${left}%;
+                top: -20px;
+                width: 1px;
+                height: ${10 + Math.random() * 20}px;
+                background: rgba(255,255,255,0.4);
+                animation: rainDrop ${duration}s linear ${delay}s infinite;
+                transform: rotate(${5 + Math.random() * 10}deg);
+            }
+        `;
+    }
+    return css;
+}
+
+function createSnowFlakes(count) {
+    let css = '';
+    for (let i = 0; i < count; i++) {
+        const left = Math.random() * 100;
+        const size = 2 + Math.random() * 4;
+        const delay = Math.random() * 5;
+        const duration = 5 + Math.random() * 10;
+        css += `
+            .snow-effect:before {
+                content: '';
+                position: absolute;
+                left: ${left}%;
+                top: -10px;
+                width: ${size}px;
+                height: ${size}px;
+                background: white;
+                border-radius: 50%;
+                filter: blur(1px);
+                animation: snowFall ${duration}s linear ${delay}s infinite;
+            }
+        `;
+    }
+    return css;
+}
+
+function createSunRays(count) {
+    let css = '';
+    for (let i = 0; i < count; i++) {
+        const angle = (360 / count) * i;
+        const length = 30 + Math.random() * 20;
+        css += `
+            .sun-effect:before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 2px;
+                height: ${length}%;
+                background: rgba(255,255,0,0.1);
+                transform-origin: 0 0;
+                transform: rotate(${angle}deg) translateY(-50%);
+                animation: sunRaySpin 20s linear infinite;
+            }
+        `;
+    }
+    return css;
+}
+function updateWeatherEffect(condition) {
+    const effectElement = document.getElementById('weather-effect');
+    effectElement.className = 'weather-effect'; // Resetta le classi
+    
+    // Aggiungi la classe appropriata in base alle condizioni
+    if (condition.includes('rain')) {
+        effectElement.classList.add('rain');
+        addRainDrops(20);
+    } else if (condition.includes('snow')) {
+        effectElement.classList.add('snow');
+        addSnowFlakes(30);
+    } else if (condition.includes('clear')) {
+        effectElement.classList.add('sun');
+        addSunRays(8);
+    } else if (condition.includes('cloud')) {
+        effectElement.classList.add('clouds');
+    } else if (condition.includes('thunder')) {
+        effectElement.classList.add('thunder');
+    }
+}
+
+// Funzioni helper per elementi dinamici
+function addRainDrops(count) {
+    const effectElement = document.getElementById('weather-effect');
+    effectElement.innerHTML = '';
+    
+    for (let i = 0; i < count; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        drop.style.left = `${Math.random() * 100}%`;
+        drop.style.animationDuration = `${0.5 + Math.random() * 1.5}s`;
+        drop.style.animationDelay = `${Math.random() * 2}s`;
+        drop.style.height = `${10 + Math.random() * 20}px`;
+        effectElement.appendChild(drop);
+    }
+}
+
+function addSnowFlakes(count) {
+    const effectElement = document.getElementById('weather-effect');
+    effectElement.innerHTML = '';
+    
+    for (let i = 0; i < count; i++) {
+        const flake = document.createElement('div');
+        flake.className = 'snow-flake';
+        flake.style.left = `${Math.random() * 100}%`;
+        flake.style.width = `${2 + Math.random() * 4}px`;
+        flake.style.height = flake.style.width;
+        flake.style.animationDuration = `${5 + Math.random() * 10}s`;
+        flake.style.animationDelay = `${Math.random() * 5}s`;
+        effectElement.appendChild(flake);
+    }
+}
+
+function addSunRays(count) {
+    const effectElement = document.getElementById('weather-effect');
+    effectElement.innerHTML = '';
+    
+    for (let i = 0; i < count; i++) {
+        const ray = document.createElement('div');
+        ray.className = 'sun-ray';
+        ray.style.transform = `rotate(${(360 / count) * i}deg)`;
+        ray.style.height = `${30 + Math.random() * 20}%`;
+        effectElement.appendChild(ray);
     }
 }
 
