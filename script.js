@@ -13,6 +13,7 @@ let stopwatch = {
     elapsed: 0,
     laps: []
 };
+let amoledMode = localStorage.getItem('amoledMode') === 'true' || false;
 let currentSection = 'home';
 let userAvatar = localStorage.getItem('userAvatar') || null;
 let currentTheme = localStorage.getItem('theme') || 'default';
@@ -492,9 +493,9 @@ function loadHomeSection() {
                 <div class="card home-timer-item" data-id="${timer.id}">
                     <div class="card-content">
                         <div class="timer-info">
-                            <h3>${timer.name || 'Timer'}</h3>
-                            ${timer.group && timer.group !== 'all' ? 
+                           ${timer.group && timer.group !== 'all' ? 
                                 `<span class="timer-badge">${groupNames[timer.group] || timer.group}</span>` : ''}
+                            <h3>${timer.name || 'Timer'}</h3>
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <button class="icon-btn play-btn">
@@ -621,9 +622,9 @@ function loadTimersSection() {
                 <div class="card timer-item" data-id="${timer.id}">
                     <div class="card-content">
                         <div class="timer-info">
-                            <h3>${timer.name || 'Timer'}</h3>
                             ${timer.group && timer.group !== 'all' ? 
                                 `<span class="timer-badge">${groupNames[timer.group] || timer.group}</span>` : ''}
+                            <h3>${timer.name || 'Timer'}</h3>
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <div class="timer-actions">
@@ -1258,6 +1259,18 @@ function loadSettingsSection() {
                             </label>
                         </div>
                     </div>
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">Modalità AMOLED</h4>
+                                <p class="group-description">Sfondo nero puro per schermi AMOLED</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="amoled-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -1269,7 +1282,7 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>Versione</span>
-                            <span>1.4.2</span>
+                            <span>1.4.3</span>
                         </div>
                         <div class="info-item">
                             <span>Sviluppatore</span>
@@ -1583,7 +1596,7 @@ document.head.appendChild(style);
             setTheme(theme);
         });
     });
-    
+    document.getElementById('amoled-toggle').checked = amoledMode;
     // Notifications toggle
     document.getElementById('notifications-toggle')?.addEventListener('change', function() {
         if (this.checked) {
@@ -1596,6 +1609,12 @@ document.head.appendChild(style);
         } else {
             notificationPermission = false;
         }
+    });
+
+    document.getElementById('amoled-toggle')?.addEventListener('change', function() {
+        amoledMode = this.checked;
+        localStorage.setItem('amoledMode', amoledMode);
+        applyTheme();
     });
     
     // Change username button
@@ -2006,6 +2025,16 @@ function setTheme(theme) {
 
 function applyTheme() {
     const root = document.documentElement;
+    const body = document.body;
+    
+    // Applica la modalità AMOLED
+    if (amoledMode) {
+        body.style.backgroundColor = '#000000';
+        body.classList.add('amoled-mode');
+    } else {
+        body.style.backgroundColor = '#1f1f1f';
+        body.classList.remove('amoled-mode');
+    }
     
     switch(currentTheme) {
         case 'green':
@@ -2211,12 +2240,12 @@ function getSectionTitle(section) {
     const titles = {
         'home': 'Home',
         'cronometers': 'Cronometro',
-        'timers': 'Timer e Sveglie',
+        'timers': 'Timer',
         'alarms': 'Sveglie',
         'settings': 'Impostazioni',
         'feed': 'Feed'
     };
-    return titles[section] || 'ByTime';
+    return titles[section] || 'bytime';
 }
 
 async function updateLocalCoordinates() {

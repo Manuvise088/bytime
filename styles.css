@@ -2400,3 +2400,30 @@ body.accessibility-mode .time-display {
     text-transform: capitalize;
     display: inline-block;
 }
+.group-selector {
+    display: none;
+}
+body.amoled-mode {
+    background-color: #000000 !important;
+}
+body.amoled-mode .nav-btn:not(.active) {
+    color: #aaa !important;
+}
+
+body.amoled-mode .empty-state,
+body.amoled-mode .time-display,
+body.amoled-mode .group-description,
+body.amoled-mode .accessibility-description,
+body.amoled-mode .account-type,
+body.amoled-mode .location-info,
+body.amoled-mode .temp-feels,
+body.amoled-mode .weather-city,
+body.amoled-mode .day-desc,
+body.amoled-mode .sun-card span,
+body.amoled-mode .stat-card span {
+    color: #898989 !important;
+}
+
+body.amoled-mode span {
+    color: white !important;
+}
