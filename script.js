@@ -14,6 +14,7 @@ let stopwatch = {
     elapsed: 0,
     laps: []
 };
+let autoplayEnabled = localStorage.getItem('autoplayEnabled') !== 'false';
 let amoledMode = localStorage.getItem('amoledMode') === 'true' || false;
 let currentSection = 'home';
 let userAvatar = localStorage.getItem('userAvatar') || null;
@@ -32,8 +33,662 @@ const addBtn = document.getElementById('add-btn');
 const addMenu = document.getElementById('add-menu');
 const addTimerMenu = document.getElementById('add-timer-menu');
 const addAlarmMenu = document.getElementById('add-alarm-menu');
+const translations = {
+    it: {
+        appName: "bytime",
+        greetings: {
+            morning: "Buongiorno",
+            lunch: "Buon pranzo",
+            afternoon: "Buon pomeriggio",
+            evening: "Buonasera",
+            night: "Buonanotte",
+            welcome: "Benvenuto in ByTime"
+        },
+        sections: {
+            home: "Home",
+            timers: "Timer",
+            alarms: "Sveglie",
+            cronometers: "Cronometro",
+            settings: "Impostazioni",
+            feed: "Feed"
+        },
+        buttons: {
+            seeAll: "Vedi tutti",
+            start: "Avvia",
+            stop: "Ferma",
+            pause: "Pausa",
+            resume: "Riprendi",
+            save: "Salva",
+            cancel: "Annulla",
+            delete: "Elimina",
+            edit: "Modifica",
+            add: "Aggiungi",
+            confirm: "Conferma",
+            skip: "Salta",
+            back: "Indietro",
+            retry: "Riprova",
+            refresh: "Aggiorna"
+        },
+        timer: {
+            createFirst: "Crea il tuo primo timer",
+            noTimers: "Nessun timer impostato",
+            recentTimers: "Timer recenti",
+            namePlaceholder: "Nome del timer (opzionale)",
+            hours: "Ore",
+            minutes: "Minuti",
+            seconds: "Secondi",
+            groupAll: "Tutti i timer",
+            groupWork: "Lavoro",
+            groupPersonal: "Personale",
+            groupFitness: "Fitness",
+            groupStudy: "Studio"
+        },
+        alarm: {
+            createFirst: "Crea la tua prima sveglia",
+            noAlarms: "Nessuna sveglia impostata",
+            recentAlarms: "Sveglie recenti",
+            namePlaceholder: "Nome sveglia (opzionale)",
+            repeat: "Ripeti",
+            days: ["L", "M", "M", "G", "V", "S", "D"],
+            active: "Attiva",
+            inactive: "Disattiva"
+        },
+        stopwatch: {
+            start: "Avvia",
+            stop: "Ferma",
+            lap: "Giro",
+            reset: "Azzera",
+            laps: "Giri",
+            noLaps: "Nessun giro registrato"
+        },
+        settings: {
+            account: "Account",
+            accountType: "Account locale",
+            changeUsername: "Modifica profilo",
+            appearance: "Aspetto",
+            theme: "Tema dell'app",
+            preferences: "Preferenze",
+            notifications: "Notifiche",
+            notificationsDesc: "Notifiche push per timer e sveglie",
+            location: "Localizzazione",
+            locationDesc: "Condividi la posizione per informazioni locali",
+            timerGroups: "Gruppi timer",
+            timerGroupsDesc: "Organizza i timer in categorie",
+            amoledMode: "Modalità AMOLED",
+            amoledModeDesc: "Sfondo nero puro per schermi AMOLED",
+            autoplay: "Autoplay timer",
+            autoplayDesc: "Avvia automaticamente i nuovi timer",
+            experimental: "Impostazioni sperimentali",
+            liquidGlass: "Stile Liquid Glass",
+            liquidGlassDesc: "Effetto vetro smerigliato con bordi fluidi",
+            info: "Informazioni",
+            version: "Versione",
+            developer: "Sviluppatore",
+            reportBug: "Segnala un bug",
+            language: "Lingua",
+            input: "Immissione",
+            languageTitle: "Lingua e immissione",
+            languageDesc: "Lingua dell'app"
+        },
+        weather: {
+            current: "Meteo Attuale",
+            forecast: "Previsioni",
+            feelsLike: "Percepiti",
+            humidity: "Umidità",
+            wind: "Vento",
+            sunrise: "Alba",
+            sunset: "Tramonto",
+            loading: "Caricamento dati meteo...",
+            error: "Impossibile caricare i dati meteo",
+            stats: "Statistiche Meteo",
+            maxTemp: "Record massimo",
+            minTemp: "Record minimo",
+            avgHumidity: "Umidità media",
+            maxWind: "Vento massimo"
+        },
+        modals: {
+            newTimer: "Nuovo Timer",
+            newAlarm: "Nuova Sveglia",
+            usernameTitle: "Modifica il tuo profilo",
+            usernameSubtitle: "Aggiorna il tuo nome e la tua immagine",
+            usernameLabel: "Il tuo nome",
+            usernamePlaceholder: "Come vuoi essere chiamato?",
+            avatarLabel: "Scegli immagine",
+            saveChanges: "Salva modifiche",
+            continue: "Continua",
+            footerText: "Puoi cambiare nome e immagine in qualsiasi momento dalle impostazioni"
+        },
+        notifications: {
+            timerStart: "Timer avviato",
+            timerComplete: "Timer completato!",
+            alarm: "Sveglia"
+        }
+    },
+    en: {
+        appName: "bytime",
+        greetings: {
+            morning: "Good morning",
+            lunch: "Lunch time",
+            afternoon: "Good afternoon",
+            evening: "Good evening",
+            night: "Good night",
+            welcome: "Welcome to ByTime"
+        },
+        sections: {
+            home: "Home",
+            timers: "Timers",
+            alarms: "Alarms",
+            cronometers: "Stopwatch",
+            settings: "Settings",
+            feed: "Feed"
+        },
+        buttons: {
+            seeAll: "See all",
+            start: "Start",
+            stop: "Stop",
+            pause: "Pause",
+            resume: "Resume",
+            save: "Save",
+            cancel: "Cancel",
+            delete: "Delete",
+            edit: "Edit",
+            add: "Add",
+            confirm: "Confirm",
+            skip: "Skip",
+            back: "Back",
+            retry: "Retry",
+            refresh: "Refresh"
+        },
+        timer: {
+            createFirst: "Create your first timer",
+            noTimers: "No timers set",
+            recentTimers: "Recent timers",
+            namePlaceholder: "Timer name (optional)",
+            hours: "Hours",
+            minutes: "Minutes",
+            seconds: "Seconds",
+            groupAll: "All timers",
+            groupWork: "Work",
+            groupPersonal: "Personal",
+            groupFitness: "Fitness",
+            groupStudy: "Study"
+        },
+        alarm: {
+            createFirst: "Create your first alarm",
+            noAlarms: "No alarms set",
+            recentAlarms: "Recent alarms",
+            namePlaceholder: "Alarm name (optional)",
+            repeat: "Repeat",
+            days: ["S", "M", "T", "W", "T", "F", "S"],
+            active: "Active",
+            inactive: "Inactive"
+        },
+        stopwatch: {
+            start: "Start",
+            stop: "Stop",
+            lap: "Lap",
+            reset: "Reset",
+            laps: "Laps",
+            noLaps: "No laps recorded"
+        },
+        settings: {
+            account: "Account",
+            accountType: "Local account",
+            changeUsername: "Edit profile",
+            appearance: "Appearance",
+            theme: "App theme",
+            preferences: "Preferences",
+            notifications: "Notifications",
+            notificationsDesc: "Push notifications for timers and alarms",
+            location: "Location",
+            locationDesc: "Share location for local information",
+            timerGroups: "Timer groups",
+            timerGroupsDesc: "Organize timers into categories",
+            amoledMode: "AMOLED mode",
+            amoledModeDesc: "Pure black background for AMOLED screens",
+            autoplay: "Timer autoplay",
+            autoplayDesc: "Automatically start new timers",
+            experimental: "Experimental features",
+            liquidGlass: "Liquid Glass style",
+            liquidGlassDesc: "Frosted glass effect with fluid edges",
+            info: "Information",
+            version: "Version",
+            developer: "Developer",
+            reportBug: "Report a bug",
+            language: "Language",
+            input: "Input",
+            languageTitle: "Language & Input",
+            languageDesc: "App language"
+        },
+        weather: {
+            current: "Current Weather",
+            forecast: "Forecast",
+            feelsLike: "Feels like",
+            humidity: "Humidity",
+            wind: "Wind",
+            sunrise: "Sunrise",
+            sunset: "Sunset",
+            loading: "Loading weather data...",
+            error: "Failed to load weather data",
+            stats: "Weather Stats",
+            maxTemp: "Max record",
+            minTemp: "Min record",
+            avgHumidity: "Avg humidity",
+            maxWind: "Max wind"
+        },
+        modals: {
+            newTimer: "New Timer",
+            newAlarm: "New Alarm",
+            usernameTitle: "Edit your profile",
+            usernameSubtitle: "Update your name and image",
+            usernameLabel: "Your name",
+            usernamePlaceholder: "What should we call you?",
+            avatarLabel: "Choose image",
+            saveChanges: "Save changes",
+            continue: "Continue",
+            footerText: "You can change name and image anytime in settings"
+        },
+        notifications: {
+            timerStart: "Timer started",
+            timerComplete: "Timer completed!",
+            alarm: "Alarm"
+        }
+    },
+    es: {
+        appName: "bytime",
+        greetings: {
+            morning: "Buenos días",
+            lunch: "Hora de comer",
+            afternoon: "Buenas tardes",
+            evening: "Buenas noches",
+            night: "Buenas noches",
+            welcome: "Bienvenido a ByTime"
+        },
+        sections: {
+            home: "Inicio",
+            timers: "Temporizadores",
+            alarms: "Alarmas",
+            cronometers: "Cronómetro",
+            settings: "Ajustes",
+            feed: "Noticias"
+        },
+        buttons: {
+            seeAll: "Ver todos",
+            start: "Iniciar",
+            stop: "Detener",
+            pause: "Pausa",
+            resume: "Continuar",
+            save: "Guardar",
+            cancel: "Cancelar",
+            delete: "Eliminar",
+            edit: "Editar",
+            add: "Añadir",
+            confirm: "Confirmar",
+            skip: "Saltar",
+            back: "Atrás",
+            retry: "Reintentar",
+            refresh: "Actualizar"
+        },
+        timer: {
+            createFirst: "Crea tu primer temporizador",
+            noTimers: "No hay temporizadores",
+            recentTimers: "Temporizadores recientes",
+            namePlaceholder: "Nombre del temporizador (opcional)",
+            hours: "Horas",
+            minutes: "Minutos",
+            seconds: "Segundos",
+            groupAll: "Todos los temporizadores",
+            groupWork: "Trabajo",
+            groupPersonal: "Personal",
+            groupFitness: "Fitness",
+            groupStudy: "Estudio"
+        },
+        alarm: {
+            createFirst: "Crea tu primera alarma",
+            noAlarms: "No hay alarmas",
+            recentAlarms: "Alarmas recientes",
+            namePlaceholder: "Nombre de alarma (opcional)",
+            repeat: "Repetir",
+            days: ["D", "L", "M", "X", "J", "V", "S"],
+            active: "Activa",
+            inactive: "Inactiva"
+        },
+        stopwatch: {
+            start: "Iniciar",
+            stop: "Detener",
+            lap: "Vuelta",
+            reset: "Reiniciar",
+            laps: "Vueltas",
+            noLaps: "No hay vueltas registradas"
+        },
+        settings: {
+            account: "Cuenta",
+            accountType: "Cuenta local",
+            changeUsername: "Editar perfil",
+            appearance: "Apariencia",
+            theme: "Tema de la app",
+            preferences: "Preferencias",
+            notifications: "Notificaciones",
+            notificationsDesc: "Notificaciones push para temporizadores y alarmas",
+            location: "Ubicación",
+            locationDesc: "Compartir ubicación para información local",
+            timerGroups: "Grupos de temporizadores",
+            timerGroupsDesc: "Organizar temporizadores en categorías",
+            amoledMode: "Modo AMOLED",
+            amoledModeDesc: "Fondo negro puro para pantallas AMOLED",
+            autoplay: "Autoplay de temporizadores",
+            autoplayDesc: "Iniciar automáticamente nuevos temporizadores",
+            experimental: "Características experimentales",
+            liquidGlass: "Estilo Liquid Glass",
+            liquidGlassDesc: "Efecto vidrio esmerilado con bordes fluidos",
+            info: "Información",
+            version: "Versión",
+            developer: "Desarrollador",
+            reportBug: "Reportar un error",
+            language: "Idioma",
+            input: "Entrada",
+            languageTitle: "Idioma y entrada",
+            languageDesc: "Idioma de la app"
+        },
+        weather: {
+            current: "Tiempo Actual",
+            forecast: "Pronóstico",
+            feelsLike: "Sensación",
+            humidity: "Humedad",
+            wind: "Viento",
+            sunrise: "Amanecer",
+            sunset: "Atardecer",
+            loading: "Cargando datos del tiempo...",
+            error: "Error al cargar datos del tiempo",
+            stats: "Estadísticas del Tiempo",
+            maxTemp: "Máximo récord",
+            minTemp: "Mínimo récord",
+            avgHumidity: "Humedad promedio",
+            maxWind: "Viento máximo"
+        },
+        modals: {
+            newTimer: "Nuevo Temporizador",
+            newAlarm: "Nueva Alarma",
+            usernameTitle: "Edita tu perfil",
+            usernameSubtitle: "Actualiza tu nombre e imagen",
+            usernameLabel: "Tu nombre",
+            usernamePlaceholder: "¿Cómo quieres que te llamemos?",
+            avatarLabel: "Elegir imagen",
+            saveChanges: "Guardar cambios",
+            continue: "Continuar",
+            footerText: "Puedes cambiar nombre e imagen en cualquier momento en ajustes"
+        },
+        notifications: {
+            timerStart: "Temporizador iniciado",
+            timerComplete: "¡Temporizador completado!",
+            alarm: "Alarma"
+        }
+    },
+    fr: {
+        appName: "bytime",
+        greetings: {
+            morning: "Bonjour",
+            lunch: "Bon appétit",
+            afternoon: "Bon après-midi",
+            evening: "Bonsoir",
+            night: "Bonne nuit",
+            welcome: "Bienvenue sur ByTime"
+        },
+        sections: {
+            home: "Accueil",
+            timers: "Minuteurs",
+            alarms: "Alarmes",
+            cronometers: "Chronomètre",
+            settings: "Paramètres",
+            feed: "Flux"
+        },
+        buttons: {
+            seeAll: "Voir tout",
+            start: "Démarrer",
+            stop: "Arrêter",
+            pause: "Pause",
+            resume: "Reprendre",
+            save: "Enregistrer",
+            cancel: "Annuler",
+            delete: "Supprimer",
+            edit: "Modifier",
+            add: "Ajouter",
+            confirm: "Confirmer",
+            skip: "Passer",
+            back: "Retour",
+            retry: "Réessayer",
+            refresh: "Actualiser"
+        },
+        timer: {
+            createFirst: "Créez votre premier minuteur",
+            noTimers: "Aucun minuteur",
+            recentTimers: "Minuteurs récents",
+            namePlaceholder: "Nom du minuteur (optionnel)",
+            hours: "Heures",
+            minutes: "Minutes",
+            seconds: "Secondes",
+            groupAll: "Tous les minuteurs",
+            groupWork: "Travail",
+            groupPersonal: "Personnel",
+            groupFitness: "Fitness",
+            groupStudy: "Étude"
+        },
+        alarm: {
+            createFirst: "Créez votre première alarme",
+            noAlarms: "Aucune alarme",
+            recentAlarms: "Alarmes récentes",
+            namePlaceholder: "Nom de l'alarme (optionnel)",
+            repeat: "Répéter",
+            days: ["L", "M", "M", "J", "V", "S", "D"],
+            active: "Active",
+            inactive: "Inactive"
+        },
+        stopwatch: {
+            start: "Démarrer",
+            stop: "Arrêter",
+            lap: "Tour",
+            reset: "Réinitialiser",
+            laps: "Tours",
+            noLaps: "Aucun tour enregistré"
+        },
+        settings: {
+            account: "Compte",
+            accountType: "Compte local",
+            changeUsername: "Modifier le profil",
+            appearance: "Apparence",
+            theme: "Thème de l'application",
+            preferences: "Préférences",
+            notifications: "Notifications",
+            notificationsDesc: "Notifications push pour les minuteurs et alarmes",
+            location: "Localisation",
+            locationDesc: "Partager la position pour des informations locales",
+            timerGroups: "Groupes de minuteurs",
+            timerGroupsDesc: "Organiser les minuteurs en catégories",
+            amoledMode: "Mode AMOLED",
+            amoledModeDesc: "Fond noir pur pour écrans AMOLED",
+            autoplay: "Lecture automatique",
+            autoplayDesc: "Démarrer automatiquement les nouveaux minuteurs",
+            experimental: "Fonctionnalités expérimentales",
+            liquidGlass: "Style Liquid Glass",
+            liquidGlassDesc: "Effet verre dépoli avec bords fluides",
+            info: "Information",
+            version: "Version",
+            developer: "Développeur",
+            reportBug: "Signaler un bug",
+            language: "Langue",
+            input: "Saisie",
+            languageTitle: "Langue et saisie",
+            languageDesc: "Langue de l'application"
+        },
+        weather: {
+            current: "Météo Actuelle",
+            forecast: "Prévisions",
+            feelsLike: "Ressenti",
+            humidity: "Humidité",
+            wind: "Vent",
+            sunrise: "Lever",
+            sunset: "Coucher",
+            loading: "Chargement des données météo...",
+            error: "Échec du chargement des données météo",
+            stats: "Statistiques Météo",
+            maxTemp: "Record max",
+            minTemp: "Record min",
+            avgHumidity: "Humidité moy",
+            maxWind: "Vent max"
+        },
+        modals: {
+            newTimer: "Nouveau Minuteur",
+            newAlarm: "Nouvelle Alarme",
+            usernameTitle: "Modifier votre profil",
+            usernameSubtitle: "Mettre à jour votre nom et image",
+            usernameLabel: "Votre nom",
+            usernamePlaceholder: "Comment voulez-vous être appelé?",
+            avatarLabel: "Choisir une image",
+            saveChanges: "Enregistrer les modifications",
+            continue: "Continuer",
+            footerText: "Vous pouvez changer nom et image à tout moment dans les paramètres"
+        },
+        notifications: {
+            timerStart: "Minuteur démarré",
+            timerComplete: "Minuteur terminé!",
+            alarm: "Alarme"
+        }
+    },
+    de: {
+        appName: "bytime",
+        greetings: {
+            morning: "Guten Morgen",
+            lunch: "Mittagessen",
+            afternoon: "Guten Tag",
+            evening: "Guten Abend",
+            night: "Gute Nacht",
+            welcome: "Willkommen bei ByTime"
+        },
+        sections: {
+            home: "Startseite",
+            timers: "Timer",
+            alarms: "Alarme",
+            cronometers: "Stoppuhr",
+            settings: "Einstellungen",
+            feed: "Feed"
+        },
+        buttons: {
+            seeAll: "Alle anzeigen",
+            start: "Starten",
+            stop: "Stoppen",
+            pause: "Pause",
+            resume: "Fortsetzen",
+            save: "Speichern",
+            cancel: "Abbrechen",
+            delete: "Löschen",
+            edit: "Bearbeiten",
+            add: "Hinzufügen",
+            confirm: "Bestätigen",
+            skip: "Überspringen",
+            back: "Zurück",
+            retry: "Erneut versuchen",
+            refresh: "Aktualisieren"
+        },
+        timer: {
+            createFirst: "Erstellen Sie Ihren ersten Timer",
+            noTimers: "Keine Timer",
+            recentTimers: "Letzte Timer",
+            namePlaceholder: "Timer-Name (optional)",
+            hours: "Stunden",
+            minutes: "Minuten",
+            seconds: "Sekunden",
+            groupAll: "Alle Timer",
+            groupWork: "Arbeit",
+            groupPersonal: "Persönlich",
+            groupFitness: "Fitness",
+            groupStudy: "Studium"
+        },
+        alarm: {
+            createFirst: "Erstellen Sie Ihren ersten Alarm",
+            noAlarms: "Keine Alarme",
+            recentAlarms: "Letzte Alarme",
+            namePlaceholder: "Alarmname (optional)",
+            repeat: "Wiederholen",
+            days: ["M", "D", "M", "D", "F", "S", "S"],
+            active: "Aktiv",
+            inactive: "Inaktiv"
+        },
+        stopwatch: {
+            start: "Starten",
+            stop: "Stoppen",
+            lap: "Runde",
+            reset: "Zurücksetzen",
+            laps: "Runden",
+            noLaps: "Keine Runden aufgezeichnet"
+        },
+        settings: {
+            account: "Konto",
+            accountType: "Lokales Konto",
+            changeUsername: "Profil bearbeiten",
+            appearance: "Aussehen",
+            theme: "App-Design",
+            preferences: "Einstellungen",
+            notifications: "Benachrichtigungen",
+            notificationsDesc: "Push-Benachrichtigungen für Timer und Alarme",
+            location: "Standort",
+            locationDesc: "Standort für lokale Informationen teilen",
+            timerGroups: "Timer-Gruppen",
+            timerGroupsDesc: "Timer in Kategorien organisieren",
+            amoledMode: "AMOLED-Modus",
+            amoledModeDesc: "Reiner schwarzer Hintergrund für AMOLED-Bildschirme",
+            autoplay: "Timer-Autoplay",
+            autoplayDesc: "Neue Timer automatisch starten",
+            experimental: "Experimentelle Funktionen",
+            liquidGlass: "Liquid Glass-Stil",
+            liquidGlassDesc: "Milchglaseffekt mit fließenden Rändern",
+            info: "Information",
+            version: "Version",
+            developer: "Entwickler",
+            reportBug: "Fehler melden",
+            language: "Sprache",
+            input: "Eingabe",
+            languageTitle: "Sprache & Eingabe",
+            languageDesc: "App-Sprache"
+        },
+        weather: {
+            current: "Aktuelles Wetter",
+            forecast: "Vorhersage",
+            feelsLike: "Gefühlt",
+            humidity: "Luftfeuchtigkeit",
+            wind: "Wind",
+            sunrise: "Sonnenaufgang",
+            sunset: "Sonnenuntergang",
+            loading: "Wetterdaten werden geladen...",
+            error: "Fehler beim Laden der Wetterdaten",
+            stats: "Wetterstatistiken",
+            maxTemp: "Rekordmaximum",
+            minTemp: "Rekordminimum",
+            avgHumidity: "Durchschn. Luftfeuchtigkeit",
+            maxWind: "Maximaler Wind"
+        },
+        modals: {
+            newTimer: "Neuer Timer",
+            newAlarm: "Neuer Alarm",
+            usernameTitle: "Ihr Profil bearbeiten",
+            usernameSubtitle: "Aktualisieren Sie Ihren Namen und Ihr Bild",
+            usernameLabel: "Ihr Name",
+            usernamePlaceholder: "Wie sollen wir Sie nennen?",
+            avatarLabel: "Bild auswählen",
+            saveChanges: "Änderungen speichern",
+            continue: "Weiter",
+            footerText: "Sie können Name und Bild jederzeit in den Einstellungen ändern"
+        },
+        notifications: {
+            timerStart: "Timer gestartet",
+            timerComplete: "Timer abgeschlossen!",
+            alarm: "Alarm"
+        }
+    }
+};
 
 document.addEventListener('DOMContentLoaded', function() {
+    currentLanguage = localStorage.getItem('language') || 'it';
+    document.title = translations[currentLanguage]?.appName || 'bytime';
     applyTheme();
     applyLiquidGlassEffect();
     initializeTimerGroups()
@@ -90,6 +745,10 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAlarms();
 });
 
+function getDayNames() {
+    return translations[currentLanguage]?.alarm?.days || ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
+}
+
 function saveTimerGroups() {
     localStorage.setItem('timerGroups', JSON.stringify(timerGroups));
     localStorage.setItem('showTimerGroups', showTimerGroups);
@@ -97,15 +756,12 @@ function saveTimerGroups() {
 
 function showUsernamePrompt() {
     const isEditing = !!currentUser;
-    document.querySelector('nav').style.display = 'none';
-    document.getElementById('add-btn').style.display = 'none';
-    document.getElementById('account-btn').style.display = 'none';
     
     mainContent.innerHTML = `
         <div class="username-page">
             <div class="username-header">
-                <h1>${isEditing ? 'Modifica il tuo profilo' : 'Benvenuto in ByTime'}</h1>
-                <p>${isEditing ? 'Aggiorna il tuo nome e la tua immagine' : 'Personalizza la tua esperienza'}</p>
+                <h1>${isEditing ? t('modals.usernameTitle') : t('greetings.welcome')}</h1>
+                <p>${isEditing ? t('modals.usernameSubtitle') : t('settings.personalize')}</p>
             </div>
             
             <div class="avatar-section">
@@ -117,18 +773,18 @@ function showUsernamePrompt() {
                 </div>
                 <label for="avatar-upload" class="btn-upload">
                     <span class="material-icons">add_a_photo</span>
-                    Scegli immagine
+                    ${t('modals.avatarLabel')}
                 </label>
                 <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
             </div>
             
             <div class="username-form">
                 <div class="input-container">
-                    <label for="username-input">Il tuo nome</label>
+                    <label for="username-input">${t('modals.usernameLabel')}</label>
                     <input 
                         type="text" 
                         id="username-input" 
-                        placeholder="Come vuoi essere chiamato?" 
+                        placeholder="${t('modals.usernamePlaceholder')}" 
                         maxlength="20"
                         autocomplete="off"
                         autocapitalize="words"
@@ -140,17 +796,17 @@ function showUsernamePrompt() {
                 <div class="username-actions">
                     <button id="save-username-btn" class="btn-primary" ${isEditing ? '' : 'disabled'}>
                         <span class="material-icons">check</span>
-                        ${isEditing ? 'Salva modifiche' : 'Conferma'}
+                        ${isEditing ? t('modals.saveChanges') : t('buttons.confirm')}
                     </button>
                     <button id="skip-username-btn" class="btn-secondary">
                         <span class="material-icons">${isEditing ? 'arrow_back' : 'arrow_forward'}</span>
-                        ${isEditing ? 'Torna indietro' : 'Salta e continua'}
+                        ${isEditing ? t('buttons.back') : t('buttons.skip')}
                     </button>
                 </div>
             </div>
             
             <div class="username-footer">
-                <p>Puoi cambiare nome e immagine in qualsiasi momento dalle impostazioni</p>
+                <p>${t('modals.footerText')}</p>
             </div>
         </div>
     `;
@@ -327,24 +983,35 @@ function showUsernamePrompt() {
 }
 
 function getGreeting() {
-    if (!currentUser) return "Benvenuto in ByTime";
+    if (!currentUser) {
+        return translations[currentLanguage]?.greetings?.welcome || "Welcome";
+    }
     
     const now = new Date();
     const hours = now.getHours();
+    const greetings = translations[currentLanguage]?.greetings || {};
     
-    if (hours >= 6 && hours < 12) {
-        return `Buongiorno, ${currentUser}!`;
-    } else if (hours >= 12 && hours <= 13) {
-        return `Buon pranzo, ${currentUser}!`;
-    } else if (hours > 13 && hours <= 18) {
-        return `Buon pomeriggio, ${currentUser}!`;
-    } else if (hours > 18 && hours <= 22) {
-        return `Buonasera, ${currentUser}!`;
-    } else {
-        return `Buonanotte, ${currentUser}!`;
-    }
+    if (hours >= 6 && hours < 12) return `${greetings.morning}, ${currentUser}!`;
+    if (hours >= 12 && hours <= 13) return `${greetings.lunch}, ${currentUser}!`;
+    if (hours > 13 && hours <= 18) return `${greetings.afternoon}, ${currentUser}!`;
+    if (hours > 18 && hours <= 22) return `${greetings.evening}, ${currentUser}!`;
+    return `${greetings.night}, ${currentUser}!`;
 }
 
+function t(key) {
+    const keys = key.split('.');
+    let result = translations[currentLanguage];
+    
+    for (const k of keys) {
+        result = result?.[k];
+        if (result === undefined) {
+            console.warn(`Translation missing for key: ${key} in language: ${currentLanguage}`);
+            return translations['en'][keys[0]][keys[1]] || key;
+        }
+    }
+    
+    return result;
+}
 
 function setupEventListeners() {
 
@@ -467,24 +1134,16 @@ function loadSection(section) {
 }
 
 function loadHomeSection() {
-    const groupNames = {
-        'all': 'Tutti',
-        'work': 'Lavoro',
-        'personal': 'Personale',
-        'fitness': 'Fitness',
-        'study': 'Studio'
-    };
-
     mainContent.innerHTML = `
         <div class="greeting">
             <h1>${getGreeting()}</h1>
         </div>
         
         <div class="section-title-home">
-            <h2>Timer recenti</h2>
+            <h2>${t('timer.recentTimers')}</h2>
             <a href="#" class="section-btn" data-section="timers">
                 <span class="material-icons">timer</span>
-                <span>Vedi tutti</span>
+                <span>${t('buttons.seeAll')}</span>
             </a>
         </div>
         
@@ -494,8 +1153,8 @@ function loadHomeSection() {
                     <div class="card-content">
                         <div class="timer-info">
                            ${timer.group && timer.group !== 'all' ? 
-                                `<span class="timer-badge">${groupNames[timer.group] || timer.group}</span>` : ''}
-                            <h3>${timer.name || 'Timer'}</h3>
+                                `<span class="timer-badge">${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}</span>` : ''}
+                            <h3>${timer.name || t('timer.timer')}</h3>
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <button class="icon-btn play-btn">
@@ -511,17 +1170,17 @@ function loadHomeSection() {
             `).join('') : 
             `<div class="empty-state">
                 <span class="material-icons">timer</span>
-                <p>Nessun timer impostato</p>
+                <p>${t('timer.noTimers')}</p>
             </div>`
         }
         
         <div class="separator"></div>
         
         <div class="section-title-home">
-            <h2>Sveglie recenti</h2>
+            <h2>${t('alarm.recentAlarms')}</h2>
             <a href="#" class="section-btn" data-section="alarms">
                 <span class="material-icons">alarm</span>
-                <span>Vedi tutti</span>
+                <span>${t('buttons.seeAll')}</span>
             </a>
         </div>
         
@@ -530,7 +1189,7 @@ function loadHomeSection() {
                 <div class="card" data-id="${alarm.id}">
                     <div class="card-content">
                         <div>
-                            <h3>${alarm.name || 'Sveglia'}</h3>
+                            <h3>${alarm.name || t('alarm.alarm')}</h3>
                             <p class="time-display">${formatAlarmTime(alarm.time)} ${alarm.days ? `(${formatDays(alarm.days)})` : ''}</p>
                         </div>
                         <div class="alarm-status">
@@ -543,12 +1202,11 @@ function loadHomeSection() {
             `).join('') : 
             `<div class="empty-state">
                 <span class="material-icons">alarm</span>
-                <p>Nessuna sveglia impostata</p>
+                <p>${t('alarm.noAlarms')}</p>
             </div>`
         }
     `;
-    
-    // Add event listeners to dynamic elements
+
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -582,17 +1240,6 @@ function loadHomeSection() {
 function loadTimersSection() {
     document.querySelector('.fab').style.display = 'flex';
     
-    const groupNames = {
-        'all': 'Tutti',
-        'work': 'Lavoro',
-        'personal': 'Personale',
-        'fitness': 'Fitness',
-        'study': 'Studio'
-    };
-
-    let timersToShow = timers;
-    let groupFilter = 'all';
-    
     mainContent.innerHTML = '';
     
     if (showTimerGroups && timerGroups.length > 1) {
@@ -600,20 +1247,11 @@ function loadTimersSection() {
             <div class="group-selector">
                 ${timerGroups.map(group => `
                     <button class="group-btn ${groupFilter === group.id ? 'active' : ''}" data-group="${group.id}">
-                        ${group.name}
+                        ${t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`)}
                     </button>
                 `).join('')}
             </div>
         `;
-        
-        document.querySelectorAll('.group-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                groupFilter = this.dataset.group;
-                loadTimersSection();
-            });
-        });
-        
-        timersToShow = filterTimersByGroup(groupFilter);
     }
     
     mainContent.innerHTML += `
@@ -623,8 +1261,8 @@ function loadTimersSection() {
                     <div class="card-content">
                         <div class="timer-info">
                             ${timer.group && timer.group !== 'all' ? 
-                                `<span class="timer-badge">${groupNames[timer.group] || timer.group}</span>` : ''}
-                            <h3>${timer.name || 'Timer'}</h3>
+                                `<span class="timer-badge">${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}</span>` : ''}
+                            <h3>${timer.name || t('timer.timer')}</h3>
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <div class="timer-actions">
@@ -645,10 +1283,10 @@ function loadTimersSection() {
             `).join('') : 
             `<div class="empty-state">
                 <span class="material-icons">timer</span>
-                <p>Nessun timer impostato</p>
+                <p>${t('timer.noTimers')}</p>
                 <button id="create-first-timer" class="btn-primary">
                     <span class="material-icons">add</span>
-                    Crea il tuo primo timer
+                    ${t('timer.createFirst')}
                 </button>
             </div>`
         }
@@ -696,7 +1334,7 @@ function loadAlarmsSection() {
                 <div class="card" data-id="${alarm.id}">
                     <div class="card-content">
                         <div>
-                            <h3>${alarm.name || 'Sveglia'}</h3>
+                            <h3>${alarm.name || t('alarm.alarm')}</h3>
                             <p class="time-display">${formatAlarmTime(alarm.time)} ${alarm.days ? `(${formatDays(alarm.days)})` : ''}</p>
                         </div>
                         <div class="alarm-actions">
@@ -712,14 +1350,15 @@ function loadAlarmsSection() {
             `).join('') : 
             `<div class="empty-state">
                 <span class="material-icons">alarm</span>
-                <p>Nessuna sveglia impostata</p>
+                <p>${t('alarm.noAlarms')}</p>
                 <button id="create-first-alarm" class="btn-primary">
                     <span class="material-icons">add</span>
-                    Crea la tua prima sveglia
+                    ${t('alarm.createFirst')}
                 </button>
             </div>`
         }
     `;
+
 
     // Toggle alarm
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
@@ -743,6 +1382,38 @@ function loadAlarmsSection() {
     });
 }
 
+function setLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    document.title = translations[lang]?.appName || 'bytime';
+    
+    // Aggiorna i testi nella UI corrente
+    updateUITexts();
+    
+    // Ricarica la sezione corrente per applicare i cambiamenti
+    loadSection(currentSection);
+}
+
+function updateUITexts() {
+    // Aggiorna i testi statici nella UI
+    headerTitle.textContent = getSectionTitle(currentSection);
+    
+    // Aggiorna i testi dei pulsanti di navigazione
+    document.querySelectorAll('.nav-btn span:last-child').forEach((span, index) => {
+        const sections = ['home', 'timers', 'alarms', 'cronometers', 'feed', 'settings'];
+        if (index < sections.length) {
+            span.textContent = t(`sections.${sections[index]}`);
+        }
+    });
+    
+    // Aggiorna altri elementi testuali se necessario
+    if (currentSection === 'settings') {
+        document.querySelectorAll('.section-title').forEach(el => {
+            const section = el.textContent.trim();
+            el.textContent = t(`settings.${section.toLowerCase().replace(' ', '')}`) || section;
+        });
+    }
+}
 function loadStopwatchSection() {
     document.querySelector('.fab').style.display = 'none';
     
@@ -762,19 +1433,25 @@ function loadStopwatchSection() {
             <div id="laps-container" class="laps-container">
                 ${stopwatch.laps.length > 0 ? `
                     <div class="laps-header">
-                        <span>Giro</span>
-                        <span>Tempo</span>
+                        <span>${t('stopwatch.lap')}</span>
+                        <span>${t('timer.time')}</span>
                     </div>
                     ${stopwatch.laps.map((lap, index) => `
                         <div class="lap-item">
-                            <span>Giro ${index + 1}</span>
+                            <span>${t('stopwatch.lap')} ${index + 1}</span>
                             <span>${formatStopwatchTime(lap)}</span>
                         </div>
                     `).join('')}
-                ` : ''}
+                ` : `
+                    <div class="no-laps">
+                        <span class="material-icons">flag</span>
+                        <p>${t('stopwatch.noLaps')}</p>
+                    </div>
+                `}
             </div>
         </div>
     `;
+    
 
     // Start/stop button
     document.getElementById('stopwatch-start-stop').addEventListener('click', toggleStopwatch);
@@ -839,85 +1516,81 @@ function loadFeedSection() {
     document.querySelector('.fab').style.display = 'none';
     
     mainContent.innerHTML = `
-    <div class="weather-page">
-        <!-- Current Weather - Maggiore gerarchia -->
-        <div class="weather-current-section">
-            <div class="weather-header">
-                <h2><span class="material-icons">cloud</span> Meteo Attuale</h2>
-                <button id="refresh-weather" class="icon-btn">
-                    <span class="material-icons">refresh</span>
-                </button>
-            </div>
-            
-            <div class="weather-container">
-                <div id="weather-effect" class="weather-effect"></div>
-                <div id="weather-content" class="weather-content">
-                    <div class="weather-loading">
-                        <span class="material-icons spinning">autorenew</span>
-                        <p>Caricamento dati meteo...</p>
+        <div class="weather-page">
+            <div class="weather-current-section">
+                <div class="weather-header">
+                    <h2><span class="material-icons">cloud</span> ${t('weather.current')}</h2>
+                    <button id="refresh-weather" class="icon-btn">
+                        <span class="material-icons">refresh</span>
+                    </button>
+                </div>
+                
+                <div class="weather-container">
+                    <div id="weather-effect" class="weather-effect"></div>
+                    <div id="weather-content" class="weather-content">
+                        <div class="weather-loading">
+                            <span class="material-icons spinning">autorenew</span>
+                            <p>${t('weather.loading')}</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Weather Forecast - Disposizione verticale e scrollabile -->
-        <div class="forecast-section">
-            <h2><span class="material-icons">calendar_today</span> Previsioni</h2>
-            <div id="forecast-content" class="forecast-content">
-                <div class="forecast-loading">
-                    <span class="material-icons spinning">autorenew</span>
-                    <p>Caricamento previsioni...</p>
+            
+            <div class="forecast-section">
+                <h2><span class="material-icons">calendar_today</span> ${t('weather.forecast')}</h2>
+                <div id="forecast-content" class="forecast-content">
+                    <div class="forecast-loading">
+                        <span class="material-icons spinning">autorenew</span>
+                        <p>${t('weather.loadingForecast')}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-            <!-- Sun Times Section -->
+            
             <div class="sun-section">
-                <h2><span class="material-icons">wb_sunny</span> Sole</h2>
+                <h2><span class="material-icons">wb_sunny</span> ${t('weather.sun')}</h2>
                 <div class="sun-cards">
                     <div class="sun-card">
                         <span class="material-icons">brightness_7</span>
                         <div>
-                            <span>Alba</span>
+                            <span>${t('weather.sunrise')}</span>
                             <strong id="sunrise-time">--:--</strong>
                         </div>
                     </div>
                     <div class="sun-card">
                         <span class="material-icons">brightness_3</span>
                         <div>
-                            <span>Tramonto</span>
+                            <span>${t('weather.sunset')}</span>
                             <strong id="sunset-time">--:--</strong>
                         </div>
                     </div>
                 </div>
-                <p class="location-info" id="location-status">Determinando la posizione...</p>
+                <p class="location-info" id="location-status">${t('weather.locating')}</p>
             </div>
             
-            <!-- Weather Stats - Stile simile alla sezione Sole -->
             <div class="weather-stats-section">
-                <h2><span class="material-icons">insights</span> Statistiche Meteo</h2>
+                <h2><span class="material-icons">insights</span> ${t('weather.stats')}</h2>
                 <div id="weather-stats" class="weather-stats">
                     <div class="stat-card">
                         <div>
-                            <span>Record massimo</span>
+                            <span>${t('weather.maxTemp')}</span>
                             <strong id="max-temp">--°</strong>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div>
-                            <span>Record minimo</span>
+                            <span>${t('weather.minTemp')}</span>
                             <strong id="min-temp">--°</strong>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div>
-                            <span>Umidità media</span>
+                            <span>${t('weather.avgHumidity')}</span>
                             <strong id="avg-humidity">--%</strong>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div>
-                            <span>Vento massimo</span>
+                            <span>${t('weather.maxWind')}</span>
                             <strong id="max-wind">-- km/h</strong>
                         </div>
                     </div>
@@ -935,12 +1608,13 @@ function loadFeedSection() {
         loadWeatherForecast();
     });
 }
+
 async function loadWeatherForecast() {
     const forecastContainer = document.getElementById('forecast-content');
     forecastContainer.innerHTML = `
         <div class="forecast-loading">
             <span class="material-icons spinning">autorenew</span>
-            <p>Caricamento previsioni...</p>
+            <p>${t('weather.loadingForecast')}</p>
         </div>
     `;
 
@@ -1002,7 +1676,7 @@ async function loadWeatherForecast() {
                 ${Object.values(dailyForecasts).slice(0, 5).map(day => `
                     <div class="forecast-day">
                         <div class="forecast-day-header">
-                            <span class="day-name">${day.date.toLocaleDateString('it-IT', { weekday: 'long' })}</span>
+                            <span class="day-name">${day.date.toLocaleDateString(currentLanguage, { weekday: 'long' })}</span>
                             <div class="day-weather">
                                 <img src="https://openweathermap.org/img/wn/${day.icon}.png" alt="${day.mainCondition}">
                                 <span>${Math.round(day.minTemp)}° / ${Math.round(day.maxTemp)}°</span>
@@ -1017,14 +1691,14 @@ async function loadWeatherForecast() {
         `;
 
     } catch (error) {
-        console.error("Errore nel recupero previsioni:", error);
+        console.error("Error loading forecast:", error);
         forecastContainer.innerHTML = `
             <div class="forecast-error">
                 <span class="material-icons">error</span>
-                <p>${getUserFriendlyError(error)}</p>
+                <p>${t('weather.errorForecast')}</p>
                 <button id="retry-forecast-btn" class="btn-secondary small">
                     <span class="material-icons">refresh</span>
-                    Riprova
+                    ${t('buttons.retry')}
                 </button>
             </div>
         `;
@@ -1037,7 +1711,7 @@ async function loadWeatherData() {
     weatherContainer.innerHTML = `
         <div class="weather-loading">
             <span class="material-icons spinning">autorenew</span>
-            <p>Caricamento dati meteo...</p>
+            <p>${t('weather.loading')}</p>
         </div>
     `;
 
@@ -1094,7 +1768,7 @@ async function loadWeatherData() {
                         </div>
                         <div class="weather-temp">
                             <span class="temp-value">${weather.temp}°</span>
-                            <span class="temp-feels">Percepiti ${weather.feels_like}°</span>
+                            <span class="temp-feels">${t('weather.feelsLike')} ${weather.feels_like}°</span>
                         </div>
                     </div>
                     <div class="weather-details">
@@ -1105,28 +1779,25 @@ async function loadWeatherData() {
                 <div class="weather-stats">
                     <div class="weather-stat">
                         <span class="material-icons">water_drop</span>
-                        <span>${weather.humidity}%</span>
+                        <span>${weather.humidity}% ${t('weather.humidity')}</span>
                     </div>
                     <div class="weather-stat">
                         <span class="material-icons">air</span>
-                        <span>${weather.wind} km/h</span>
+                        <span>${weather.wind} ${t('weather.windUnit')}</span>
                     </div>
                 </div>
             </div>
         `;
-        const style = document.createElement('style');
-        style.textContent = weatherEffects.css;
-        document.head.appendChild(style);
-
+        
     } catch (error) {
-        console.error("Errore nel recupero dati meteo:", error);
+        console.error("Error loading weather data:", error);
         weatherContainer.innerHTML = `
             <div class="weather-error">
                 <span class="material-icons">error</span>
-                <p>${getUserFriendlyError(error)}</p>
+                <p>${t('weather.error')}</p>
                 <button id="retry-weather-btn" class="btn-secondary small">
                     <span class="material-icons">refresh</span>
-                    Riprova
+                    ${t('buttons.retry')}
                 </button>
             </div>
         `;
@@ -1447,10 +2118,11 @@ function capitalizeFirstLetter(string) {
 function loadSettingsSection() {
     document.querySelector('.fab').style.display = 'none';
     document.getElementById('account-btn').style.display = 'none';
+    
     mainContent.innerHTML = `
         <div class="settings-page">
             <div class="settings-section">
-                <h2 class="section-title">Account</h2>
+                <h2 class="section-title">${t('settings.account')}</h2>
                 <div class="section-content">
                     <div class="account-details">
                         ${userAvatar ? 
@@ -1458,13 +2130,13 @@ function loadSettingsSection() {
                             `<span class="material-icons">account_circle</span>`
                         }
                         <div class="account-text">
-                            <h3>${currentUser || 'Utente'}</h3>
-                            <p class="account-type">Account locale</p>
+                            <h3>${currentUser || t('settings.user')}</h3>
+                            <p class="account-type">${t('settings.accountType')}</p>
                         </div>
                     </div>
                     <button id="change-username-btn" class="btn-secondary small">
                         <span class="material-icons">edit</span>
-                        Modifica
+                        ${t('settings.changeUsername')}
                     </button>
                 </div>
             </div>
@@ -1472,26 +2144,26 @@ function loadSettingsSection() {
             <div class="settings-divider"></div>
             
             <div class="settings-section">
-                <h2 class="section-title">Aspetto</h2>
+                <h2 class="section-title">${t('settings.appearance')}</h2>
                 <div class="section-content">
                     <div class="settings-group">
-                        <h4 class="group-title">Tema dell'app</h4>
+                        <h4 class="group-title">${t('settings.theme')}</h4>
                         <div class="theme-options">
                             <button class="theme-option ${currentTheme === 'default' ? 'active' : ''}" data-theme="default">
                                 <div class="theme-preview default"></div>
-                                <span>Predefinito</span>
+                                <span>${t('settings.themeDefault')}</span>
                             </button>
                             <button class="theme-option ${currentTheme === 'green' ? 'active' : ''}" data-theme="green">
                                 <div class="theme-preview green"></div>
-                                <span>Verde</span>
+                                <span>${t('settings.themeGreen')}</span>
                             </button>
                             <button class="theme-option ${currentTheme === 'red' ? 'active' : ''}" data-theme="red">
                                 <div class="theme-preview red"></div>
-                                <span>Rosso</span>
+                                <span>${t('settings.themeRed')}</span>
                             </button>
                             <button class="theme-option ${currentTheme === 'purple' ? 'active' : ''}" data-theme="purple">
                                 <div class="theme-preview purple"></div>
-                                <span>Viola</span>
+                                <span>${t('settings.themePurple')}</span>
                             </button>
                         </div>
                     </div>
@@ -1501,14 +2173,31 @@ function loadSettingsSection() {
             <div class="settings-divider"></div>
             
             <div class="settings-section">
-                <h2 class="section-title">Preferenze</h2>
+                <h2 class="section-title">${t('settings.languageTitle')}</h2>
                 <div class="section-content">
-                    <!-- Notifiche -->
+                    <div class="settings-group">
+                        <h4 class="group-title">${t('settings.languageDesc')}</h4>
+                        <select id="language-select" class="settings-select">
+                            <option value="it" ${currentLanguage === 'it' ? 'selected' : ''}>Italiano</option>
+                            <option value="en" ${currentLanguage === 'en' ? 'selected' : ''}>English</option>
+                            <option value="es" ${currentLanguage === 'es' ? 'selected' : ''}>Español</option>
+                            <option value="fr" ${currentLanguage === 'fr' ? 'selected' : ''}>Français</option>
+                            <option value="de" ${currentLanguage === 'de' ? 'selected' : ''}>Deutsch</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-divider"></div>
+            
+            <div class="settings-section">
+                <h2 class="section-title">${t('settings.preferences')}</h2>
+                <div class="section-content">
                     <div class="settings-group">
                         <div class="switch-container">
                             <div class="switch-info">
-                                <h4 class="group-title">Notifiche</h4>
-                                <p class="group-description">Attiva o disattiva le notifiche push per timer e sveglie</p>
+                                <h4 class="group-title">${t('settings.notifications')}</h4>
+                                <p class="group-description">${t('settings.notificationsDesc')}</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="notifications-toggle" ${notificationPermission ? 'checked' : ''}>
@@ -1517,12 +2206,11 @@ function loadSettingsSection() {
                         </div>
                     </div>
                     
-                    <!-- Localizzazione -->
                     <div class="settings-group">
                         <div class="switch-container">
                             <div class="switch-info">
-                                <h4 class="group-title">Localizzazione</h4>
-                                <p class="group-description">Condividi la posizione per informazioni locali precise</p>
+                                <h4 class="group-title">${t('settings.location')}</h4>
+                                <p class="group-description">${t('settings.locationDesc')}</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="location-toggle">
@@ -1531,12 +2219,11 @@ function loadSettingsSection() {
                         </div>
                     </div>
                     
-                    <!-- Gruppi timer -->
                     <div class="settings-group">
                         <div class="switch-container">
                             <div class="switch-info">
-                                <h4 class="group-title">Gruppi timer</h4>
-                                <p class="group-description">Organizza i timer in categorie personalizzate</p>
+                                <h4 class="group-title">${t('settings.timerGroups')}</h4>
+                                <p class="group-description">${t('settings.timerGroupsDesc')}</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="timer-groups-toggle" ${showTimerGroups ? 'checked' : ''}>
@@ -1544,14 +2231,28 @@ function loadSettingsSection() {
                             </label>
                         </div>
                     </div>
+                    
                     <div class="settings-group">
                         <div class="switch-container">
                             <div class="switch-info">
-                                <h4 class="group-title">Modalità AMOLED</h4>
-                                <p class="group-description">Sfondo nero puro per schermi AMOLED</p>
+                                <h4 class="group-title">${t('settings.amoledMode')}</h4>
+                                <p class="group-description">${t('settings.amoledModeDesc')}</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="amoled-toggle" ${amoledMode ? 'checked' : ''}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">${t('settings.autoplay')}</h4>
+                                <p class="group-description">${t('settings.autoplayDesc')}</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="autoplay-toggle" ${autoplayEnabled ? 'checked' : ''}>
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -1562,13 +2263,13 @@ function loadSettingsSection() {
             <div class="settings-divider"></div>
             
             <div class="settings-section">
-                <h2 class="section-title">Impostazioni sperimentali</h2>
+                <h2 class="section-title">${t('settings.experimental')}</h2>
                 <div class="section-content">
                     <div class="settings-group">
                         <div class="switch-container">
                             <div class="switch-info">
-                                <h4 class="group-title">Stile Liquid Glass</h4>
-                                <p class="group-description">Effetto vetro smerigliato con bordi fluidi</p>
+                                <h4 class="group-title">${t('settings.liquidGlass')}</h4>
+                                <p class="group-description">${t('settings.liquidGlassDesc')}</p>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="liquid-glass-toggle" ${liquidGlassMode ? 'checked' : ''}>
@@ -1582,22 +2283,22 @@ function loadSettingsSection() {
             <div class="settings-divider"></div>
             
             <div class="settings-section">
-                <h2 class="section-title">Informazioni</h2>
+                <h2 class="section-title">${t('settings.info')}</h2>
                 <div class="section-content">
                     <div class="info-grid">
                         <div class="info-item">
-                            <span>Versione</span>
+                            <span>${t('settings.version')}</span>
                             <span>1.4.4</span>
                         </div>
                         <div class="info-item">
-                            <span>Sviluppatore</span>
+                            <span>${t('settings.developer')}</span>
                             <span>bytime devTeam</span>
                         </div>
                     </div>
                     <a href="mailto:mvisentin2008@gmail.com">
                         <button class="segnala">
                             <span class="material-icons">bug_report</span>
-                            Segnala un bug
+                            ${t('settings.reportBug')}
                         </button>
                     </a>
                 </div>
@@ -1919,7 +2620,13 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
             notificationPermission = false;
         }
     });
-
+    document.getElementById('language-select')?.addEventListener('change', function() {
+        setLanguage(this.value);
+    });
+    document.getElementById('autoplay-toggle')?.addEventListener('change', function() {
+            autoplayEnabled = this.checked;
+            localStorage.setItem('autoplayEnabled', autoplayEnabled);
+        });
     document.getElementById('amoled-toggle')?.addEventListener('change', function() {
         amoledMode = this.checked;
         localStorage.setItem('amoledMode', amoledMode);
@@ -2096,7 +2803,7 @@ function createNewTimer() {
     const group = groupSelect ? groupSelect.value : 'all';
     
     if (hours === 0 && minutes === 0 && seconds === 0) {
-        alert('Inserisci un tempo valido');
+        alert(t('timer.invalidTime'));
         return;
     }
     
@@ -2118,7 +2825,10 @@ function createNewTimer() {
         loadSection(currentSection);
     }
     
-    // Reset form
+    if (autoplayEnabled) {
+        toggleTimer(timer);
+    }
+    
     document.getElementById('hours').value = '';
     document.getElementById('minutes').value = '';
     document.getElementById('seconds').value = '';
@@ -2149,7 +2859,7 @@ function createNewAlarm() {
     const name = document.getElementById('alarm-name').value;
     
     if (!time) {
-        alert('Inserisci un orario valido');
+        alert(t('alarm.invalidTime'));
         return;
     }
     
@@ -2175,7 +2885,6 @@ function createNewAlarm() {
         loadSection(currentSection);
     }
     
-    // Reset form
     document.getElementById('alarm-time').value = '';
     document.getElementById('alarm-name').value = '';
     document.querySelectorAll('.days button').forEach(btn => {
@@ -2215,7 +2924,7 @@ function toggleTimer(timer) {
 }
 
 function startTimerCountdown(timer) {
-    showNotification('Timer avviato', `Timer "${timer.name || 'Senza nome'}" avviato`);
+    showNotification(t('notifications.timerStart'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.started')}`);
     
     timer.interval = setInterval(() => {
         const now = new Date().getTime();
@@ -2226,7 +2935,7 @@ function startTimerCountdown(timer) {
             activeTimer = null;
             localStorage.removeItem('activeTimer');
             
-            showNotification('Timer completato!', `Il timer "${timer.name || 'Senza nome'}" è scaduto`, true);
+            showNotification(t('notifications.timerComplete'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.completed')}`, true);
             
             if (currentSection === 'home' || currentSection === 'timers') {
                 loadSection(currentSection);
@@ -2260,8 +2969,8 @@ function checkAlarms() {
         if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
             if (!alarm.days || alarm.days.includes(currentDay)) {
                 showNotification(
-                    alarm.name || 'Sveglia', 
-                    `È ora! (${alarm.time})`, 
+                    alarm.name || t('alarm.alarm'), 
+                    `${t('alarm.time')} (${alarm.time})`, 
                     true
                 );
             }
@@ -2345,7 +3054,7 @@ function formatAlarmTime(timeStr) {
 }
 
 function formatDays(days) {
-    const dayNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+    const dayNames = translations[currentLanguage]?.alarm?.days || ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     return days.map(day => dayNames[day]).join(', ');
 }
 
@@ -2399,9 +3108,14 @@ function applyTheme() {
 function showNotification(title, body, requireInteraction = false) {
     if (!('Notification' in window)) return;
     
+    const translatedTitle = translations[currentLanguage]?.notifications?.[title] || title;
+    const translatedBody = typeof body === 'string' ? 
+                         (translations[currentLanguage]?.notifications?.[body] || body) : 
+                         body;
+    
     if (Notification.permission === 'granted') {
         const options = {
-            body: body,
+            body: translatedBody,
             icon: '/icons/icon-192x192.png',
             badge: '/icons/badge-72x72.png',
             vibrate: [200, 100, 200],
@@ -2409,9 +3123,9 @@ function showNotification(title, body, requireInteraction = false) {
         };
         
         if (serviceWorkerRegistration) {
-            serviceWorkerRegistration.showNotification(title, options);
+            serviceWorkerRegistration.showNotification(translatedTitle, options);
         } else {
-            new Notification(title, options);
+            new Notification(translatedTitle, options);
         }
     }
 }
@@ -2431,47 +3145,42 @@ async function loadSunTimesWithFallback() {
     const sunriseEl = document.getElementById('sunrise-time');
     const sunsetEl = document.getElementById('sunset-time');
     
+    statusEl.textContent = t('weather.locating');
+    
     if (navigator.geolocation) {
         try {
-            statusEl.textContent = "Ricerca posizione in corso...";
-            
             const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    resolve, 
-                    reject, 
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-                );
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
             });
 
             const { latitude, longitude } = position.coords;
             
-            // Usa l'API di OpenWeatherMap per ottenere i dati del sole
-            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=it&appid=4a01e12e352c7cc307f580cd772c8297`);
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=${currentLanguage}&appid=4a01e12e352c7cc307f580cd772c8297`);
             const data = await response.json();
             
             if (data.sys) {
                 const sunriseTime = new Date(data.sys.sunrise * 1000);
                 const sunsetTime = new Date(data.sys.sunset * 1000);
                 
-                sunriseEl.textContent = sunriseTime.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
-                sunsetEl.textContent = sunsetTime.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+                sunriseEl.textContent = sunriseTime.toLocaleTimeString(currentLanguage, {hour: '2-digit', minute:'2-digit'});
+                sunsetEl.textContent = sunsetTime.toLocaleTimeString(currentLanguage, {hour: '2-digit', minute:'2-digit'});
                 
-                statusEl.textContent = data.name || "Posizione rilevata";
+                statusEl.textContent = data.name || t('weather.locationFound');
             } else {
-                throw new Error("Dati alba/tramonto non disponibili");
+                throw new Error(t('weather.sunDataUnavailable'));
             }
         } catch (error) {
-            console.error("Errore geolocalizzazione:", error);
-            showDefaultItalianTimes();
-            statusEl.textContent = "Posizione approssimativa (Italia)";
+            console.error("Geolocation error:", error);
+            showDefaultSunTimes();
+            statusEl.textContent = t('weather.approxLocation');
         }
     } else {
-        showDefaultItalianTimes();
-        statusEl.textContent = "Geolocalizzazione non supportata";
+        showDefaultSunTimes();
+        statusEl.textContent = t('weather.geoUnsupported');
     }
 }
 
@@ -2569,15 +3278,7 @@ function showDefaultItalianTimes() {
 }
 
 function getSectionTitle(section) {
-    const titles = {
-        'home': 'Home',
-        'cronometers': 'Cronometro',
-        'timers': 'Timer',
-        'alarms': 'Sveglie',
-        'settings': 'Impostazioni',
-        'feed': 'Feed'
-    };
-    return titles[section] || 'bytime';
+    return translations[currentLanguage]?.sections?.[section] || section;
 }
 
 async function updateLocalCoordinates() {
