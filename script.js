@@ -1,4 +1,5 @@
 let currentUser = localStorage.getItem('username') || null;
+let liquidGlassMode = localStorage.getItem('liquidGlassMode') === 'true' || false;
 let timers = JSON.parse(localStorage.getItem('timers')) || [];
 let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
 let cronometers = JSON.parse(localStorage.getItem('cronometers')) || []; 
@@ -34,6 +35,7 @@ const addAlarmMenu = document.getElementById('add-alarm-menu');
 
 document.addEventListener('DOMContentLoaded', function() {
     applyTheme();
+    applyLiquidGlassEffect();
     initializeTimerGroups()
     if (!currentUser) {
         showUsernamePrompt();
@@ -1549,7 +1551,27 @@ function loadSettingsSection() {
                                 <p class="group-description">Sfondo nero puro per schermi AMOLED</p>
                             </div>
                             <label class="switch">
-                                <input type="checkbox" id="amoled-toggle">
+                                <input type="checkbox" id="amoled-toggle" ${amoledMode ? 'checked' : ''}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-divider"></div>
+            
+            <div class="settings-section">
+                <h2 class="section-title">Impostazioni sperimentali</h2>
+                <div class="section-content">
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">Stile Liquid Glass</h4>
+                                <p class="group-description">Effetto vetro smerigliato con bordi fluidi</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="liquid-glass-toggle" ${liquidGlassMode ? 'checked' : ''}>
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -1565,11 +1587,11 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>Versione</span>
-                            <span>1.4.3</span>
+                            <span>1.4.4</span>
                         </div>
                         <div class="info-item">
                             <span>Sviluppatore</span>
-                            <span>Visentin Manuel</span>
+                            <span>bytime devTeam</span>
                         </div>
                     </div>
                     <a href="mailto:mvisentin2008@gmail.com">
@@ -1582,7 +1604,6 @@ function loadSettingsSection() {
             </div>
         </div>
     `;
-    
     
     const style = document.createElement('style');
 style.textContent = `
@@ -1863,7 +1884,12 @@ document.head.appendChild(style);
             btn.classList.add('active');
         }
     });
-
+document.getElementById('liquid-glass-toggle')?.addEventListener('change', function() {
+    liquidGlassMode = this.checked;
+    localStorage.setItem('liquidGlassMode', liquidGlassMode);
+    applyTheme();
+    applyLiquidGlassEffect();
+});
         document.getElementById('timer-groups-toggle')?.addEventListener('change', function() {
         showTimerGroups = this.checked;
         saveTimerGroups();
@@ -1909,6 +1935,29 @@ document.head.appendChild(style);
     document.getElementById('request-location-btn')?.addEventListener('click', function() {
         requestLocationPermission();
     });
+}
+
+function applyLiquidGlassEffect() {
+    const body = document.body;
+    
+    if (liquidGlassMode) {
+        body.classList.add('liquid-glass-mode');
+        
+        // Crea elementi per l'effetto fluido
+        const liquidEffect = document.createElement('div');
+        liquidEffect.className = 'liquid-effect';
+        document.body.appendChild(liquidEffect);
+        
+        // Animazione casuale per l'effetto
+        setInterval(() => {
+            liquidEffect.style.setProperty('--x', `${Math.random() * 100}%`);
+            liquidEffect.style.setProperty('--y', `${Math.random() * 100}%`);
+            liquidEffect.style.setProperty('--r', `${Math.random() * 360}deg`);
+        }, 8000);
+    } else {
+        body.classList.remove('liquid-glass-mode');
+        document.querySelectorAll('.liquid-effect').forEach(el => el.remove());
+    }
 }
 
 function toggleStopwatch() {
