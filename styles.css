@@ -579,9 +579,9 @@ a {
 
 .add-menu {
     position: fixed;
-    bottom: 140px;
-    right: 20px;
-    background-color: rgba(40, 40, 40, 0.95);
+    bottom: 130px;
+    right: 15px;
+    background-color: rgba(40, 40, 40, 0.335);
     border-radius: 15px;
     padding: 10px 0;
     padding-left: 10px;
@@ -615,6 +615,7 @@ a {
     gap: 12px;
     font-size: 0.95rem;
     transition-duration: 0.3s;
+    border-radius: 10px;
 }
 
 .add-menu-item:hover {
@@ -630,14 +631,14 @@ a {
 }
 
 #add-btn {
-    bottom: 85px;
-    right: 20px;
+    bottom: 130px;
+    right: 15px;
     z-index: 1002;
     position: fixed;
     width: 56px;
     height: 56px;
     border-radius: 10px;
-    background-color: var(--primary-color, transparent(12%));
+    background-color: rgba(60, 60, 60, 0.7);
     color: white;
     display: flex;
     align-items: center;
@@ -680,6 +681,7 @@ a {
     border-radius: 100px;
     padding-top: 5px;
     padding-bottom: 5px;
+    margin-bottom: 2vh;
     padding-left: 15px;
     padding-right: 15px;
     background-color: var(--primary-color);
@@ -1058,340 +1060,6 @@ body.accessibility-mode .time-display {
 
 .style-btn .material-icons {
     font-size: 20px;
-}
-
-.weather-section {
-    background: #333;
-    border-radius: 15px;
-    padding: 1.5rem;
-}
-
-.weather-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.weather-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    font-size: 1.2rem;
-}
-
-.weather-container {
-    min-height: 200px;
-    position: relative;
-}
-
-.weather-current {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.weather-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.weather-icon img {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-}
-
-.weather-temp {
-    text-align: center;
-}
-
-.temp-value {
-    font-size: 4rem;
-    font-weight: bold;
-    display: block;
-    line-height: 1;
-}
-
-.temp-feels {
-    font-size: 0.85rem;
-    color: var(--text-gray);
-    margin-top: 0.3rem;
-}
-
-.weather-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.weather-description {
-    font-size: 1rem;
-    margin-bottom: 0.8rem;
-    text-transform: capitalize;
-}
-
-.weather-stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    justify-content: space-between;
-    gap: 0.8rem;
-}
-
-.weather-stat {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-}
-
-.weather-stat .material-icons {
-    font-size: 1rem;
-    color: var(--primary-color);
-}
-
-.weather-hourly {
-    margin-top: 1.5rem;
-}
-
-.weather-hourly h4 {
-    margin-bottom: 0.8rem;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.hourly-scroll {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    padding: 0.5rem 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) #444;
-}
-
-.hourly-scroll::-webkit-scrollbar {
-    height: 4px;
-}
-
-.hourly-scroll::-webkit-scrollbar-track {
-    background: #444;
-    border-radius: 2px;
-}
-
-.hourly-scroll::-webkit-scrollbar-thumb {
-    background-color: var(--primary-color);
-    border-radius: 2px;
-}
-
-.hourly-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 50px;
-    flex-shrink: 0;
-}
-
-.hourly-item span:first-child {
-    font-size: 0.8rem;
-    color: var(--text-gray);
-}
-
-.hourly-item img {
-    width: 30px;
-    height: 30px;
-    margin: 0.3rem 0;
-}
-
-.hourly-item span:last-child {
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-.hourly-item small {
-    font-size: 0.7rem;
-    color: var(--text-gray);
-}
-
-.news-section {
-    background: #333;
-    border-radius: 15px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.news-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.news-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.news-title h3 {
-    margin: 0;
-    font-size: 1.2rem;
-}
-
-.news-selector {
-    padding: 8px 12px;
-    border-radius: 20px;
-    background-color: #444;
-    color: white;
-    border: none;
-    font-size: 0.9rem;
-}
-
-.news-container {
-    min-height: 300px;
-    position: relative;
-}
-
-.news-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.2rem;
-}
-
-.news-item {
-    display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 1rem;
-    background: #444;
-    border-radius: 10px;
-    overflow: hidden;
-    transition: transform 0.2s;
-}
-
-.news-item:hover {
-    transform: translateY(-2px);
-}
-
-.news-image {
-    height: 100px;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-
-.news-image::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
-}
-
-.news-content {
-    padding: 0.8rem 0.8rem 0.8rem 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.news-content h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 0.95rem;
-    line-height: 1.3;
-    display: -webkit-box;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.news-content p {
-    margin: 0 0 0.8rem 0;
-    font-size: 0.8rem;
-    color: var(--text-gray);
-    line-height: 1.4;
-    display: -webkit-box;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.news-footer {
-    margin-top: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.news-footer small {
-    font-size: 0.75rem;
-    color: #888;
-}
-
-.news-link {
-    color: var(--primary-color);
-    font-size: 0.8rem;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    font-weight: bold;
-}
-
-.news-link .material-icons {
-    font-size: 0.9rem;
-    margin-left: 0.3rem;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(255,255,255,0.1);
-    border-radius: 50%;
-    border-top-color: var(--primary-color);
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.weather-loading,
-.news-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    width: 100%;
-}
-
-.weather-loading p,
-.news-loading p {
-    margin-top: 1rem;
-    color: var(--text-gray);
-}
-
-@media (max-width: 768px) {
-    .clock-weather-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .news-item {
-        grid-template-columns: 1fr;
-    }
-    
-    .news-image {
-        height: 180px;
-    }
 }
 
 .btn-primary.disabled {
@@ -2590,32 +2258,609 @@ body.amoled-mode span {
     opacity: 0;
 }
 .weather-container {
-    background: #333;
+    position: relative;
     border-radius: 15px;
     overflow: hidden;
-    margin-bottom: 1.5rem;
-    position: relative;
-    box-shadow: none;
+    background: #444;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-height: 200px; /* Altezza minima per il contenitore */
 }
-.weather-current-section {
+
+/* Aggiorna la sezione .weather-effect */
+.weather-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+/* Assicurati che il contenuto meteo abbia z-index superiore */
+.weather-content {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+    height: 100%;
+}
+
+/* Aggiungi queste regole per gli effetti specifici */
+.weather-effect.rain {
+    background: linear-gradient(to bottom, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0) 100%);
+    animation: rain 1s linear infinite;
+}
+
+.weather-effect.snow {
+    background: transparent;
+}
+
+.weather-effect.sun {
+    background: radial-gradient(
+        circle at center,
+        rgba(255,255,0,0.1) 0%,
+        rgba(255,255,0,0) 70%
+    );
+    animation: sunGlow 3s ease-in-out infinite alternate;
+}
+
+.weather-effect.clouds {
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.1) 50%,
+        rgba(255,255,255,0) 100%
+    );
+    animation: cloudsMove 20s linear infinite;
+}
+
+.weather-effect.thunder {
+    animation: thunderFlash 8s linear infinite;
+}
+
+/* Keyframes per le animazioni */
+@keyframes rain {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+@keyframes sunGlow {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.6; }
+}
+
+@keyframes cloudsMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 100% 0; }
+}
+
+@keyframes thunderFlash {
+    0%, 85%, 100% { background: transparent; }
+    5% { background: rgba(255,255,255,0.6); }
+    6% { background: transparent; }
+    10% { background: rgba(255,255,255,0.4); }
+    11% { background: transparent; }
+}
+
+/* Stili per gli elementi meteorologici dinamici */
+.rain-drop {
+    position: absolute;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.4);
+    animation: rainDrop linear infinite;
+}
+
+.snow-flake {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    filter: blur(1px);
+    animation: snowFall linear infinite;
+}
+
+.sun-ray {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    background: rgba(255, 255, 0, 0.1);
+    transform-origin: 0 0;
+    animation: sunRaySpin 20s linear infinite;
+}
+/* Stopwatch Styles */
+.stopwatch-container {
     background: #333;
     border-radius: 15px;
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.weather-header {
+.stopwatch-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
 }
 
-.weather-header h2 {
+.stopwatch-header h2 {
     margin: 0;
     font-size: 1.3rem;
+    color: white;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.stopwatch-display {
+    text-align: center;
+    font-size: 4rem;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 300;
+    margin: 1.5rem 0;
+    color: white;
+    letter-spacing: -2px;
+}
+
+.stopwatch-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stopwatch-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.stopwatch-btn.start {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.stopwatch-btn.stop {
+    background-color: #e53935;
+    color: white;
+}
+
+.stopwatch-btn.lap {
+    background-color: #444;
+    color: white;
+    border: 1px solid #666;
+}
+
+.stopwatch-btn.reset {
+    background-color: #444;
+    color: white;
+    border: 1px solid #666;
+}
+
+.stopwatch-btn .material-icons {
+    font-size: 1.2rem;
+}
+
+.laps-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.laps-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.laps-container::-webkit-scrollbar-track {
+    background: #444;
+    border-radius: 2px;
+}
+
+.laps-container::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 2px;
+}
+
+.laps-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #444;
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+    position: sticky;
+    top: 0;
+    background: #333;
+    z-index: 1;
+}
+
+.lap-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #444;
+    font-size: 0.95rem;
+    align-items: center;
+}
+
+.lap-item:last-child {
+    border-bottom: none;
+}
+
+.lap-diff {
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+.lap-diff.faster {
+    color: #4CAF50;
+}
+
+.lap-diff.slower {
+    color: #F44336;
+}
+
+.lap-diff.first-lap {
+    color: #aaa;
+}
+
+.no-laps {
+    text-align: center;
+    padding: 2rem 0;
+    color: #666;
+}
+
+.no-laps .material-icons {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #444;
+}
+
+.no-laps p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 480px) {
+    .stopwatch-display {
+        font-size: 3rem;
+    }
+    
+    .stopwatch-controls {
+        gap: 1rem;
+    }
+    
+    .stopwatch-btn {
+        padding: 0.8rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+/* Aggiungi queste regole CSS in fondo al file */
+
+/* Effetto Liquid Glass */
+.liquid-glass-mode {
+    --glass-blur: 12px;
+    --glass-opacity: 0.2;
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --glass-background: rgba(40, 40, 40, 0.7);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --glass-text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.liquid-glass-mode body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+.liquid-glass-mode .card,
+.liquid-glass-mode .modal-content,
+.liquid-glass-mode .settings-page,
+.liquid-glass-mode .stopwatch-container,
+.liquid-glass-mode .weather-container,
+.liquid-glass-mode .forecast-section,
+.liquid-glass-mode .sun-section,
+.liquid-glass-mode .weather-stats-section {
+
+    box-shadow: var(--glass-shadow) !important;
+    border-radius: 20px !important;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.liquid-glass-mode .card:hover,
+.liquid-glass-mode .modal-content:hover,
+.liquid-glass-mode .settings-page:hover,
+.liquid-glass-mode .stopwatch-container:hover,
+.liquid-glass-mode .weather-container:hover,
+.liquid-glass-mode .forecast-section:hover,
+.liquid-glass-mode .sun-section:hover,
+.liquid-glass-mode .weather-stats-section:hover,
+.liquid-glass-mode .add-menu:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.liquid-glass-mode .progress-bar {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.liquid-glass-mode .progress {
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.liquid-glass-mode .nav-btn:not(.active) {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.liquid-glass-mode .nav-btn.active {
+    color: var(--primary-color) !important;
+    text-shadow: 0 0 8px color-mix(in srgb, var(--primary-color) 30%, transparent);
+}
+
+.liquid-glass-mode .time-display,
+.liquid-glass-mode .group-description,
+.liquid-glass-mode .accessibility-description,
+.liquid-glass-mode .account-type,
+.liquid-glass-mode .location-info,
+.liquid-glass-mode .temp-feels,
+.liquid-glass-mode .weather-city,
+.liquid-glass-mode .day-desc,
+.liquid-glass-mode .sun-card span,
+.liquid-glass-mode .stat-card span {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.liquid-glass-mode .empty-state {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.liquid-glass-mode .empty-state .material-icons {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Effetto liquido animato */
+.liquid-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200vw;
+    height: 200vh;
+    background: radial-gradient(
+        circle at var(--x, 50%) var(--y, 50%),
+        rgba(87, 130, 201, 0.15) 0%,
+        transparent 70%
+    );
+    z-index: -1;
+    pointer-events: none;
+    animation: liquidMove 16s infinite alternate;
+    transform: rotate(var(--r, 0deg));
+    opacity: 0.6;
+}
+
+@keyframes liquidMove {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Effetti di luce riflessa */
+.liquid-glass-mode .card::before,
+.liquid-glass-mode .modal-content::before,
+.liquid-glass-mode .settings-page::before,
+.liquid-glass-mode .stopwatch-container::before,
+.liquid-glass-mode .weather-container::before,
+.liquid-glass-mode .forecast-section::before,
+.liquid-glass-mode .sun-section::before,
+.liquid-glass-mode .weather-stats-section::before,
+.liquid-glass-mode .add-menu::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(255, 255, 255, 0.03) 100%
+    );
+    transform: rotate(15deg);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Miglioramenti per il testo */
+.liquid-glass-mode h1,
+.liquid-glass-mode h2,
+.liquid-glass-mode h3,
+.liquid-glass-mode h4,
+.liquid-glass-mode strong,
+.liquid-glass-mode .temp-value,
+.liquid-glass-mode .time-display,
+.liquid-glass-mode .stopwatch-display {
+    text-shadow: var(--glass-text-shadow);
+}
+
+/* Pulsanti con effetto glass */
+.liquid-glass-mode .btn-primary,
+.liquid-glass-mode .stopwatch-btn.start,
+.liquid-glass-mode #start-timer,
+.liquid-glass-mode #save-alarm,
+.liquid-glass-mode .section-btn {
+    background: color-mix(in srgb, var(--primary-color) 80%, transparent) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 50%, transparent) !important;
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--primary-color) 30%, transparent) !important;
+}
+
+.liquid-glass-mode .btn-primary:hover,
+.liquid-glass-mode .stopwatch-btn.start:hover,
+.liquid-glass-mode #start-timer:hover,
+.liquid-glass-mode #save-alarm:hover,
+.liquid-glass-mode .section-btn:hover {
+    background: color-mix(in srgb, var(--primary-color) 90%, transparent) !important;
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--primary-color) 40%, transparent) !important;
+}
+
+/* Navbar con effetto glass */
+.liquid-glass-mode nav {
+    background: rgba(40, 40, 40, 0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Header con effetto glass */
+.liquid-glass-mode header {
+    background: color-mix(in srgb, var(--primary-color) 80%, transparent) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Effetti speciali per gli elementi attivi */
+.liquid-glass-mode .nav-btn.active .material-icons {
+    background: rgba(87, 130, 201, 0.2) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+    box-shadow: 0 0 15px rgba(87, 130, 201, 0.4) !important;
+}
+
+.liquid-glass-mode .group-btn.active {
+    background: rgba(87, 130, 201, 0.3) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+    box-shadow: 0 0 10px rgba(87, 130, 201, 0.3) !important;
+}
+
+/* Transizioni fluide */
+.liquid-glass-mode * {
+    transition: background-color 0.5s ease, 
+                box-shadow 0.5s ease, 
+                transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                border-color 0.5s ease;
+}
+/* Modifiche alla navbar principale */
+nav {
+    display: flex;
+    background-color: rgba(60, 60, 60, 0.7); /* Colore più chiaro per glass effect */
+    border-top: none; /* Rimuovo il bordo superiore */
+    position: fixed;
+    bottom: 20px; /* Distanza dal fondo */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 45px); /* Larghezza ridotta con margini */
+    max-width: 500px; /* Larghezza massima */
+    z-index: 1000;
+    border-radius: 30px; /* Bordi molto arrotondati */
+    padding: 10px 15px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Pulsanti di navigazione */
+.nav-btn {
+    flex: 1;
+    padding: 10px 5px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.7rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+/* Icone dei pulsanti */
+.nav-btn .material-icons {
+    margin-bottom: 4px;
+    font-size: 22px;
+    padding: 8px;
+    border-radius: 1vh;
+    transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+    position: relative;
+    z-index: 1;
+}
+
+/* Pulsante attivo */
+.nav-btn.active {
+    color: var(--primary-color);
+}
+
+.nav-btn.active .material-icons {
+    background-color: rgba(87, 130, 201, 0.2);
+    color: var(--primary-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(87, 130, 201, 0.3);
+}
+
+/* Effetto hover sui pulsanti */
+.nav-btn:not(.active):hover .material-icons {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Effetto liquid glass per la navbar */
+.liquid-glass-mode nav {
+    background: rgba(60, 60, 60, 0.4) !important;
+    backdrop-filter: blur(25px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+}
+
+.liquid-glass-mode .nav-btn.active .material-icons {
+    background: rgba(87, 130, 201, 0.25) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    box-shadow: 0 0 20px rgba(87, 130, 201, 0.4) !important;
+}
+
+/* Animazione per l'effetto liquido */
+@keyframes liquidNav {
+    0% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+    100% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Applica l'animazione solo in modalità liquid glass */
+.liquid-glass-mode nav {
+    animation: liquidNav 5s ease-in-out infinite;
 }
