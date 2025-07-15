@@ -119,43 +119,58 @@
             </div>
         </div>
     </div>
-
+    <div class="modal" id="reset-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 data-translate="settings.resetConfirm"></h2>
+            <p data-translate="settings.resetWarning"></p>
+            
+            <div class="reset-slider-container">
+                <div class="reset-slider-track">
+                    <div class="reset-slider-thumb">
+                        <span class="material-icons">arrow_forward</span>
+                    </div>
+                    <span class="reset-slider-text" data-translate="settings.resetSlide"></span>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal" id="timer-modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Nuovo Timer</h2>
-            <input type="text" id="timer-name" placeholder="Nome del timer (opzionale)">
+            <h2 data-translate="modals.newTimer">Nuovo Timer</h2>
+            <input type="text" id="timer-name" placeholder="Timer name" data-placeholder="timer.namePlaceholder">
             
             <div class="time-input">
-                <input type="number" id="hours" placeholder="HH" min="0" max="99">
+                <input type="number" id="hours" data-placeholder="timer.hours" min="0" max="99" placeholder="HH">
                 <span>:</span>
-                <input type="number" id="minutes" placeholder="MM" min="0" max="59">
+                <input type="number" id="minutes" data-placeholder="timer.minutes" min="0" max="59" placeholder="MM">
                 <span>:</span>
-                <input type="number" id="seconds" placeholder="SS" min="0" max="59">
+                <input type="number" id="seconds" data-placeholder="timer.seconds" min="0" max="59" placeholder="SS">
             </div>
             <select id="timer-group" class="settings-select">
-                <option value="all">Tutti i timer</option>
-                <option value="work">Lavoro</option>
-                <option value="personal">Personale</option>
-                <option value="fitness">Fitness</option>
-                <option value="study">Studio</option>
+                <option value="all" data-translate="timer.groupAll">Tutti i timer</option>
+                <option value="work" data-translate="timer.groupWork">Lavoro</option>
+                <option value="personal" data-translate="timer.groupPersonal">Personale</option>
+                <option value="fitness" data-translate="timer.groupFitness">Fitness</option>
+                <option value="study" data-translate="timer.groupStudy">Studio</option>
             </select>
-            <button id="start-timer">Avvia Timer</button>
+            <button id="start-timer" data-translate="buttons.start">Avvia Timer</button>
         </div>
     </div>
 
     <div id="alarm-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Nuova Sveglia</h2>
-            <input type="text" id="alarm-name" placeholder="Nome sveglia (opzionale)">
+            <h2 data-translate="modals.newAlarm">Nuova Sveglia</h2>
+            <input type="text" id="alarm-name" data-placeholder="alarm.namePlaceholder" placeholder="Alarm name">
             
             <div style="margin: 20px 0;">
                 <input type="time" id="alarm-time">
             </div>
             
             <div class="repeat-options">
-                <h3>Ripeti</h3>
+                <h3 data-translate="alarm.repeat">Ripeti</h3>
                 <div class="days">
                     <button data-day="0">L</button>
                     <button data-day="1">M</button>
@@ -167,7 +182,7 @@
                 </div>
             </div>
             
-            <button id="save-alarm">Salva Sveglia</button>
+            <button id="save-alarm" data-translate="buttons.save">Salva Sveglia</button>
         </div>
     </div>
 
