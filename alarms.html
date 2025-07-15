@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sveglia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#121212">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .alarm-container {
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .time-display {
+            font-size: 5rem;
+            margin: 2rem 0;
+        }
+        
+        .alarm-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        button {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        
+        #snooze-alarm {
+            background-color: #5782c9;
+            color: white;
+        }
+        
+        #dismiss-alarm {
+            background-color: #e53935;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="alarm-container">
+        <h1>Sveglia</h1>
+        <div class="time-display" id="alarm-time">--:--</div>
+        <div class="alarm-actions">
+            <button id="snooze-alarm">Posticipa</button>
+            <button id="dismiss-alarm">Termina</button>
+        </div>
+    </div>
+
+<script>
+    // Get alarm ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const alarmId = urlParams.get('id');
+    
+    // Play alarm sound
+    const alarmSound = new Audio('/sounds/alarm_sound.mp3');
+    alarmSound.loop = true;
+    alarmSound.play().catch(e => console.error('Audio play failed:', e));
+
+    // Connect to service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+            // Notify service worker that alarm window is open
+            registration.active.postMessage({
+                type: 'alarmWindowOpen',
+                alarmId: alarmId
+            });
+            
+            // Set up button handlers
+            document.getElementById('snooze-alarm').addEventListener('click', () => {
+                // Posticipa di 5 minuti
+                registration.active.postMessage({
+                    type: 'snoozeAlarm',
+                    alarmId: alarmId,
+                    minutes: 5 // Posticipa di 5 minuti
+                });
+                alarmSound.pause();
+                window.close();
+            });
+            
+            document.getElementById('dismiss-alarm').addEventListener('click', () => {
+                // Termina la sveglia
+                registration.active.postMessage({
+                    type: 'dismissAlarm',
+                    alarmId: alarmId,
+                    dismissPermanently: false // Non disattivare la sveglia, solo ferma l'allarme corrente
+                });
+                alarmSound.pause();
+                window.close();
+            });
+        });
+    }
+
+    // Update current time display
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('alarm-time').textContent = 
+            now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+    
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Handle messages from service worker
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data.type === 'stopAlarm') {
+            alarmSound.pause();
+            window.close();
+        }
+    });
+
+    // Close sound when window closes
+    window.addEventListener('beforeunload', () => {
+        alarmSound.pause();
+    });
+</script>
+</body>
+</html>
