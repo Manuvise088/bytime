@@ -591,7 +591,7 @@ a {
 }
 
 #add-btn {
-    bottom: 130px;
+    bottom: 120px !important;
     right: 15px;
     z-index: 1002;
     position: fixed;
