@@ -1,5 +1,6 @@
 let currentUser = localStorage.getItem('username') || null;
 let liquidGlassMode = localStorage.getItem('liquidGlassMode') === 'true' || false;
+let m3ExpressiveMode = localStorage.getItem('m3ExpressiveMode') === 'true' || false;
 let timers = JSON.parse(localStorage.getItem('timers')) || [];
 let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
 let cronometers = JSON.parse(localStorage.getItem('cronometers')) || []; 
@@ -34,6 +35,10 @@ const addBtn = document.getElementById('add-btn');
 const addMenu = document.getElementById('add-menu');
 const addTimerMenu = document.getElementById('add-timer-menu');
 const addAlarmMenu = document.getElementById('add-alarm-menu');
+const alarmFilters = {
+    all: 'all',
+    repeating: 'repeating'
+};
 const translations = {
     it: {
         appName: "bytime",
@@ -51,7 +56,8 @@ const translations = {
             alarms: "Sveglie",
             cronometers: "Cronometro",
             settings: "Impostazioni",
-            feed: "Feed"
+            feed: "Feed",
+            weather: "Meteo"
         },
         buttons: {
             seeAll: "Vedi tutti",
@@ -68,7 +74,9 @@ const translations = {
             skip: "Salta",
             back: "Indietro",
             retry: "Riprova",
-            refresh: "Aggiorna"
+            refresh: "Aggiorna",
+            snooze: "Posticipa",
+            dismiss: "Annulla"
         },
         timer: {
             createFirst: "Crea il tuo primo timer",
@@ -83,7 +91,11 @@ const translations = {
             groupPersonal: "Personale",
             groupFitness: "Fitness",
             groupStudy: "Studio",
-            invalidTime: "Timer invalido!"
+            invalidTime: "Timer invalido!",
+            time: "Tempo",
+            started: "avviato",
+            completed: "completato",
+            unnamed: "Senza nome"
         },
         alarm: {
             createFirst: "Crea la tua prima sveglia",
@@ -93,7 +105,12 @@ const translations = {
             repeat: "Ripeti",
             days: ["L", "M", "M", "G", "V", "S", "D"],
             active: "Attiva",
-            inactive: "Disattiva"
+            inactive: "Disattiva",
+            allAlarms: "Tutte le sveglie",
+            repeatingAlarms: "Sveglie ripetute",
+            noRepeatingAlarms: "Nessuna sveglia ripetuta",
+            invalidTime: "Orario non valido",
+            time: "Orario"
         },
         stopwatch: {
             start: "Avvia",
@@ -142,7 +159,10 @@ const translations = {
             resetSlide: "Scorri per confermare",
             resetComplete: "Reset completato!",
             resetNo: "No, torna indietro!",
-            resetDetails: "Verranno rimossi: <br>-Timer <br>-Sveglie <br>-Cronometri <br>-Impostazioni e dettagli utente"
+            resetDetails: "Verranno rimossi: <br>-Timer <br>-Sveglie <br>-Cronometri <br>-Impostazioni e dettagli utente",
+            user: "Utente",
+            searchPlaceholder: "Cerca nelle impostazioni",
+            noResults: "Nessun risultato trovato"
         },
         weather: {
             current: "Meteo Attuale",
@@ -159,7 +179,14 @@ const translations = {
             maxTemp: "Record massimo",
             minTemp: "Record minimo",
             avgHumidity: "Umidità media",
-            maxWind: "Vento massimo"
+            maxWind: "Vento massimo",
+            sun: "Sole",
+            locating: "Localizzazione in corso...",
+            locationFound: "Posizione trovata",
+            approxLocation: "Posizione approssimativa",
+            geoUnsupported: "Geolocalizzazione non supportata",
+            sunDataUnavailable: "Dati sole non disponibili",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Nuovo Timer",
@@ -195,7 +222,8 @@ const translations = {
             alarms: "Alarms",
             cronometers: "Stopwatch",
             settings: "Settings",
-            feed: "Feed"
+            feed: "Feed",
+            weather: "Weather"
         },
         buttons: {
             seeAll: "See all",
@@ -212,7 +240,9 @@ const translations = {
             skip: "Skip",
             back: "Back",
             retry: "Retry",
-            refresh: "Refresh"
+            refresh: "Refresh",
+            snooze: "Snooze",
+            dismiss: "Dismiss"
         },
         timer: {
             createFirst: "Create your first timer",
@@ -228,7 +258,10 @@ const translations = {
             groupFitness: "Fitness",
             groupStudy: "Study",
             invalidTime: "Invalid time!",
-            time: "Time lap"
+            time: "Time",
+            started: "started",
+            completed: "completed",
+            unnamed: "Unnamed"
         },
         alarm: {
             createFirst: "Create your first alarm",
@@ -238,7 +271,12 @@ const translations = {
             repeat: "Repeat",
             days: ["S", "M", "T", "W", "T", "F", "S"],
             active: "Active",
-            inactive: "Inactive"
+            inactive: "Inactive",
+            allAlarms: "All alarms",
+            repeatingAlarms: "Repeating alarms",
+            noRepeatingAlarms: "No repeating alarms",
+            invalidTime: "Invalid time",
+            time: "Time"
         },
         stopwatch: {
             start: "Start",
@@ -246,7 +284,7 @@ const translations = {
             lap: "Lap",
             reset: "Reset",
             laps: "Laps",
-            noLaps: "No laps recorded",
+            noLaps: "No laps recorded"
         },
         settings: {
             account: "Account",
@@ -287,7 +325,10 @@ const translations = {
             resetNo: "No, go back!",
             resetComplete: "Reset completed successfully!",
             resetSlide: "Slide to confirm",
-            resetDetails: "Removed data: <br>-Timers <br>-Alarms <br>-Stopwatches <br>-Settings and user details"
+            resetDetails: "Removed data: <br>-Timers <br>-Alarms <br>-Stopwatches <br>-Settings and user details",
+            user: "User",
+            searchPlaceholder: "Search settings",
+            noResults: "No results found"
         },
         weather: {
             current: "Current Weather",
@@ -305,7 +346,14 @@ const translations = {
             avgHumidity: "Avg humidity",
             maxWind: "Max wind",
             loadingForecast: "Loading forecast data...",
-            errorForecast: "Error loading forecast data."
+            errorForecast: "Error loading forecast data.",
+            sun: "Sun",
+            locating: "Locating...",
+            locationFound: "Location found",
+            approxLocation: "Approximate location",
+            geoUnsupported: "Geolocation not supported",
+            sunDataUnavailable: "Sun data unavailable",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "New Timer",
@@ -341,7 +389,8 @@ const translations = {
             alarms: "Alarmas",
             cronometers: "Cronómetro",
             settings: "Ajustes",
-            feed: "Noticias"
+            feed: "Noticias",
+            weather: "Clima"
         },
         buttons: {
             seeAll: "Ver todos",
@@ -358,7 +407,9 @@ const translations = {
             skip: "Saltar",
             back: "Atrás",
             retry: "Reintentar",
-            refresh: "Actualizar"
+            refresh: "Actualizar",
+            snooze: "Posponer",
+            dismiss: "Descartar"
         },
         timer: {
             createFirst: "Crea tu primer temporizador",
@@ -372,7 +423,12 @@ const translations = {
             groupWork: "Trabajo",
             groupPersonal: "Personal",
             groupFitness: "Fitness",
-            groupStudy: "Estudio"
+            groupStudy: "Estudio",
+            invalidTime: "¡Tiempo inválido!",
+            time: "Tiempo",
+            started: "iniciado",
+            completed: "completado",
+            unnamed: "Sin nombre"
         },
         alarm: {
             createFirst: "Crea tu primera alarma",
@@ -383,6 +439,11 @@ const translations = {
             days: ["D", "L", "M", "X", "J", "V", "S"],
             active: "Activa",
             inactive: "Inactiva",
+            allAlarms: "Todas las alarmas",
+            repeatingAlarms: "Alarmas repetitivas",
+            noRepeatingAlarms: "No hay alarmas repetitivas",
+            invalidTime: "Hora inválida",
+            time: "Hora"
         },
         stopwatch: {
             start: "Iniciar",
@@ -431,7 +492,10 @@ const translations = {
             resetComplete: "¡Reinicio completo!",
             resetSlide: "Desliza el dedo para confirmar",
             resetNo: "No, vuelve atrás",
-            resetDetails: "Se eliminarán: <br>- Temporizadores <br>- Alarmas <br>- Cronómetros <br>- Ajustes y detalles del usuario"
+            resetDetails: "Se eliminarán: <br>- Temporizadores <br>- Alarmas <br>- Cronómetros <br>- Ajustes y detalles del usuario",
+            user: "Usuario",
+            searchPlaceholder: "Buscar en ajustes",
+            noResults: "No se encontraron resultados"
         },
         weather: {
             current: "Tiempo Actual",
@@ -448,8 +512,15 @@ const translations = {
             minTemp: "Mínimo récord",
             avgHumidity: "Humedad promedio",
             maxWind: "Viento máximo",
-            loadingForecast: "Carga de datos de previsión... ",
-            errorForecast: "Previsiones de error al cargar."
+            loadingForecast: "Carga de datos de previsión...",
+            errorForecast: "Previsiones de error al cargar.",
+            sun: "Sol",
+            locating: "Localizando...",
+            locationFound: "Ubicación encontrada",
+            approxLocation: "Ubicación aproximada",
+            geoUnsupported: "Geolocalización no soportada",
+            sunDataUnavailable: "Datos solares no disponibles",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Nuevo Temporizador",
@@ -461,7 +532,7 @@ const translations = {
             avatarLabel: "Elegir imagen",
             saveChanges: "Guardar cambios",
             continue: "Continuar",
-            footerText: "Puedes cambiar nombre e imagen en cualquier momento en ajustes",
+            footerText: "Puedes cambiar nombre e imagen en cualquier momento en ajustes"
         },
         notifications: {
             timerStart: "Temporizador iniciado",
@@ -485,7 +556,8 @@ const translations = {
             alarms: "Alarmes",
             cronometers: "Chronomètre",
             settings: "Paramètres",
-            feed: "Flux"
+            feed: "Flux",
+            weather: "Météo"
         },
         buttons: {
             seeAll: "Voir tout",
@@ -502,7 +574,9 @@ const translations = {
             skip: "Passer",
             back: "Retour",
             retry: "Réessayer",
-            refresh: "Actualiser"
+            refresh: "Actualiser",
+            snooze: "Snooze",
+            dismiss: "Rejeter"
         },
         timer: {
             createFirst: "Créez votre premier minuteur",
@@ -516,7 +590,12 @@ const translations = {
             groupWork: "Travail",
             groupPersonal: "Personnel",
             groupFitness: "Fitness",
-            groupStudy: "Étude"
+            groupStudy: "Étude",
+            invalidTime: "Temps invalide !",
+            time: "Temps",
+            started: "démarré",
+            completed: "terminé",
+            unnamed: "Sans nom"
         },
         alarm: {
             createFirst: "Créez votre première alarme",
@@ -526,7 +605,12 @@ const translations = {
             repeat: "Répéter",
             days: ["L", "M", "M", "J", "V", "S", "D"],
             active: "Active",
-            inactive: "Inactive"
+            inactive: "Inactive",
+            allAlarms: "Toutes les alarmes",
+            repeatingAlarms: "Alarmes répétitives",
+            noRepeatingAlarms: "Pas d'alarmes répétitives",
+            invalidTime: "Heure invalide",
+            time: "Heure"
         },
         stopwatch: {
             start: "Démarrer",
@@ -575,7 +659,9 @@ const translations = {
             resetSlide: "Balayez pour confirmer",
             resetNo: "Non, retournez",
             personalize: "Personnalisez votre expérience",
-            removeDetails: "Les éléments suivants seront supprimés :<br>- Minuteurs<br>- Alarmes<br>- Chronomètres<br>- Paramètres et détails de l'utilisateur"
+            removeDetails: "Les éléments suivants seront supprimés :<br>- Minuteurs<br>- Alarmes<br>- Chronomètres<br>- Paramètres et détails de l'utilisateur",
+            user: "Utilisateur",
+            searchPlaceholder: "Rechercher dans les paramètres",
         },
         weather: {
             current: "Météo Actuelle",
@@ -593,7 +679,14 @@ const translations = {
             avgHumidity: "Humidité moy",
             maxWind: "Vent max",
             loadingForecast: "Chargement des données prévisionnelles...",
-            errorForecast: "Erreur de chargement des prévisions."
+            errorForecast: "Erreur de chargement des prévisions.",
+            sun: "Soleil",
+            locating: "Localisation en cours...",
+            locationFound: "Localisation trouvée",
+            approxLocation: "Localisation approximative",
+            geoUnsupported: "Géolocalisation non supportée",
+            sunDataUnavailable: "Données solaires indisponibles",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Nouveau Minuteur",
@@ -629,7 +722,8 @@ const translations = {
             alarms: "Alarme",
             cronometers: "Stoppuhr",
             settings: "Einstellungen",
-            feed: "Feed"
+            feed: "Feed",
+            weather: "Wetter"
         },
         buttons: {
             seeAll: "Alle anzeigen",
@@ -646,7 +740,9 @@ const translations = {
             skip: "Überspringen",
             back: "Zurück",
             retry: "Erneut versuchen",
-            refresh: "Aktualisieren"
+            refresh: "Aktualisieren",
+            snooze: "Snooze",
+            dismiss: "Verwerfen"
         },
         timer: {
             createFirst: "Erstellen Sie Ihren ersten Timer",
@@ -660,7 +756,12 @@ const translations = {
             groupWork: "Arbeit",
             groupPersonal: "Persönlich",
             groupFitness: "Fitness",
-            groupStudy: "Studium"
+            groupStudy: "Studium",
+            invalidTime: "Ungültige Zeit!",
+            time: "Zeit",
+            started: "gestartet",
+            completed: "abgeschlossen",
+            unnamed: "Unbenannt"
         },
         alarm: {
             createFirst: "Erstellen Sie Ihren ersten Alarm",
@@ -670,7 +771,12 @@ const translations = {
             repeat: "Wiederholen",
             days: ["M", "D", "M", "D", "F", "S", "S"],
             active: "Aktiv",
-            inactive: "Inaktiv"
+            inactive: "Inaktiv",
+            allAlarms: "Alle Alarme",
+            repeatingAlarms: "Wiederholende Alarme",
+            noRepeatingAlarms: "Keine wiederholenden Alarme",
+            invalidTime: "Ungültige Zeit",
+            time: "Zeit"
         },
         stopwatch: {
             start: "Starten",
@@ -719,7 +825,10 @@ const translations = {
             resetSlide: "Zum Bestätigen wischen",
             resetNo: "Nein, zurück",
             personalize: "Passen Sie Ihr Erlebnis an ",
-            resetDetails: "Folgendes wird entfernt: <br>- Timer <br>- Wecker <br>- Stoppuhren <br>- Einstellungen und Benutzerdetails"
+            resetDetails: "Folgendes wird entfernt: <br>- Timer <br>- Wecker <br>- Stoppuhren <br>- Einstellungen und Benutzerdetails",
+            user: "Benutzer",
+            searchPlaceholder: "Einstellungen durchsuchen",
+            noResults: "Keine Ergebnisse gefunden"
         },
         weather: {
             current: "Aktuelles Wetter",
@@ -737,7 +846,14 @@ const translations = {
             avgHumidity: "Durchschn. Luftfeuchtigkeit",
             maxWind: "Maximaler Wind",
             loadingForecast: "Laden von Prognosedaten...",
-            errorForecast: "Fehler beim Laden von Prognosen."
+            errorForecast: "Fehler beim Laden von Prognosen.",
+            sun: "Sonne",
+            locating: "Standortermittlung...",
+            locationFound: "Standort gefunden",
+            approxLocation: "Ungefährer Standort",
+            geoUnsupported: "Geolokalisierung nicht unterstützt",
+            sunDataUnavailable: "Sonnendaten nicht verfügbar",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Neuer Timer",
@@ -767,6 +883,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTimerGroups();
     updateModalTexts();
     
+    if (m3ExpressiveMode) {
+        document.body.classList.add('m3-expressive');
+    }
+
+
     if (!currentUser) {
         showUsernamePrompt();
     } else {
@@ -775,22 +896,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupEventListeners();
 
-    // Request notification permission
     if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-            notificationPermission = permission === 'granted';
+            Notification.requestPermission().then(permission => {
+                notificationPermission = permission === 'granted';
+            });
+        }
+    
+    if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                notificationPermission = permission === 'granted';
         });
     }
-    
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(registration => {
-            serviceWorkerRegistration = registration;
-        }).catch(err => {
-            console.error('ServiceWorker registration failed: ', err);
-        });
-    }
-    
+    navigator.serviceWorker.addEventListener('message', function(event) {
+        if (event.data.type === 'stopAlarm' && typeof window.stopAlarmSound === 'function') {
+            window.stopAlarmSound();
+        }
+    })
     // Handle PWA installation prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -1518,7 +1639,7 @@ function loadTimersSection() {
             <div class="group-selector">
                 ${timerGroups.map(group => `
                     <button class="group-btn ${groupFilter === group.id ? 'active' : ''}" data-group="${group.id}">
-                        ${t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`)}
+                        ${group.id === 'all' ? t('timer.groupAll') : t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`)}
                     </button>
                 `).join('')}
             </div>
@@ -1541,7 +1662,7 @@ function loadTimersSection() {
                     <div class="card-content">
                         <div class="timer-info">
                             ${timer.group && timer.group !== 'all' ? 
-                                `<span class="timer-badge">
+                                `<span class="timer-badge" style="background-color: ${getGroupColor(timer.group)}">
                                     ${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}
                                 </span>` : ''}
                             <h3>${timer.name || t('timer.timer')}</h3>
@@ -1558,7 +1679,7 @@ function loadTimersSection() {
                     </div>
                     ${timer.id === activeTimer?.id ? 
                         `<div class="progress-bar">
-                            <div class="progress" style="width: ${calculateProgress(activeTimer)}%;}"></div>
+                            <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
                         </div>` : ''
                     }
                 </div>
@@ -1599,7 +1720,6 @@ function loadTimersSection() {
 
 function getGroupColor(groupId) {
     const colors = {
-        'all': '#5782c9',
         'work': '#4CAF50',
         'personal': '#9C27B0',
         'fitness': '#FF9800',
@@ -1607,12 +1727,31 @@ function getGroupColor(groupId) {
     };
     return colors[groupId] || '#607D8B';
 }
+
 function loadAlarmsSection() {
     document.querySelector('.fab').style.display = 'flex';
     
+    const currentAlarmFilter = localStorage.getItem('currentAlarmFilter') || alarmFilters.all;
+    
     mainContent.innerHTML = `
-        ${alarms.length > 0 ? 
-            alarms.map(alarm => `
+        <div class="filter-selector">
+            <button class="filter-btn ${currentAlarmFilter === alarmFilters.all ? 'active' : ''}" data-filter="${alarmFilters.all}">
+                ${t('alarm.allAlarms')}
+            </button>
+            <button class="filter-btn ${currentAlarmFilter === alarmFilters.repeating ? 'active' : ''}" data-filter="${alarmFilters.repeating}">
+                ${t('alarm.repeatingAlarms')}
+            </button>
+        </div>
+    `;
+    
+    // Filtra le sveglie in base alla selezione
+    const alarmsToShow = currentAlarmFilter === alarmFilters.all ? 
+        alarms : 
+        alarms.filter(alarm => alarm.days && alarm.days.length > 0);
+    
+    mainContent.innerHTML += `
+        ${alarmsToShow.length > 0 ? 
+            alarmsToShow.map(alarm => `
                 <div class="card" data-id="${alarm.id}">
                     <div class="card-content">
                         <div>
@@ -1632,7 +1771,9 @@ function loadAlarmsSection() {
             `).join('') : 
             `<div class="empty-state">
                 <span class="material-icons">alarm</span>
-                <p>${t('alarm.noAlarms')}</p>
+                <p>${currentAlarmFilter === alarmFilters.repeating ? 
+                    t('alarm.noRepeatingAlarms') : 
+                    t('alarm.noAlarms')}</p>
                 <button id="create-first-alarm" class="btn-primary">
                     <span class="material-icons">add</span>
                     ${t('alarm.createFirst')}
@@ -1641,8 +1782,16 @@ function loadAlarmsSection() {
         }
     `;
 
+    // Aggiungi event listener per i filtri
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            localStorage.setItem('currentAlarmFilter', filter);
+            loadAlarmsSection();
+        });
+    });
 
-    // Toggle alarm
+    // Il resto del codice rimane uguale...
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -1650,7 +1799,6 @@ function loadAlarmsSection() {
         });
     });
 
-    // Delete alarm
     document.querySelectorAll('.delete-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -1658,7 +1806,6 @@ function loadAlarmsSection() {
         });
     });
 
-    // Create first alarm button
     document.getElementById('create-first-alarm')?.addEventListener('click', function() {
         alarmModal.style.display = 'block';
     });
@@ -2401,6 +2548,12 @@ function loadSettingsSection() {
     
     mainContent.innerHTML = `
         <div class="settings-page">
+        <div class="search-settings-container">
+                <div class="search-box">
+                    <span class="material-icons">search</span>
+                    <input type="text" id="settings-search" placeholder="${t('settings.searchPlaceholder')}" autocomplete="off">
+                </div>
+            </div>
             <div class="settings-section">
                 <h2 class="section-title">${t('settings.account')}</h2>
                 <div class="section-content">
@@ -2557,6 +2710,18 @@ function loadSettingsSection() {
                             </label>
                         </div>
                     </div>
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">Material 3 Expressive</h4>
+                                <p class="group-description">Stile avanzato con forme espressive e tipografia dinamica</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="m3-expressive-toggle" ${m3ExpressiveMode ? 'checked' : ''}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -2568,7 +2733,7 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>${t('settings.version')}</span>
-                            <span>1.4.6</span>
+                            <span>1.4.7</span>
                         </div>
                         <div class="info-item">
                             <span>Release Source:</span>
@@ -2604,276 +2769,324 @@ function loadSettingsSection() {
     `;
     
     const style = document.createElement('style');
-style.textContent = `
-    .settings-page {
-        padding: 0;
-    }
-    
-    .settings-header {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 24px;
-        padding-bottom: 12px;
-    }
-    
-    .settings-header h3 {
-        margin: 0;
-        font-size: 1.5rem;
-        color: var(--text-primary);
-    }
-    
-    #settings-back-btn {
-        background: none;
-        border: none;
-        color: var(--primary-color);
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 50%;
-        transition: background-color 0.3s;
-        background-color: white;
-    }
-    
-    .settings-section {
-        padding: 1.5rem 1rem;
-        margin-bottom: 0;
-    }
-    
-    .settings-divider {
-        height: 8px;
-        background-color: #2a2a2a;
-        margin: 0;
-        border-radius: 2vh;
-    }
-    
-    .section-title {
-        font-size: 1.1rem;
-        margin-bottom: 1.2rem;
-        color: var(--primary-color);
-        display: flex;
-        align-items: center;
-    }
-    
-    .section-title::before {
-        content: '';
-        display: inline-block;
-        width: 4px;
-        height: 1.1rem;
-        background-color: var(--primary-color);
-        margin-right: 0.8rem;
-        border-radius: 2px;
-    }
-    
-    .section-content {
-        padding: 0 0.5rem;
-    }
-    
-    .account-details {
-        display: flex;
-        align-items: center;
-        gap: 3vh;
-        margin-bottom: 16px;
-    }
-    
-    .user-avatar, #icon_account {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        object-fit: cover;
-        font-size: 60px;
-        color: var(--primary-color);
-    }
-    
-    #icon_account {
-        margin-right: 5vh;
-    }
-    
-    .account-text h3 {
-        margin: 0;
-        font-size: 1.2rem;
-    }
-    
-    .account-type {
-        margin: 0;
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-    }
-    
-    .settings-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .settings-group:last-child {
-        margin-bottom: 0;
-    }
-    
-    .group-title {
-        font-size: 1rem;
-        margin: 0 0 0.3rem 0;
-        color: white;
-    }
-    
-    .group-description {
-        font-size: 0.85rem;
-        color: #aaa;
-        margin: 0;
-    }
-    
-    .theme-options {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    
-    .theme-option {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        background: none;
-        cursor: pointer;
-    }
-    
-    .theme-preview {
-        border-radius: 2vh;
-    }
-    
-    .theme-preview.default {
-        background-color: #5782c9;
-    }
-    
-    .theme-preview.green {
-        background-color: #2E7D32;
-    }
-    
-    .theme-preview.red {
-        background-color: #C62828;
-    }
-    
-    .theme-preview.purple {
-        background-color: #6A1B9A;
-    }
-    
-    .switch-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.8rem 0;
-    }
-    
-    .switch-container:last-child {
-        border-bottom: none;
-    }
-    
-    .switch-info {
-        flex: 1;
-        margin-right: 1rem;
-    }
-    
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 30px;
-    }
-    
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-    }
-    
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 24px;
-        width: 24px;
-        left: 4px;
-        top: 3px;
-        background-color: white;
-        transition: .4s;
-    }
-    
-    input:checked + .slider {
-        background-color: var(--primary-color);
-    }
-    
-    input:checked + .slider:before {
-        transform: translateX(16px);
-    }
-    
-    .slider.round {
-        border-radius: 34px;
-    }
-    
-    .slider.round:before {
-        border-radius: 50%;
-    }
-    
-    .location-hint {
-        margin-top: 8px;
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-    }
-    
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-    }
-    
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.8rem 0;
-        border-bottom: 1px solid #444;
-    }
-    
-    .info-item:last-child {
-        border-bottom: none;
-    }
-    
-    .info-item span:first-child {
-        color: #aaa;
-    }
-    
-    .info-item span:last-child {
-        color: white;
-        font-weight: normal;
-    }
-    
-    .segnala, .segnala a {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 1.5rem;
-        padding: 8px 16px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        text-decoration: none;
-        width: 100%;
-        justify-content: center;
-    }
-`;
-document.head.appendChild(style);
+    style.textContent = `
+        .search-settings-container {
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            background-color: var(--background-color);
+            z-index: 10;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: #2a2a2a;
+            border-radius: 24px;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:focus-within {
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        
+        .search-box .material-icons {
+            color: #aaa;
+            margin-right: 8px;
+        }
+        
+        #settings-search {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            padding: 8px 0;
+        }
+        
+        #settings-search::placeholder {
+            color: #666;
+        }
+        
+        .settings-section.hidden {
+            display: none;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #aaa;
+        }
+        .settings-page {
+            padding: 0;
+        }
+        
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+        }
+        
+        .settings-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+        
+        #settings-back-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            background-color: white;
+        }
+        
+        .settings-section {
+            padding: 1.5rem 1rem;
+            margin-bottom: 0;
+        }
+        
+        .settings-divider {
+            height: 8px;
+            background-color: #2a2a2a;
+            margin: 0;
+            border-radius: 2vh;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.1rem;
+            background-color: var(--primary-color);
+            margin-right: 0.8rem;
+            border-radius: 2px;
+        }
+        
+        .section-content {
+            padding: 0 0.5rem;
+        }
+        
+        .account-details {
+            display: flex;
+            align-items: center;
+            gap: 3vh;
+            margin-bottom: 16px;
+        }
+        
+        .user-avatar, #icon_account {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            font-size: 60px;
+            color: var(--primary-color);
+        }
+        
+        #icon_account {
+            margin-right: 5vh;
+        }
+        
+        .account-text h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .account-type {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .settings-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .group-title {
+            font-size: 1rem;
+            margin: 0 0 0.3rem 0;
+            color: white;
+        }
+        
+        .group-description {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin: 0;
+        }
+        
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .theme-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: none;
+            cursor: pointer;
+        }
+        
+        .theme-preview {
+            border-radius: 2vh;
+        }
+        
+        .theme-preview.default {
+            background-color: #5782c9;
+        }
+        
+        .theme-preview.green {
+            background-color: #2E7D32;
+        }
+        
+        .theme-preview.red {
+            background-color: #C62828;
+        }
+        
+        .theme-preview.purple {
+            background-color: #6A1B9A;
+        }
+        
+        .switch-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+        }
+        
+        .switch-container:last-child {
+            border-bottom: none;
+        }
+        
+        .switch-info {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            top: 3px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        .location-hint {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #444;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-item span:first-child {
+            color: #aaa;
+        }
+        
+        .info-item span:last-child {
+            color: white;
+            font-weight: normal;
+        }
+        
+        .segnala, .segnala a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            width: 100%;
+            justify-content: center;
+        }
+    `;
+    document.head.appendChild(style);
 
     document.getElementById('account-btn').style.display = 'none';
     document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -2882,6 +3095,55 @@ document.head.appendChild(style);
             btn.classList.add('active');
         }
     });
+
+    document.getElementById('settings-search')?.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const sections = document.querySelectorAll('.settings-section');
+        let hasResults = false;
+        let previousVisibleSection = null;
+
+        sections.forEach(section => {
+            const title = section.querySelector('.section-title')?.textContent.toLowerCase() || '';
+            const content = section.textContent.toLowerCase();
+            
+            if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                section.classList.remove('hidden');
+                hasResults = true;
+                
+                // Nascondi il separatore se la sezione precedente è nascosta
+                const divider = section.previousElementSibling;
+                if (divider && divider.classList.contains('settings-divider')) {
+                    divider.style.display = previousVisibleSection ? 'block' : 'none';
+                }
+                
+                previousVisibleSection = section;
+            } else {
+                section.classList.add('hidden');
+                
+                // Nascondi anche il separatore precedente
+                const divider = section.previousElementSibling;
+                if (divider && divider.classList.contains('settings-divider')) {
+                    divider.style.display = 'none';
+                }
+            }
+        });
+
+    // Mostra messaggio se nessun risultato
+    const noResults = document.querySelector('.no-results');
+    if (!hasResults) {
+        if (!noResults) {
+            const noResultsEl = document.createElement('div');
+            noResultsEl.className = 'no-results';
+            noResultsEl.innerHTML = `
+                <span class="material-icons">search_off</span>
+                <p>${t('settings.noResults')}</p>
+            `;
+            document.querySelector('.settings-page').appendChild(noResultsEl);
+        }
+    } else if (noResults) {
+        noResults.remove();
+    }
+});
 document.getElementById('liquid-glass-toggle')?.addEventListener('change', function() {
     liquidGlassMode = this.checked;
     localStorage.setItem('liquidGlassMode', liquidGlassMode);
@@ -2953,6 +3215,35 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
     // Request location permission
     document.getElementById('request-location-btn')?.addEventListener('click', function() {
         requestLocationPermission();
+    });
+    document.getElementById('liquid-glass-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            // Disattiva M3 Expressive se Liquid Glass è attivato
+            document.getElementById('m3-expressive-toggle').checked = false;
+            m3ExpressiveMode = false;
+            localStorage.setItem('m3ExpressiveMode', false);
+            document.body.classList.remove('m3-expressive');
+        }
+        liquidGlassMode = this.checked;
+        localStorage.setItem('liquidGlassMode', liquidGlassMode);
+        applyTheme();
+        applyLiquidGlassEffect();
+    });
+
+    // Aggiungi questo nel setup degli event listener
+    document.getElementById('m3-expressive-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            // Disattiva Liquid Glass se M3 Expressive è attivato
+            document.getElementById('liquid-glass-toggle').checked = false;
+            liquidGlassMode = false;
+            localStorage.setItem('liquidGlassMode', false);
+            document.body.classList.remove('liquid-glass-mode');
+            document.querySelectorAll('.liquid-effect').forEach(el => el.remove());
+        }
+        m3ExpressiveMode = this.checked;
+        localStorage.setItem('m3ExpressiveMode', m3ExpressiveMode);
+        document.body.classList.toggle('m3-expressive', m3ExpressiveMode);
+        applyTheme();
     });
 }
 
@@ -3163,6 +3454,8 @@ function initializeTimerGroups() {
             { id: 'study', name: 'Studio', isDefault: false }
         ];
         localStorage.setItem('timerGroups', JSON.stringify(timerGroups));
+    } else {
+        timerGroups = JSON.parse(localStorage.getItem('timerGroups'));
     }
     showTimerGroups = localStorage.getItem('showTimerGroups') === 'true' || false;
 }
@@ -3280,17 +3573,74 @@ function checkAlarms() {
         
         if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
             if (!alarm.days || alarm.days.includes(currentDay)) {
-                showNotification(
-                    alarm.name || t('alarm.alarm'), 
-                    `${t('alarm.time')} (${alarm.time})`, 
-                    true
-                );
+                // Controlla se la sveglia è già stata attivata oggi
+                const lastTriggered = alarm.lastTriggeredDate;
+                const today = now.toDateString();
+                
+                if (!lastTriggered || lastTriggered !== today) {
+                    // Aggiorna la data dell'ultimo trigger
+                    alarm.lastTriggeredDate = today;
+                    saveAlarms();
+                    
+                    // Mostra la notifica
+                    showNotification(
+                        alarm.name || t('notifications.alarm'), 
+                        `${t('alarm.time')}: ${alarm.time}`,
+                        true,  // requireInteraction
+                        true,  // isAlarm
+                        alarm.id
+                    );
+                    
+                    // Riproduci il suono dell'allarme
+                    playAlarmSound();
+                }
             }
         }
     });
     
-    // Check again in 1 minute
     setTimeout(checkAlarms, 60000 - now.getSeconds() * 1000 - now.getMilliseconds());
+}
+
+function showNotification(title, body, requireInteraction = false, isAlarm = false, alarmId = null) {
+    if (!('Notification' in window)) return;
+    
+    const notificationTitle = translations[currentLanguage]?.notifications?.[title] || title;
+    const notificationBody = typeof body === 'string' ? 
+                          (translations[currentLanguage]?.notifications?.[body] || body) : 
+                          body;
+    
+    if (Notification.permission === 'granted') {
+        const options = {
+            body: notificationBody,
+            icon: '/icons/icon-192x192.png',
+            badge: '/icons/badge-72x72.png',
+            vibrate: isAlarm ? [200, 100, 200, 100, 200] : [200, 100, 200],
+            requireInteraction: isAlarm,
+            data: {
+                type: isAlarm ? 'alarm' : 'timer',
+                alarmId: alarmId
+            }
+        };
+        
+        if (isAlarm) {
+            options.actions = [
+                { action: 'snooze', title: t('buttons.snooze') },
+                { action: 'dismiss', title: t('buttons.dismiss') }
+            ];
+        }
+        
+        if (serviceWorkerRegistration) {
+            serviceWorkerRegistration.showNotification(notificationTitle, options);
+        } else if ('Notification' in window) {
+            new Notification(notificationTitle, options);
+        }
+    } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                showNotification(title, body, requireInteraction, isAlarm, alarmId);
+            }
+        });
+    }
 }
 
 function calculateProgress(timer) {
@@ -3389,35 +3739,44 @@ function applyTheme() {
         body.classList.remove('amoled-mode');
     }
     
-    switch(currentTheme) {
-        case 'green':
-            root.style.setProperty('--primary-color', '#2E7D32');
-            root.style.setProperty('--secondary-color', '#66BB6A');
-            root.style.setProperty('--accent-color', '#FF7043');
-            break;
-        case 'red':
-            root.style.setProperty('--primary-color', '#C62828');
-            root.style.setProperty('--secondary-color', '#EF5350');
-            root.style.setProperty('--accent-color', '#FFA000');
-            break;
-        case 'purple':
-            root.style.setProperty('--primary-color', '#6A1B9A');
-            root.style.setProperty('--secondary-color', '#AB47BC');
-            root.style.setProperty('--accent-color', '#26C6DA');
-            break;
-        case 'dark':
-            root.style.setProperty('--primary-color', '#121212');
-            root.style.setProperty('--secondary-color', '#1E1E1E');
-            root.style.setProperty('--accent-color', '#BB86FC');
-            break;
-        default:
-            root.style.setProperty('--primary-color', '#5782c9');
-            root.style.setProperty('--secondary-color', '#34A853');
-            root.style.setProperty('--accent-color', '#EA4335');
+    // Se M3 Expressive è attivo, usa la sua palette di colori
+    if (m3ExpressiveMode) {
+        // Applica la palette M3 Expressive
+        root.style.setProperty('--primary-color', '#6750A4');
+        root.style.setProperty('--secondary-color', '#625B71');
+        root.style.setProperty('--accent-color', '#7D5260');
+    } else {
+        // Altrimenti usa la palette normale in base al tema selezionato
+        switch(currentTheme) {
+            case 'green':
+                root.style.setProperty('--primary-color', '#2E7D32');
+                root.style.setProperty('--secondary-color', '#66BB6A');
+                root.style.setProperty('--accent-color', '#FF7043');
+                break;
+            case 'red':
+                root.style.setProperty('--primary-color', '#C62828');
+                root.style.setProperty('--secondary-color', '#EF5350');
+                root.style.setProperty('--accent-color', '#FFA000');
+                break;
+            case 'purple':
+                root.style.setProperty('--primary-color', '#6A1B9A');
+                root.style.setProperty('--secondary-color', '#AB47BC');
+                root.style.setProperty('--accent-color', '#26C6DA');
+                break;
+            case 'dark':
+                root.style.setProperty('--primary-color', '#121212');
+                root.style.setProperty('--secondary-color', '#1E1E1E');
+                root.style.setProperty('--accent-color', '#BB86FC');
+                break;
+            default:
+                root.style.setProperty('--primary-color', '#5782c9');
+                root.style.setProperty('--secondary-color', '#34A853');
+                root.style.setProperty('--accent-color', '#EA4335');
+        }
     }
 }
 
-function showNotification(title, body, requireInteraction = false) {
+function showNotification(title, body, requireInteraction = false, isAlarm = false, alarmId = null) {
     if (!('Notification' in window)) return;
     
     const translatedTitle = translations[currentLanguage]?.notifications?.[title] || title;
@@ -3430,15 +3789,39 @@ function showNotification(title, body, requireInteraction = false) {
             body: translatedBody,
             icon: '/icons/icon-192x192.png',
             badge: '/icons/badge-72x72.png',
-            vibrate: [200, 100, 200],
-            requireInteraction: requireInteraction
+            vibrate: isAlarm ? [200, 100, 200, 100, 200] : [200, 100, 200],
+            requireInteraction: isAlarm ? true : requireInteraction,
+            data: {
+                type: isAlarm ? 'alarm' : 'timer',
+                alarmId: alarmId
+            }
         };
+        
+        // Aggiungi azioni per le sveglie
+        if (isAlarm) {
+            options.actions = [
+                { action: 'snooze', title: t('buttons.snooze') },
+                { action: 'dismiss', title: t('buttons.dismiss') }
+            ];
+        }
         
         if (serviceWorkerRegistration) {
             serviceWorkerRegistration.showNotification(translatedTitle, options);
         } else {
             new Notification(translatedTitle, options);
         }
+    }
+}
+
+async function requestWakeLock() {
+    try {
+        const wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => {
+            console.log('Wake Lock was released');
+        });
+        console.log('Wake Lock is active');
+    } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
     }
 }
 
@@ -3450,6 +3833,17 @@ function closeAllNotifications() {
             });
         });
     }
+}
+
+function playAlarmSound() {
+    const alarmSound = new Audio('/sounds/alarm_sound.mp3');
+    alarmSound.loop = true;
+    alarmSound.play();
+    
+    window.stopAlarmSound = function() {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+    };
 }
 
 async function loadSunTimesWithFallback() {
