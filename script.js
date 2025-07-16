@@ -1,5 +1,6 @@
 let currentUser = localStorage.getItem('username') || null;
 let liquidGlassMode = localStorage.getItem('liquidGlassMode') === 'true' || false;
+let m3ExpressiveMode = localStorage.getItem('m3ExpressiveMode') === 'true' || false;
 let timers = JSON.parse(localStorage.getItem('timers')) || [];
 let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
 let cronometers = JSON.parse(localStorage.getItem('cronometers')) || []; 
@@ -26,6 +27,7 @@ let deferredPrompt = null;
 const mainContent = document.getElementById('main-content');
 const headerTitle = document.getElementById('header-title');
 const accountBtn = document.getElementById('account-btn');
+const resetModal = document.createElement('div');
 const backBtn = document.getElementById('back-btn');
 const timerModal = document.getElementById('timer-modal');
 const alarmModal = document.getElementById('alarm-modal');
@@ -33,6 +35,10 @@ const addBtn = document.getElementById('add-btn');
 const addMenu = document.getElementById('add-menu');
 const addTimerMenu = document.getElementById('add-timer-menu');
 const addAlarmMenu = document.getElementById('add-alarm-menu');
+const alarmFilters = {
+    all: 'all',
+    repeating: 'repeating'
+};
 const translations = {
     it: {
         appName: "bytime",
@@ -50,7 +56,8 @@ const translations = {
             alarms: "Sveglie",
             cronometers: "Cronometro",
             settings: "Impostazioni",
-            feed: "Feed"
+            feed: "Feed",
+            weather: "Meteo"
         },
         buttons: {
             seeAll: "Vedi tutti",
@@ -67,7 +74,9 @@ const translations = {
             skip: "Salta",
             back: "Indietro",
             retry: "Riprova",
-            refresh: "Aggiorna"
+            refresh: "Aggiorna",
+            snooze: "Posticipa",
+            dismiss: "Annulla"
         },
         timer: {
             createFirst: "Crea il tuo primo timer",
@@ -82,7 +91,11 @@ const translations = {
             groupPersonal: "Personale",
             groupFitness: "Fitness",
             groupStudy: "Studio",
-            invalidTime: "Timer invalido!"
+            invalidTime: "Timer invalido!",
+            time: "Tempo",
+            started: "avviato",
+            completed: "completato",
+            unnamed: "Senza nome"
         },
         alarm: {
             createFirst: "Crea la tua prima sveglia",
@@ -92,7 +105,12 @@ const translations = {
             repeat: "Ripeti",
             days: ["L", "M", "M", "G", "V", "S", "D"],
             active: "Attiva",
-            inactive: "Disattiva"
+            inactive: "Disattiva",
+            allAlarms: "Tutte le sveglie",
+            repeatingAlarms: "Sveglie ripetute",
+            noRepeatingAlarms: "Nessuna sveglia ripetuta",
+            invalidTime: "Orario non valido",
+            time: "Orario"
         },
         stopwatch: {
             start: "Avvia",
@@ -109,6 +127,7 @@ const translations = {
             appearance: "Aspetto",
             theme: "Tema dell'app",
             preferences: "Preferenze",
+            personalize: "Personalizza la tua esperienza",
             notifications: "Notifiche",
             notificationsDesc: "Notifiche push per timer e sveglie",
             location: "Localizzazione",
@@ -134,6 +153,14 @@ const translations = {
             themeGreen: "Verde",
             themeRed: "Rosso",
             themePurple: "Viola",
+            resetAll: "Ripristina tutto",
+            resetWarning: "Cancella tutti i dati e ripristina ogni impostazione e preferenza dell'utente",
+            resetConfirm: "Sicuro di voler cancellare tutti i dati?",
+            resetSlide: "Scorri per confermare",
+            resetComplete: "Reset completato!",
+            resetNo: "No, torna indietro!",
+            resetDetails: "Verranno rimossi: <br>-Timer <br>-Sveglie <br>-Cronometri <br>-Impostazioni e dettagli utente",
+            user: "Utente"
         },
         weather: {
             current: "Meteo Attuale",
@@ -150,7 +177,14 @@ const translations = {
             maxTemp: "Record massimo",
             minTemp: "Record minimo",
             avgHumidity: "Umidità media",
-            maxWind: "Vento massimo"
+            maxWind: "Vento massimo",
+            sun: "Sole",
+            locating: "Localizzazione in corso...",
+            locationFound: "Posizione trovata",
+            approxLocation: "Posizione approssimativa",
+            geoUnsupported: "Geolocalizzazione non supportata",
+            sunDataUnavailable: "Dati sole non disponibili",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Nuovo Timer",
@@ -186,7 +220,8 @@ const translations = {
             alarms: "Alarms",
             cronometers: "Stopwatch",
             settings: "Settings",
-            feed: "Feed"
+            feed: "Feed",
+            weather: "Weather"
         },
         buttons: {
             seeAll: "See all",
@@ -203,7 +238,9 @@ const translations = {
             skip: "Skip",
             back: "Back",
             retry: "Retry",
-            refresh: "Refresh"
+            refresh: "Refresh",
+            snooze: "Snooze",
+            dismiss: "Dismiss"
         },
         timer: {
             createFirst: "Create your first timer",
@@ -218,7 +255,11 @@ const translations = {
             groupPersonal: "Personal",
             groupFitness: "Fitness",
             groupStudy: "Study",
-            invalidTime: "Invalid time!"
+            invalidTime: "Invalid time!",
+            time: "Time",
+            started: "started",
+            completed: "completed",
+            unnamed: "Unnamed"
         },
         alarm: {
             createFirst: "Create your first alarm",
@@ -228,7 +269,12 @@ const translations = {
             repeat: "Repeat",
             days: ["S", "M", "T", "W", "T", "F", "S"],
             active: "Active",
-            inactive: "Inactive"
+            inactive: "Inactive",
+            allAlarms: "All alarms",
+            repeatingAlarms: "Repeating alarms",
+            noRepeatingAlarms: "No repeating alarms",
+            invalidTime: "Invalid time",
+            time: "Time"
         },
         stopwatch: {
             start: "Start",
@@ -248,6 +294,7 @@ const translations = {
             notifications: "Notifications",
             notificationsDesc: "Push notifications for timers and alarms",
             location: "Location",
+            personalize: "Personalize your experience",
             locationDesc: "Share location for local information",
             timerGroups: "Timer groups",
             timerGroupsDesc: "Organize timers into categories",
@@ -269,7 +316,15 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Green",
             themeRed: "Red",
-            themePurple: "Purple"
+            themePurple: "Purple",
+            resetAll: "Full reset",
+            resetWarning: "Delete all data and reset any user settings and preferencies",
+            resetConfirm: "Are you sure about deleting every data?",
+            resetNo: "No, go back!",
+            resetComplete: "Reset completed successfully!",
+            resetSlide: "Slide to confirm",
+            resetDetails: "Removed data: <br>-Timers <br>-Alarms <br>-Stopwatches <br>-Settings and user details",
+            user: "User"
         },
         weather: {
             current: "Current Weather",
@@ -287,7 +342,14 @@ const translations = {
             avgHumidity: "Avg humidity",
             maxWind: "Max wind",
             loadingForecast: "Loading forecast data...",
-            errorForecast: "Error loading forecast data."
+            errorForecast: "Error loading forecast data.",
+            sun: "Sun",
+            locating: "Locating...",
+            locationFound: "Location found",
+            approxLocation: "Approximate location",
+            geoUnsupported: "Geolocation not supported",
+            sunDataUnavailable: "Sun data unavailable",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "New Timer",
@@ -323,7 +385,8 @@ const translations = {
             alarms: "Alarmas",
             cronometers: "Cronómetro",
             settings: "Ajustes",
-            feed: "Noticias"
+            feed: "Noticias",
+            weather: "Clima"
         },
         buttons: {
             seeAll: "Ver todos",
@@ -340,7 +403,9 @@ const translations = {
             skip: "Saltar",
             back: "Atrás",
             retry: "Reintentar",
-            refresh: "Actualizar"
+            refresh: "Actualizar",
+            snooze: "Posponer",
+            dismiss: "Descartar"
         },
         timer: {
             createFirst: "Crea tu primer temporizador",
@@ -354,7 +419,12 @@ const translations = {
             groupWork: "Trabajo",
             groupPersonal: "Personal",
             groupFitness: "Fitness",
-            groupStudy: "Estudio"
+            groupStudy: "Estudio",
+            invalidTime: "¡Tiempo inválido!",
+            time: "Tiempo",
+            started: "iniciado",
+            completed: "completado",
+            unnamed: "Sin nombre"
         },
         alarm: {
             createFirst: "Crea tu primera alarma",
@@ -365,6 +435,11 @@ const translations = {
             days: ["D", "L", "M", "X", "J", "V", "S"],
             active: "Activa",
             inactive: "Inactiva",
+            allAlarms: "Todas las alarmas",
+            repeatingAlarms: "Alarmas repetitivas",
+            noRepeatingAlarms: "No hay alarmas repetitivas",
+            invalidTime: "Hora inválida",
+            time: "Hora"
         },
         stopwatch: {
             start: "Iniciar",
@@ -390,6 +465,7 @@ const translations = {
             amoledMode: "Modo AMOLED",
             amoledModeDesc: "Fondo negro puro para pantallas AMOLED",
             autoplay: "Autoplay de temporizadores",
+            personalize: "Personaliza tu experiencia",
             autoplayDesc: "Iniciar automáticamente nuevos temporizadores",
             experimental: "Características experimentales",
             liquidGlass: "Estilo Liquid Glass",
@@ -405,7 +481,15 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Verde",
             themeRed: "Rojo",
-            themePurple: "Púrpura"
+            themePurple: "Púrpura",
+            resetAll: "Restaura todo",
+            resetWarning: "Borrar todos los datos y restaurar la configuración predeterminada",
+            resetConfirm: "¿Estás seguro de que quieres eliminar todos los datos?",
+            resetComplete: "¡Reinicio completo!",
+            resetSlide: "Desliza el dedo para confirmar",
+            resetNo: "No, vuelve atrás",
+            resetDetails: "Se eliminarán: <br>- Temporizadores <br>- Alarmas <br>- Cronómetros <br>- Ajustes y detalles del usuario",
+            user: "Usuario"
         },
         weather: {
             current: "Tiempo Actual",
@@ -422,8 +506,15 @@ const translations = {
             minTemp: "Mínimo récord",
             avgHumidity: "Humedad promedio",
             maxWind: "Viento máximo",
-            loadingForecast: "Carga de datos de previsión... ",
-            errorForecast: "Previsiones de error al cargar."
+            loadingForecast: "Carga de datos de previsión...",
+            errorForecast: "Previsiones de error al cargar.",
+            sun: "Sol",
+            locating: "Localizando...",
+            locationFound: "Ubicación encontrada",
+            approxLocation: "Ubicación aproximada",
+            geoUnsupported: "Geolocalización no soportada",
+            sunDataUnavailable: "Datos solares no disponibles",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Nuevo Temporizador",
@@ -435,7 +526,7 @@ const translations = {
             avatarLabel: "Elegir imagen",
             saveChanges: "Guardar cambios",
             continue: "Continuar",
-            footerText: "Puedes cambiar nombre e imagen en cualquier momento en ajustes",
+            footerText: "Puedes cambiar nombre e imagen en cualquier momento en ajustes"
         },
         notifications: {
             timerStart: "Temporizador iniciado",
@@ -459,7 +550,8 @@ const translations = {
             alarms: "Alarmes",
             cronometers: "Chronomètre",
             settings: "Paramètres",
-            feed: "Flux"
+            feed: "Flux",
+            weather: "Météo"
         },
         buttons: {
             seeAll: "Voir tout",
@@ -476,7 +568,9 @@ const translations = {
             skip: "Passer",
             back: "Retour",
             retry: "Réessayer",
-            refresh: "Actualiser"
+            refresh: "Actualiser",
+            snooze: "Snooze",
+            dismiss: "Rejeter"
         },
         timer: {
             createFirst: "Créez votre premier minuteur",
@@ -490,7 +584,12 @@ const translations = {
             groupWork: "Travail",
             groupPersonal: "Personnel",
             groupFitness: "Fitness",
-            groupStudy: "Étude"
+            groupStudy: "Étude",
+            invalidTime: "Temps invalide !",
+            time: "Temps",
+            started: "démarré",
+            completed: "terminé",
+            unnamed: "Sans nom"
         },
         alarm: {
             createFirst: "Créez votre première alarme",
@@ -500,7 +599,12 @@ const translations = {
             repeat: "Répéter",
             days: ["L", "M", "M", "J", "V", "S", "D"],
             active: "Active",
-            inactive: "Inactive"
+            inactive: "Inactive",
+            allAlarms: "Toutes les alarmes",
+            repeatingAlarms: "Alarmes répétitives",
+            noRepeatingAlarms: "Pas d'alarmes répétitives",
+            invalidTime: "Heure invalide",
+            time: "Heure"
         },
         stopwatch: {
             start: "Démarrer",
@@ -541,8 +645,16 @@ const translations = {
             themeDefault: "Faire défaut",
             themeGreen: "Vert",
             themeRed: "Rouge",
-            themePurple: "Pourpre"
-
+            themePurple: "Pourpre",
+            resetAll: "Restaurer",
+            resetWarning: "Effacer toutes les données et restaurer les paramètres par défaut",
+            resetConfirm: "Êtes-vous sûr de vouloir supprimer toutes les données?",
+            resetComplete: "Réinitialisation terminée !",
+            resetSlide: "Balayez pour confirmer",
+            resetNo: "Non, retournez",
+            personalize: "Personnalisez votre expérience",
+            removeDetails: "Les éléments suivants seront supprimés :<br>- Minuteurs<br>- Alarmes<br>- Chronomètres<br>- Paramètres et détails de l'utilisateur",
+            user: "Utilisateur"
         },
         weather: {
             current: "Météo Actuelle",
@@ -560,7 +672,14 @@ const translations = {
             avgHumidity: "Humidité moy",
             maxWind: "Vent max",
             loadingForecast: "Chargement des données prévisionnelles...",
-            errorForecast: "Erreur de chargement des prévisions."
+            errorForecast: "Erreur de chargement des prévisions.",
+            sun: "Soleil",
+            locating: "Localisation en cours...",
+            locationFound: "Localisation trouvée",
+            approxLocation: "Localisation approximative",
+            geoUnsupported: "Géolocalisation non supportée",
+            sunDataUnavailable: "Données solaires indisponibles",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Nouveau Minuteur",
@@ -596,7 +715,8 @@ const translations = {
             alarms: "Alarme",
             cronometers: "Stoppuhr",
             settings: "Einstellungen",
-            feed: "Feed"
+            feed: "Feed",
+            weather: "Wetter"
         },
         buttons: {
             seeAll: "Alle anzeigen",
@@ -613,7 +733,9 @@ const translations = {
             skip: "Überspringen",
             back: "Zurück",
             retry: "Erneut versuchen",
-            refresh: "Aktualisieren"
+            refresh: "Aktualisieren",
+            snooze: "Snooze",
+            dismiss: "Verwerfen"
         },
         timer: {
             createFirst: "Erstellen Sie Ihren ersten Timer",
@@ -627,7 +749,12 @@ const translations = {
             groupWork: "Arbeit",
             groupPersonal: "Persönlich",
             groupFitness: "Fitness",
-            groupStudy: "Studium"
+            groupStudy: "Studium",
+            invalidTime: "Ungültige Zeit!",
+            time: "Zeit",
+            started: "gestartet",
+            completed: "abgeschlossen",
+            unnamed: "Unbenannt"
         },
         alarm: {
             createFirst: "Erstellen Sie Ihren ersten Alarm",
@@ -637,7 +764,12 @@ const translations = {
             repeat: "Wiederholen",
             days: ["M", "D", "M", "D", "F", "S", "S"],
             active: "Aktiv",
-            inactive: "Inaktiv"
+            inactive: "Inaktiv",
+            allAlarms: "Alle Alarme",
+            repeatingAlarms: "Wiederholende Alarme",
+            noRepeatingAlarms: "Keine wiederholenden Alarme",
+            invalidTime: "Ungültige Zeit",
+            time: "Zeit"
         },
         stopwatch: {
             start: "Starten",
@@ -678,7 +810,16 @@ const translations = {
             themeDefault: "Vorgabe",
             themeRed: "Rot",
             themeGreen: "grün",
-            themePurple: "Violett"
+            themePurple: "Violett",
+            resetAll: "Wiederherstellen",
+            resetWarning: "Löschen Sie alle Daten und stellen Sie die Standardeinstellungen wieder her",
+            resetConfirm: "Sind Sie sicher, dass Sie alle Daten löschen möchten?",
+            resetComplete: "Zurücksetzen abgeschlossen!",
+            resetSlide: "Zum Bestätigen wischen",
+            resetNo: "Nein, zurück",
+            personalize: "Passen Sie Ihr Erlebnis an ",
+            resetDetails: "Folgendes wird entfernt: <br>- Timer <br>- Wecker <br>- Stoppuhren <br>- Einstellungen und Benutzerdetails",
+            user: "Benutzer"
         },
         weather: {
             current: "Aktuelles Wetter",
@@ -696,7 +837,14 @@ const translations = {
             avgHumidity: "Durchschn. Luftfeuchtigkeit",
             maxWind: "Maximaler Wind",
             loadingForecast: "Laden von Prognosedaten...",
-            errorForecast: "Fehler beim Laden von Prognosen."
+            errorForecast: "Fehler beim Laden von Prognosen.",
+            sun: "Sonne",
+            locating: "Standortermittlung...",
+            locationFound: "Standort gefunden",
+            approxLocation: "Ungefährer Standort",
+            geoUnsupported: "Geolokalisierung nicht unterstützt",
+            sunDataUnavailable: "Sonnendaten nicht verfügbar",
+            windUnit: "km/h"
         },
         modals: {
             newTimer: "Neuer Timer",
@@ -726,6 +874,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTimerGroups();
     updateModalTexts();
     
+    if (m3ExpressiveMode) {
+        document.body.classList.add('m3-expressive');
+    }
+
+
     if (!currentUser) {
         showUsernamePrompt();
     } else {
@@ -734,22 +887,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupEventListeners();
 
-    // Request notification permission
     if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-            notificationPermission = permission === 'granted';
+            Notification.requestPermission().then(permission => {
+                notificationPermission = permission === 'granted';
+            });
+        }
+    
+    if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                notificationPermission = permission === 'granted';
         });
     }
-    
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(registration => {
-            serviceWorkerRegistration = registration;
-        }).catch(err => {
-            console.error('ServiceWorker registration failed: ', err);
-        });
-    }
-    
+    navigator.serviceWorker.addEventListener('message', function(event) {
+        if (event.data.type === 'stopAlarm' && typeof window.stopAlarmSound === 'function') {
+            window.stopAlarmSound();
+        }
+    })
     // Handle PWA installation prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -821,6 +974,15 @@ function updateModalTexts() {
             btn.textContent = dayNames[index];
         });
     }
+    
+    // Update reset modal
+    const resetModal = document.getElementById('reset-modal');
+    if (resetModal) {
+        resetModal.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            el.textContent = t(key);
+        });
+    }
 }
 
 
@@ -835,6 +997,11 @@ function saveTimerGroups() {
 
 function showUsernamePrompt() {
     const isEditing = !!currentUser;
+    
+    // Nascondi gli elementi della UI
+    document.querySelector('nav').style.display = 'none';
+    document.getElementById('add-btn').style.display = 'none';
+    document.getElementById('account-btn').style.display = 'none';
     
     mainContent.innerHTML = `
         <div class="username-page">
@@ -1108,6 +1275,7 @@ function setupEventListeners() {
         const section = button.dataset.section;
         const icon = button.querySelector('.material-icons');
         const textSpan = button.querySelector('span:not(.material-icons)');
+
         
         if (textSpan) {
             textSpan.textContent = t(`sections.${section}`);
@@ -1127,6 +1295,11 @@ function setupEventListeners() {
                 btn.classList.add('active');
             }
         });
+    });
+
+    document.getElementById('reset-all-btn')?.addEventListener('click', () => {
+        document.getElementById('reset-modal').style.display = 'block';
+        initResetSlider();
     });
 
     addBtn.addEventListener('click', toggleAddMenu);
@@ -1178,6 +1351,112 @@ function setupEventListeners() {
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
         backBtn.style.display = 'flex';
     });
+}
+
+function initResetSlider() {
+    const sliderTrack = document.querySelector('.reset-slider-track');
+    const sliderThumb = document.querySelector('.reset-slider-thumb');
+    const sliderText = document.querySelector('.reset-slider-text');
+    
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    
+    // Reset slider to initial position
+    sliderThumb.style.transform = 'translateX(0)';
+    sliderThumb.style.backgroundColor = 'var(--primary-color)';
+    
+    const startDrag = (e) => {
+        isDragging = true;
+        startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+        currentX = startX;
+        sliderThumb.style.transition = 'none';
+        e.preventDefault();
+    };
+    
+    const drag = (e) => {
+        if (!isDragging) return;
+        
+        const x = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+        const deltaX = x - startX;
+        const maxX = sliderTrack.offsetWidth - sliderThumb.offsetWidth;
+        
+        currentX = Math.min(Math.max(0, deltaX), maxX);
+        sliderThumb.style.transform = `translateX(${currentX}px)`;
+        
+        // Change color when reaching the end
+        if (currentX >= maxX - 10) {
+            sliderThumb.style.backgroundColor = '#e53935';
+        } else {
+            sliderThumb.style.backgroundColor = 'var(--primary-color)';
+        }
+    };
+    
+    const endDrag = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const maxX = sliderTrack.offsetWidth - sliderThumb.offsetWidth;
+        
+        if (currentX >= maxX - 10) {
+            // Confirmed - perform reset
+            performFullReset();
+        } else {
+            // Cancel - return to initial position
+            sliderThumb.style.transition = 'transform 0.3s ease';
+            sliderThumb.style.transform = 'translateX(0)';
+            sliderThumb.style.backgroundColor = 'var(--primary-color)';
+        }
+    };
+    
+    // Add event listeners
+    sliderThumb.addEventListener('mousedown', startDrag);
+    sliderThumb.addEventListener('touchstart', startDrag);
+    
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('touchmove', drag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+    
+    // Cleanup function to remove event listeners
+    return () => {
+        sliderThumb.removeEventListener('mousedown', startDrag);
+        sliderThumb.removeEventListener('touchstart', startDrag);
+        document.removeEventListener('mousemove', drag);
+        document.removeEventListener('touchmove', drag);
+        document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('touchend', endDrag);
+    };
+}
+
+function performFullReset() {
+    // Reset all settings
+    localStorage.clear();
+    
+    // Reset variables
+    currentUser = null;
+    timers = [];
+    alarms = [];
+    cronometers = [];
+    activeTimer = null;
+    currentTheme = 'default';
+    currentLanguage = 'it';
+    liquidGlassMode = false;
+    amoledMode = false;
+    autoplayEnabled = true;
+    showTimerGroups = false;
+    timerGroups = [{ id: 'all', name: 'Tutti i timer', isDefault: true }];
+    
+    // Close modal
+    document.getElementById('reset-modal').style.display = 'none';
+    
+    // Show notification
+    showNotification(t('settings.resetComplete'), '', false);
+    
+    // Reload page
+    setTimeout(() => {
+        location.reload();
+    }, 1500);
 }
 
 function toggleAddMenu() {
@@ -1351,7 +1630,7 @@ function loadTimersSection() {
             <div class="group-selector">
                 ${timerGroups.map(group => `
                     <button class="group-btn ${groupFilter === group.id ? 'active' : ''}" data-group="${group.id}">
-                        ${t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`)}
+                        ${group.id === 'all' ? t('timer.groupAll') : t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`)}
                     </button>
                 `).join('')}
             </div>
@@ -1374,7 +1653,7 @@ function loadTimersSection() {
                     <div class="card-content">
                         <div class="timer-info">
                             ${timer.group && timer.group !== 'all' ? 
-                                `<span class="timer-badge">
+                                `<span class="timer-badge" style="background-color: ${getGroupColor(timer.group)}">
                                     ${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}
                                 </span>` : ''}
                             <h3>${timer.name || t('timer.timer')}</h3>
@@ -1391,7 +1670,7 @@ function loadTimersSection() {
                     </div>
                     ${timer.id === activeTimer?.id ? 
                         `<div class="progress-bar">
-                            <div class="progress" style="width: ${calculateProgress(activeTimer)}%;}"></div>
+                            <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
                         </div>` : ''
                     }
                 </div>
@@ -1432,7 +1711,6 @@ function loadTimersSection() {
 
 function getGroupColor(groupId) {
     const colors = {
-        'all': '#5782c9',
         'work': '#4CAF50',
         'personal': '#9C27B0',
         'fitness': '#FF9800',
@@ -1440,12 +1718,31 @@ function getGroupColor(groupId) {
     };
     return colors[groupId] || '#607D8B';
 }
+
 function loadAlarmsSection() {
     document.querySelector('.fab').style.display = 'flex';
     
+    const currentAlarmFilter = localStorage.getItem('currentAlarmFilter') || alarmFilters.all;
+    
     mainContent.innerHTML = `
-        ${alarms.length > 0 ? 
-            alarms.map(alarm => `
+        <div class="filter-selector">
+            <button class="filter-btn ${currentAlarmFilter === alarmFilters.all ? 'active' : ''}" data-filter="${alarmFilters.all}">
+                ${t('alarm.allAlarms')}
+            </button>
+            <button class="filter-btn ${currentAlarmFilter === alarmFilters.repeating ? 'active' : ''}" data-filter="${alarmFilters.repeating}">
+                ${t('alarm.repeatingAlarms')}
+            </button>
+        </div>
+    `;
+    
+    // Filtra le sveglie in base alla selezione
+    const alarmsToShow = currentAlarmFilter === alarmFilters.all ? 
+        alarms : 
+        alarms.filter(alarm => alarm.days && alarm.days.length > 0);
+    
+    mainContent.innerHTML += `
+        ${alarmsToShow.length > 0 ? 
+            alarmsToShow.map(alarm => `
                 <div class="card" data-id="${alarm.id}">
                     <div class="card-content">
                         <div>
@@ -1465,7 +1762,9 @@ function loadAlarmsSection() {
             `).join('') : 
             `<div class="empty-state">
                 <span class="material-icons">alarm</span>
-                <p>${t('alarm.noAlarms')}</p>
+                <p>${currentAlarmFilter === alarmFilters.repeating ? 
+                    t('alarm.noRepeatingAlarms') : 
+                    t('alarm.noAlarms')}</p>
                 <button id="create-first-alarm" class="btn-primary">
                     <span class="material-icons">add</span>
                     ${t('alarm.createFirst')}
@@ -1474,8 +1773,16 @@ function loadAlarmsSection() {
         }
     `;
 
+    // Aggiungi event listener per i filtri
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            localStorage.setItem('currentAlarmFilter', filter);
+            loadAlarmsSection();
+        });
+    });
 
-    // Toggle alarm
+    // Il resto del codice rimane uguale...
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -1483,7 +1790,6 @@ function loadAlarmsSection() {
         });
     });
 
-    // Delete alarm
     document.querySelectorAll('.delete-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -1491,7 +1797,6 @@ function loadAlarmsSection() {
         });
     });
 
-    // Create first alarm button
     document.getElementById('create-first-alarm')?.addEventListener('click', function() {
         alarmModal.style.display = 'block';
     });
@@ -2390,6 +2695,18 @@ function loadSettingsSection() {
                             </label>
                         </div>
                     </div>
+                    <div class="settings-group">
+                        <div class="switch-container">
+                            <div class="switch-info">
+                                <h4 class="group-title">Material 3 Expressive</h4>
+                                <p class="group-description">Stile avanzato con forme espressive e tipografia dinamica</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="m3-expressive-toggle" ${m3ExpressiveMode ? 'checked' : ''}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -2401,7 +2718,7 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>${t('settings.version')}</span>
-                            <span>1.4.6</span>
+                            <span>1.4.7</span>
                         </div>
                         <div class="info-item">
                             <span>Release Source:</span>
@@ -2412,13 +2729,26 @@ function loadSettingsSection() {
                             <span>bytime devTeam</span>
                         </div>
                     </div>
+                </div>
+                        <div class="settings-section">
+                            <h2 class="section-title">Reset</h2>
+                            <div class="section-content">
+                                <button id="reset-all-btn" class="btn-danger">
+                                    <span class="material-icons">delete_forever</span>
+                                    ${t('settings.resetAll')}
+                                </button>
+                                <p class="reset-warning">${t('settings.resetWarning')}</p>
+                            </div>
+                        </div>
+                        
+                    <div class="settings-divider"></div>
+
                     <a href="mailto:mvisentin2008@gmail.com">
                         <button class="segnala">
                             <span class="material-icons">bug_report</span>
                             ${t('settings.reportBug')}
                         </button>
                     </a>
-                </div>
             </div>
         </div>
     `;
@@ -2723,6 +3053,21 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
             setTheme(theme);
         });
     });
+    document.getElementById('reset-all-btn')?.addEventListener('click', () => {
+        document.getElementById('reset-modal').style.display = 'block';
+        const cleanup = initResetSlider();
+        
+        // Add click listener to close modal when clicking outside
+        const modal = document.getElementById('reset-modal');
+        const closeModal = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                cleanup(); // Cleanup event listeners
+                modal.removeEventListener('click', closeModal);
+            }
+        };
+        modal.addEventListener('click', closeModal);
+    });
     document.getElementById('amoled-toggle').checked = amoledMode;
     // Notifications toggle
     document.getElementById('notifications-toggle')?.addEventListener('change', function() {
@@ -2758,6 +3103,35 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
     // Request location permission
     document.getElementById('request-location-btn')?.addEventListener('click', function() {
         requestLocationPermission();
+    });
+    document.getElementById('liquid-glass-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            // Disattiva M3 Expressive se Liquid Glass è attivato
+            document.getElementById('m3-expressive-toggle').checked = false;
+            m3ExpressiveMode = false;
+            localStorage.setItem('m3ExpressiveMode', false);
+            document.body.classList.remove('m3-expressive');
+        }
+        liquidGlassMode = this.checked;
+        localStorage.setItem('liquidGlassMode', liquidGlassMode);
+        applyTheme();
+        applyLiquidGlassEffect();
+    });
+
+    // Aggiungi questo nel setup degli event listener
+    document.getElementById('m3-expressive-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            // Disattiva Liquid Glass se M3 Expressive è attivato
+            document.getElementById('liquid-glass-toggle').checked = false;
+            liquidGlassMode = false;
+            localStorage.setItem('liquidGlassMode', false);
+            document.body.classList.remove('liquid-glass-mode');
+            document.querySelectorAll('.liquid-effect').forEach(el => el.remove());
+        }
+        m3ExpressiveMode = this.checked;
+        localStorage.setItem('m3ExpressiveMode', m3ExpressiveMode);
+        document.body.classList.toggle('m3-expressive', m3ExpressiveMode);
+        applyTheme();
     });
 }
 
@@ -2968,6 +3342,8 @@ function initializeTimerGroups() {
             { id: 'study', name: 'Studio', isDefault: false }
         ];
         localStorage.setItem('timerGroups', JSON.stringify(timerGroups));
+    } else {
+        timerGroups = JSON.parse(localStorage.getItem('timerGroups'));
     }
     showTimerGroups = localStorage.getItem('showTimerGroups') === 'true' || false;
 }
@@ -3085,17 +3461,74 @@ function checkAlarms() {
         
         if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
             if (!alarm.days || alarm.days.includes(currentDay)) {
-                showNotification(
-                    alarm.name || t('alarm.alarm'), 
-                    `${t('alarm.time')} (${alarm.time})`, 
-                    true
-                );
+                // Controlla se la sveglia è già stata attivata oggi
+                const lastTriggered = alarm.lastTriggeredDate;
+                const today = now.toDateString();
+                
+                if (!lastTriggered || lastTriggered !== today) {
+                    // Aggiorna la data dell'ultimo trigger
+                    alarm.lastTriggeredDate = today;
+                    saveAlarms();
+                    
+                    // Mostra la notifica
+                    showNotification(
+                        alarm.name || t('notifications.alarm'), 
+                        `${t('alarm.time')}: ${alarm.time}`,
+                        true,  // requireInteraction
+                        true,  // isAlarm
+                        alarm.id
+                    );
+                    
+                    // Riproduci il suono dell'allarme
+                    playAlarmSound();
+                }
             }
         }
     });
     
-    // Check again in 1 minute
     setTimeout(checkAlarms, 60000 - now.getSeconds() * 1000 - now.getMilliseconds());
+}
+
+function showNotification(title, body, requireInteraction = false, isAlarm = false, alarmId = null) {
+    if (!('Notification' in window)) return;
+    
+    const notificationTitle = translations[currentLanguage]?.notifications?.[title] || title;
+    const notificationBody = typeof body === 'string' ? 
+                          (translations[currentLanguage]?.notifications?.[body] || body) : 
+                          body;
+    
+    if (Notification.permission === 'granted') {
+        const options = {
+            body: notificationBody,
+            icon: '/icons/icon-192x192.png',
+            badge: '/icons/badge-72x72.png',
+            vibrate: isAlarm ? [200, 100, 200, 100, 200] : [200, 100, 200],
+            requireInteraction: isAlarm,
+            data: {
+                type: isAlarm ? 'alarm' : 'timer',
+                alarmId: alarmId
+            }
+        };
+        
+        if (isAlarm) {
+            options.actions = [
+                { action: 'snooze', title: t('buttons.snooze') },
+                { action: 'dismiss', title: t('buttons.dismiss') }
+            ];
+        }
+        
+        if (serviceWorkerRegistration) {
+            serviceWorkerRegistration.showNotification(notificationTitle, options);
+        } else if ('Notification' in window) {
+            new Notification(notificationTitle, options);
+        }
+    } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                showNotification(title, body, requireInteraction, isAlarm, alarmId);
+            }
+        });
+    }
 }
 
 function calculateProgress(timer) {
@@ -3194,35 +3627,44 @@ function applyTheme() {
         body.classList.remove('amoled-mode');
     }
     
-    switch(currentTheme) {
-        case 'green':
-            root.style.setProperty('--primary-color', '#2E7D32');
-            root.style.setProperty('--secondary-color', '#66BB6A');
-            root.style.setProperty('--accent-color', '#FF7043');
-            break;
-        case 'red':
-            root.style.setProperty('--primary-color', '#C62828');
-            root.style.setProperty('--secondary-color', '#EF5350');
-            root.style.setProperty('--accent-color', '#FFA000');
-            break;
-        case 'purple':
-            root.style.setProperty('--primary-color', '#6A1B9A');
-            root.style.setProperty('--secondary-color', '#AB47BC');
-            root.style.setProperty('--accent-color', '#26C6DA');
-            break;
-        case 'dark':
-            root.style.setProperty('--primary-color', '#121212');
-            root.style.setProperty('--secondary-color', '#1E1E1E');
-            root.style.setProperty('--accent-color', '#BB86FC');
-            break;
-        default:
-            root.style.setProperty('--primary-color', '#5782c9');
-            root.style.setProperty('--secondary-color', '#34A853');
-            root.style.setProperty('--accent-color', '#EA4335');
+    // Se M3 Expressive è attivo, usa la sua palette di colori
+    if (m3ExpressiveMode) {
+        // Applica la palette M3 Expressive
+        root.style.setProperty('--primary-color', '#6750A4');
+        root.style.setProperty('--secondary-color', '#625B71');
+        root.style.setProperty('--accent-color', '#7D5260');
+    } else {
+        // Altrimenti usa la palette normale in base al tema selezionato
+        switch(currentTheme) {
+            case 'green':
+                root.style.setProperty('--primary-color', '#2E7D32');
+                root.style.setProperty('--secondary-color', '#66BB6A');
+                root.style.setProperty('--accent-color', '#FF7043');
+                break;
+            case 'red':
+                root.style.setProperty('--primary-color', '#C62828');
+                root.style.setProperty('--secondary-color', '#EF5350');
+                root.style.setProperty('--accent-color', '#FFA000');
+                break;
+            case 'purple':
+                root.style.setProperty('--primary-color', '#6A1B9A');
+                root.style.setProperty('--secondary-color', '#AB47BC');
+                root.style.setProperty('--accent-color', '#26C6DA');
+                break;
+            case 'dark':
+                root.style.setProperty('--primary-color', '#121212');
+                root.style.setProperty('--secondary-color', '#1E1E1E');
+                root.style.setProperty('--accent-color', '#BB86FC');
+                break;
+            default:
+                root.style.setProperty('--primary-color', '#5782c9');
+                root.style.setProperty('--secondary-color', '#34A853');
+                root.style.setProperty('--accent-color', '#EA4335');
+        }
     }
 }
 
-function showNotification(title, body, requireInteraction = false) {
+function showNotification(title, body, requireInteraction = false, isAlarm = false, alarmId = null) {
     if (!('Notification' in window)) return;
     
     const translatedTitle = translations[currentLanguage]?.notifications?.[title] || title;
@@ -3235,15 +3677,39 @@ function showNotification(title, body, requireInteraction = false) {
             body: translatedBody,
             icon: '/icons/icon-192x192.png',
             badge: '/icons/badge-72x72.png',
-            vibrate: [200, 100, 200],
-            requireInteraction: requireInteraction
+            vibrate: isAlarm ? [200, 100, 200, 100, 200] : [200, 100, 200],
+            requireInteraction: isAlarm ? true : requireInteraction,
+            data: {
+                type: isAlarm ? 'alarm' : 'timer',
+                alarmId: alarmId
+            }
         };
+        
+        // Aggiungi azioni per le sveglie
+        if (isAlarm) {
+            options.actions = [
+                { action: 'snooze', title: t('buttons.snooze') },
+                { action: 'dismiss', title: t('buttons.dismiss') }
+            ];
+        }
         
         if (serviceWorkerRegistration) {
             serviceWorkerRegistration.showNotification(translatedTitle, options);
         } else {
             new Notification(translatedTitle, options);
         }
+    }
+}
+
+async function requestWakeLock() {
+    try {
+        const wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => {
+            console.log('Wake Lock was released');
+        });
+        console.log('Wake Lock is active');
+    } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
     }
 }
 
@@ -3255,6 +3721,17 @@ function closeAllNotifications() {
             });
         });
     }
+}
+
+function playAlarmSound() {
+    const alarmSound = new Audio('/sounds/alarm_sound.mp3');
+    alarmSound.loop = true;
+    alarmSound.play();
+    
+    window.stopAlarmSound = function() {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+    };
 }
 
 async function loadSunTimesWithFallback() {
