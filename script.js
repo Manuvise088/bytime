@@ -95,7 +95,8 @@ const translations = {
             time: "Tempo",
             started: "avviato",
             completed: "completato",
-            unnamed: "Senza nome"
+            unnamed: "Senza nome",
+            timer: "Timer"
         },
         alarm: {
             createFirst: "Crea la tua prima sveglia",
@@ -110,7 +111,8 @@ const translations = {
             repeatingAlarms: "Sveglie ripetute",
             noRepeatingAlarms: "Nessuna sveglia ripetuta",
             invalidTime: "Orario non valido",
-            time: "Orario"
+            time: "Orario",
+            alarm: "Sveglia"
         },
         stopwatch: {
             start: "Avvia",
@@ -261,7 +263,8 @@ const translations = {
             time: "Time",
             started: "started",
             completed: "completed",
-            unnamed: "Unnamed"
+            unnamed: "Unnamed",
+            timer: "Timer"
         },
         alarm: {
             createFirst: "Create your first alarm",
@@ -276,7 +279,8 @@ const translations = {
             repeatingAlarms: "Repeating alarms",
             noRepeatingAlarms: "No repeating alarms",
             invalidTime: "Invalid time",
-            time: "Time"
+            time: "Time",
+            alarm: "Alarm"
         },
         stopwatch: {
             start: "Start",
@@ -428,7 +432,8 @@ const translations = {
             time: "Tiempo",
             started: "iniciado",
             completed: "completado",
-            unnamed: "Sin nombre"
+            unnamed: "Sin nombre",
+            timer: "Temporizadores"
         },
         alarm: {
             createFirst: "Crea tu primera alarma",
@@ -443,7 +448,8 @@ const translations = {
             repeatingAlarms: "Alarmas repetitivas",
             noRepeatingAlarms: "No hay alarmas repetitivas",
             invalidTime: "Hora inválida",
-            time: "Hora"
+            time: "Hora",
+            alarm: "Alarma"
         },
         stopwatch: {
             start: "Iniciar",
@@ -595,7 +601,8 @@ const translations = {
             time: "Temps",
             started: "démarré",
             completed: "terminé",
-            unnamed: "Sans nom"
+            unnamed: "Sans nom",
+            timer: "Minuteur"
         },
         alarm: {
             createFirst: "Créez votre première alarme",
@@ -610,7 +617,8 @@ const translations = {
             repeatingAlarms: "Alarmes répétitives",
             noRepeatingAlarms: "Pas d'alarmes répétitives",
             invalidTime: "Heure invalide",
-            time: "Heure"
+            time: "Heure",
+            alarm: "Alarme"
         },
         stopwatch: {
             start: "Démarrer",
@@ -761,7 +769,8 @@ const translations = {
             time: "Zeit",
             started: "gestartet",
             completed: "abgeschlossen",
-            unnamed: "Unbenannt"
+            unnamed: "Unbenannt",
+            timer: "Timer"
         },
         alarm: {
             createFirst: "Erstellen Sie Ihren ersten Alarm",
@@ -776,7 +785,8 @@ const translations = {
             repeatingAlarms: "Wiederholende Alarme",
             noRepeatingAlarms: "Keine wiederholenden Alarme",
             invalidTime: "Ungültige Zeit",
-            time: "Zeit"
+            time: "Zeit",
+            alarm: "Alarm"
         },
         stopwatch: {
             start: "Starten",
@@ -912,37 +922,51 @@ document.addEventListener('DOMContentLoaded', function() {
             window.stopAlarmSound();
         }
     })
-    // Handle PWA installation prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
     });
     
-    // Load active timer if exists
     const savedActiveTimer = localStorage.getItem('activeTimer');
     if (savedActiveTimer) {
         activeTimer = JSON.parse(savedActiveTimer);
         startTimerCountdown(activeTimer);
     }
     
-    // Load stopwatch state if exists
     const savedStopwatch = localStorage.getItem('stopwatch');
     if (savedStopwatch) {
         const parsed = JSON.parse(savedStopwatch);
         stopwatch = {
-            running: false, // Always start as not running
+            running: false,
             startTime: parsed.startTime,
             elapsed: parsed.elapsed,
             laps: parsed.laps || []
         };
     }
     
-    // Start checking alarms
     checkAlarms();
 });
 
+function updateThemeColor() {
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+    const metaThemeColor = document.querySelector('#theme-color-meta');
+    
+    if (metaThemeColor && primaryColor) {
+        metaThemeColor.setAttribute('content', primaryColor);
+    }
+}
+
+updateThemeColor();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const observer = new MutationObserver(updateThemeColor);
+    observer.observe(document.body, { 
+        attributes: true, 
+        attributeFilter: ['class'] 
+    });
+});
+
 function updateModalTexts() {
-    // Update timer modal
     const timerModal = document.getElementById('timer-modal');
     if (timerModal) {
         timerModal.querySelectorAll('[data-translate]').forEach(el => {
@@ -953,8 +977,10 @@ function updateModalTexts() {
                 el.textContent = t(key);
             }
         });
-        
-        // Update select options
+        const accountBtnText = accountBtn.querySelector('[data-translate]');
+        if (accountBtnText) {
+            accountBtnText.textContent = t('sections.settings');
+        }
         const groupSelect = timerModal.querySelector('#timer-group');
         if (groupSelect) {
             Array.from(groupSelect.options).forEach(option => {
@@ -965,7 +991,6 @@ function updateModalTexts() {
         }
     }
     
-    // Update alarm modal
     const alarmModal = document.getElementById('alarm-modal');
     if (alarmModal) {
         alarmModal.querySelectorAll('[data-translate]').forEach(el => {
@@ -977,14 +1002,12 @@ function updateModalTexts() {
             }
         });
         
-        // Update day buttons in alarm modal
         const dayNames = translations[currentLanguage]?.alarm?.days || ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
         alarmModal.querySelectorAll('.days button').forEach((btn, index) => {
             btn.textContent = dayNames[index];
         });
     }
     
-    // Update reset modal
     const resetModal = document.getElementById('reset-modal');
     if (resetModal) {
         resetModal.querySelectorAll('[data-translate]').forEach(el => {
@@ -1006,8 +1029,6 @@ function saveTimerGroups() {
 
 function showUsernamePrompt() {
     const isEditing = !!currentUser;
-    
-    // Nascondi gli elementi della UI
     document.querySelector('nav').style.display = 'none';
     document.getElementById('add-btn').style.display = 'none';
     document.getElementById('account-btn').style.display = 'none';
@@ -1149,7 +1170,6 @@ function showUsernamePrompt() {
         saveButton.disabled = !currentUser;
     }
 
-    // Handle image upload
     avatarUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -1170,7 +1190,6 @@ function showUsernamePrompt() {
         }
     });
 
-    // Validate username input
     usernameInput.addEventListener('input', function() {
         const username = this.value.trim();
         saveButton.disabled = !username;
@@ -1184,7 +1203,6 @@ function showUsernamePrompt() {
         currentUser = username;
         localStorage.setItem('username', username);
         
-        // Handle avatar update
         if (avatarFile) {
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -1192,35 +1210,31 @@ function showUsernamePrompt() {
                 userAvatar = event.target.result;
                 restoreUI();
                 if (isEditing) {
-                    loadSection('settings'); // Torna alle impostazioni se stava modificando
+                    loadSection('settings');
                 } else {
                     loadSection('home');
                 }
             };
             reader.readAsDataURL(avatarFile);
         } else {
-            // Se stiamo modificando e non selezioniamo una nuova immagine, mantieni quella esistente
             if (!isEditing) {
                 localStorage.removeItem('userAvatar');
                 userAvatar = null;
             }
             restoreUI();
             if (isEditing) {
-                loadSection('settings'); // Torna alle impostazioni se stava modificando
+                loadSection('settings');
             } else {
                 loadSection('home');
             }
         }
     });
 
-    // Skip username setup o torna indietro
     document.getElementById('skip-username-btn').addEventListener('click', function() {
         if (isEditing) {
-            // Torna alle impostazioni se stava modificando
             restoreUI();
             loadSection('settings');
         } else {
-            // Comportamento originale per nuovo utente
             currentUser = 'Guest';
             localStorage.setItem('username', 'Guest');
             localStorage.removeItem('userAvatar');
@@ -1311,50 +1325,53 @@ function setupEventListeners() {
         initResetSlider();
     });
 
-    addBtn.addEventListener('click', toggleAddMenu);
-    addTimerMenu.addEventListener('click', () => {
+    document.getElementById('add-timer-menu').addEventListener('click', () => {
+            toggleAddMenu();
+            timerModal.style.display = 'block';
+        });
+
+    document.getElementById('add-alarm-menu').addEventListener('click', () => {
+        toggleAddMenu();
+        alarmModal.style.display = 'block';
+    });
+    document.getElementById('add-btn').addEventListener('click', toggleAddMenu);
+
+    document.getElementById('add-timer-menu').addEventListener('click', () => {
+        toggleAddMenu();
         timerModal.style.display = 'block';
-        addMenu.classList.remove('show');
-        addBtn.classList.remove('menu-open');
     });
 
-    addAlarmMenu.addEventListener('click', () => {
+    document.getElementById('add-alarm-menu').addEventListener('click', () => {
+        toggleAddMenu();
         alarmModal.style.display = 'block';
-        addMenu.classList.remove('show');
-        addBtn.classList.remove('menu-open');
     });
-    
-    // Close modal buttons
     Array.from(document.getElementsByClassName('close')).forEach(button => {
         button.addEventListener('click', function() {
             this.closest('.modal').style.display = 'none';
         });
     });
     
-    // Timer and alarm creation
     document.getElementById('start-timer').addEventListener('click', createNewTimer);
     document.getElementById('save-alarm').addEventListener('click', createNewAlarm);
     
-    // Alarm days selection
     document.querySelectorAll('.days button').forEach(button => {
         button.addEventListener('click', function() {
             this.classList.toggle('active');
         });
     });
     
-    // Close modals when clicking outside
     window.addEventListener('click', function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
+        if (event.target.classList.contains('add-menu-overlay')) {
+            toggleAddMenu();
         }
         
         if (!event.target.closest('#add-btn') && !event.target.closest('.add-menu')) {
-            addMenu.classList.remove('show');
+            document.querySelector('.add-menu').classList.remove('show');
+            document.querySelector('.add-menu-overlay').classList.remove('show');
             addBtn.classList.remove('menu-open');
         }
     });
     
-    // Account button
     accountBtn.addEventListener('click', () => {
         loadSection('settings');
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -1371,7 +1388,6 @@ function initResetSlider() {
     let startX = 0;
     let currentX = 0;
     
-    // Reset slider to initial position
     sliderThumb.style.transform = 'translateX(0)';
     sliderThumb.style.backgroundColor = 'var(--primary-color)';
     
@@ -1393,7 +1409,6 @@ function initResetSlider() {
         currentX = Math.min(Math.max(0, deltaX), maxX);
         sliderThumb.style.transform = `translateX(${currentX}px)`;
         
-        // Change color when reaching the end
         if (currentX >= maxX - 10) {
             sliderThumb.style.backgroundColor = '#e53935';
         } else {
@@ -1408,17 +1423,14 @@ function initResetSlider() {
         const maxX = sliderTrack.offsetWidth - sliderThumb.offsetWidth;
         
         if (currentX >= maxX - 10) {
-            // Confirmed - perform reset
             performFullReset();
         } else {
-            // Cancel - return to initial position
             sliderThumb.style.transition = 'transform 0.3s ease';
             sliderThumb.style.transform = 'translateX(0)';
             sliderThumb.style.backgroundColor = 'var(--primary-color)';
         }
     };
     
-    // Add event listeners
     sliderThumb.addEventListener('mousedown', startDrag);
     sliderThumb.addEventListener('touchstart', startDrag);
     
@@ -1427,7 +1439,6 @@ function initResetSlider() {
     document.addEventListener('mouseup', endDrag);
     document.addEventListener('touchend', endDrag);
     
-    // Cleanup function to remove event listeners
     return () => {
         sliderThumb.removeEventListener('mousedown', startDrag);
         sliderThumb.removeEventListener('touchstart', startDrag);
@@ -1439,10 +1450,7 @@ function initResetSlider() {
 }
 
 function performFullReset() {
-    // Reset all settings
     localStorage.clear();
-    
-    // Reset variables
     currentUser = null;
     timers = [];
     alarms = [];
@@ -1456,21 +1464,29 @@ function performFullReset() {
     showTimerGroups = false;
     timerGroups = [{ id: 'all', name: 'Tutti i timer', isDefault: true }];
     
-    // Close modal
     document.getElementById('reset-modal').style.display = 'none';
     
-    // Show notification
     showNotification(t('settings.resetComplete'), '', false);
     
-    // Reload page
     setTimeout(() => {
         location.reload();
     }, 1500);
 }
 
 function toggleAddMenu() {
-    addMenu.classList.toggle('show');
-    addBtn.classList.toggle('menu-open');
+    const addMenu = document.querySelector('.add-menu');
+    const overlay = document.querySelector('.add-menu-overlay');
+    const addBtn = document.getElementById('add-btn');
+    
+    if (addMenu.classList.contains('show')) {
+        addMenu.classList.remove('show');
+        overlay.classList.remove('show');
+        addBtn.classList.remove('menu-open');
+    } else {
+        addMenu.classList.add('show');
+        overlay.classList.add('show');
+        addBtn.classList.add('menu-open');
+    }
 }
 
 function loadSection(section) {
@@ -1628,7 +1644,6 @@ function loadHomeSection() {
 function loadTimersSection() {
     document.querySelector('.fab').style.display = 'flex';
     
-    // Ottieni il gruppo filtrato se esiste, altrimenti mostra tutti
     const groupFilter = localStorage.getItem('currentTimerGroup') || 'all';
     const timersToShow = groupFilter === 'all' ? timers : timers.filter(t => t.group === groupFilter);
     
@@ -1645,7 +1660,6 @@ function loadTimersSection() {
             </div>
         `;
         
-        // Aggiungi event listener per i pulsanti dei gruppi
         document.querySelectorAll('.group-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const group = this.dataset.group;
@@ -1695,7 +1709,6 @@ function loadTimersSection() {
         }
     `;
     
-    // Timer controls
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -1704,7 +1717,6 @@ function loadTimersSection() {
         });
     });
 
-    // Delete timer
     document.querySelectorAll('.delete-timer-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -1712,7 +1724,6 @@ function loadTimersSection() {
         });
     });
 
-    // Create first timer button
     document.getElementById('create-first-timer')?.addEventListener('click', function() {
         timerModal.style.display = 'block';
     });
@@ -1744,7 +1755,6 @@ function loadAlarmsSection() {
         </div>
     `;
     
-    // Filtra le sveglie in base alla selezione
     const alarmsToShow = currentAlarmFilter === alarmFilters.all ? 
         alarms : 
         alarms.filter(alarm => alarm.days && alarm.days.length > 0);
@@ -1782,7 +1792,6 @@ function loadAlarmsSection() {
         }
     `;
 
-    // Aggiungi event listener per i filtri
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const filter = this.dataset.filter;
@@ -1791,7 +1800,6 @@ function loadAlarmsSection() {
         });
     });
 
-    // Il resto del codice rimane uguale...
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -1822,10 +1830,8 @@ function setLanguage(lang) {
 }
 
 function updateUITexts() {
-    // Aggiorna i testi statici nella UI
     headerTitle.textContent = getSectionTitle(currentSection);
     
-    // Aggiorna i testi dei pulsanti di navigazione
     document.querySelectorAll('.nav-btn span:last-child').forEach((span, index) => {
         const sections = ['home', 'timers', 'alarms', 'cronometers', 'feed', 'settings'];
         if (index < sections.length) {
@@ -1833,7 +1839,6 @@ function updateUITexts() {
         }
     });
     
-    // Aggiorna altri elementi testuali se necessario
     if (currentSection === 'settings') {
         document.querySelectorAll('.section-title').forEach(el => {
             const section = el.textContent.trim();
@@ -1880,10 +1885,8 @@ function loadStopwatchSection() {
     `;
     
 
-    // Start/stop button
     document.getElementById('stopwatch-start-stop').addEventListener('click', toggleStopwatch);
     
-    // Lap/reset button
     document.getElementById('stopwatch-lap-reset').addEventListener('click', function() {
         if (stopwatch.running) {
             addLap();
@@ -1892,7 +1895,6 @@ function loadStopwatchSection() {
         }
     });
 
-    // Update display if running
     if (stopwatch.running) {
         startStopwatchUpdate();
     }
@@ -1914,17 +1916,14 @@ function formatStopwatchTimeShort(ms) {
 function calculateUsageDays() {
     const timestamps = [];
     
-    // Aggiungi timestamp da timer
     timers.forEach(timer => {
         timestamps.push(new Date(timer.createdAt).getTime());
     });
     
-    // Aggiungi timestamp da sveglie
     alarms.forEach(alarm => {
         timestamps.push(new Date(alarm.createdAt).getTime());
     });
     
-    // Aggiungi timestamp da cronometro se usato
     if (stopwatch.elapsed > 0) {
         const now = new Date().getTime();
         timestamps.push(now - stopwatch.elapsed);
@@ -2064,7 +2063,6 @@ async function loadWeatherForecast() {
         const data = await response.json();
         if (data.cod !== "200") throw new Error(data.message || 'Errore nel recupero previsioni');
 
-        // Group forecasts by day and find the most representative forecast for each day
         const dailyForecasts = {};
         data.list.forEach(forecast => {
             const date = new Date(forecast.dt * 1000);
@@ -2082,14 +2080,10 @@ async function loadWeatherForecast() {
                 };
             }
             
-            // Update min/max temps
             dailyForecasts[dayKey].minTemp = Math.min(dailyForecasts[dayKey].minTemp, forecast.main.temp_min);
             dailyForecasts[dayKey].maxTemp = Math.max(dailyForecasts[dayKey].maxTemp, forecast.main.temp_max);
-            
-            // Keep track of forecasts for this day
             dailyForecasts[dayKey].forecasts.push(forecast);
-            
-            // For the icon, use the forecast at 12:00 if available, or the first one
+             
             const hours = date.getHours();
             if (hours === 12 || !dailyForecasts[dayKey].icon) {
                 dailyForecasts[dayKey].mainCondition = forecast.weather[0].main;
@@ -2411,7 +2405,6 @@ async function loadWeatherData() {
             condition: data.weather[0].main.toLowerCase()
         };
         
-        // Aggiorna l'effetto meteorologico
         updateWeatherEffect(weather.condition);
         
         weatherContainer.innerHTML = `
@@ -2466,7 +2459,6 @@ function updateWeatherEffect(condition) {
     effectElement.innerHTML = '';
     effectElement.className = 'weather-effect';
     
-    // Aggiungi la classe appropriata in base alle condizioni
     if (condition.includes('rain')) {
         effectElement.classList.add('rain');
         addRainDrops(30);
@@ -2483,7 +2475,6 @@ function updateWeatherEffect(condition) {
     }
 }
 
-// Funzioni helper per elementi dinamici
 function addRainDrops(count) {
     const effectElement = document.getElementById('weather-effect');
     
@@ -3110,7 +3101,6 @@ function loadSettingsSection() {
                 section.classList.remove('hidden');
                 hasResults = true;
                 
-                // Nascondi il separatore se la sezione precedente è nascosta
                 const divider = section.previousElementSibling;
                 if (divider && divider.classList.contains('settings-divider')) {
                     divider.style.display = previousVisibleSection ? 'block' : 'none';
@@ -3120,7 +3110,6 @@ function loadSettingsSection() {
             } else {
                 section.classList.add('hidden');
                 
-                // Nascondi anche il separatore precedente
                 const divider = section.previousElementSibling;
                 if (divider && divider.classList.contains('settings-divider')) {
                     divider.style.display = 'none';
@@ -3128,7 +3117,6 @@ function loadSettingsSection() {
             }
         });
 
-    // Mostra messaggio se nessun risultato
     const noResults = document.querySelector('.no-results');
     if (!hasResults) {
         if (!noResults) {
@@ -3158,7 +3146,6 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         }
     });
 
-    // Theme selection
     document.querySelectorAll('.theme-option').forEach(option => {
         option.addEventListener('click', function() {
             const theme = this.dataset.theme;
@@ -3169,19 +3156,17 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         document.getElementById('reset-modal').style.display = 'block';
         const cleanup = initResetSlider();
         
-        // Add click listener to close modal when clicking outside
         const modal = document.getElementById('reset-modal');
         const closeModal = (e) => {
             if (e.target === modal) {
                 modal.style.display = 'none';
-                cleanup(); // Cleanup event listeners
+                cleanup();
                 modal.removeEventListener('click', closeModal);
             }
         };
         modal.addEventListener('click', closeModal);
     });
     document.getElementById('amoled-toggle').checked = amoledMode;
-    // Notifications toggle
     document.getElementById('notifications-toggle')?.addEventListener('change', function() {
         if (this.checked) {
             Notification.requestPermission().then(permission => {
@@ -3207,18 +3192,15 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         applyTheme();
     });
     
-    // Change username button
     document.getElementById('change-username-btn')?.addEventListener('click', function() {
         showUsernamePrompt();
     });
     
-    // Request location permission
     document.getElementById('request-location-btn')?.addEventListener('click', function() {
         requestLocationPermission();
     });
     document.getElementById('liquid-glass-toggle')?.addEventListener('change', function() {
         if (this.checked) {
-            // Disattiva M3 Expressive se Liquid Glass è attivato
             document.getElementById('m3-expressive-toggle').checked = false;
             m3ExpressiveMode = false;
             localStorage.setItem('m3ExpressiveMode', false);
@@ -3230,10 +3212,8 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         applyLiquidGlassEffect();
     });
 
-    // Aggiungi questo nel setup degli event listener
     document.getElementById('m3-expressive-toggle')?.addEventListener('change', function() {
         if (this.checked) {
-            // Disattiva Liquid Glass se M3 Expressive è attivato
             document.getElementById('liquid-glass-toggle').checked = false;
             liquidGlassMode = false;
             localStorage.setItem('liquidGlassMode', false);
@@ -3253,12 +3233,10 @@ function applyLiquidGlassEffect() {
     if (liquidGlassMode) {
         body.classList.add('liquid-glass-mode');
         
-        // Crea elementi per l'effetto fluido
         const liquidEffect = document.createElement('div');
         liquidEffect.className = 'liquid-effect';
         document.body.appendChild(liquidEffect);
         
-        // Animazione casuale per l'effetto
         setInterval(() => {
             liquidEffect.style.setProperty('--x', `${Math.random() * 100}%`);
             liquidEffect.style.setProperty('--y', `${Math.random() * 100}%`);
@@ -3573,12 +3551,10 @@ function checkAlarms() {
         
         if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
             if (!alarm.days || alarm.days.includes(currentDay)) {
-                // Controlla se la sveglia è già stata attivata oggi
                 const lastTriggered = alarm.lastTriggeredDate;
                 const today = now.toDateString();
                 
                 if (!lastTriggered || lastTriggered !== today) {
-                    // Aggiorna la data dell'ultimo trigger
                     alarm.lastTriggeredDate = today;
                     saveAlarms();
                     
@@ -3586,12 +3562,10 @@ function checkAlarms() {
                     showNotification(
                         alarm.name || t('notifications.alarm'), 
                         `${t('alarm.time')}: ${alarm.time}`,
-                        true,  // requireInteraction
-                        true,  // isAlarm
+                        true,
+                        true,
                         alarm.id
                     );
-                    
-                    // Riproduci il suono dell'allarme
                     playAlarmSound();
                 }
             }
@@ -3730,7 +3704,6 @@ function applyTheme() {
     const root = document.documentElement;
     const body = document.body;
     
-    // Applica la modalità AMOLED
     if (amoledMode) {
         body.style.backgroundColor = '#000000';
         body.classList.add('amoled-mode');
@@ -3739,14 +3712,11 @@ function applyTheme() {
         body.classList.remove('amoled-mode');
     }
     
-    // Se M3 Expressive è attivo, usa la sua palette di colori
     if (m3ExpressiveMode) {
-        // Applica la palette M3 Expressive
         root.style.setProperty('--primary-color', '#6750A4');
         root.style.setProperty('--secondary-color', '#625B71');
         root.style.setProperty('--accent-color', '#7D5260');
     } else {
-        // Altrimenti usa la palette normale in base al tema selezionato
         switch(currentTheme) {
             case 'green':
                 root.style.setProperty('--primary-color', '#2E7D32');
@@ -3797,7 +3767,6 @@ function showNotification(title, body, requireInteraction = false, isAlarm = fal
             }
         };
         
-        // Aggiungi azioni per le sveglie
         if (isAlarm) {
             options.actions = [
                 { action: 'snooze', title: t('buttons.snooze') },
