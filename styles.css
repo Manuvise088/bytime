@@ -736,46 +736,6 @@ input:checked + .slider:before {
     transform: translateX(16px);
 }
 
-body.accessibility-mode {
-    --primary-color: #1565C0;
-    --secondary-color: #0D47A1;
-    --accent-color: #FF6D00;
-}
-
-body.accessibility-mode .card,
-body.accessibility-mode .modal-content,
-body.accessibility-mode .add-menu,
-body.accessibility-mode .settings-select,
-body.accessibility-mode #timer-name,
-body.accessibility-mode #alarm-name,
-body.accessibility-mode .time-input input,
-body.accessibility-mode #alarm-time,
-body.accessibility-mode .days button {
-    border-radius: 0 !important;
-}
-
-body.accessibility-mode .nav-btn,
-body.accessibility-mode .nav-btn .material-icons,
-body.accessibility-mode .tab-btn.active::after,
-body.accessibility-mode .progress,
-body.accessibility-mode .progress-bar,
-body.accessibility-mode #add-btn,
-body.accessibility-mode .stopwatch-controls button {
-    border-radius: 0 !important;
-}
-
-body.accessibility-mode {
-    font-weight: bold;
-}
-
-body.accessibility-mode .card {
-    border: 2px solid #444;
-}
-
-body.accessibility-mode .time-display {
-    font-size: 1rem;
-}
-
 .username-page {
     display: flex;
     flex-direction: column;
@@ -849,23 +809,14 @@ body.accessibility-mode .time-display {
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
 }
-
+.add-menu {
+    position: fixed;
+    bottom: 115px;
+    right: 100px;
+}
 .add-menu-overlay.show {
     display: block;
     opacity: 1;
-}
-
-.add-menu {
-    position: fixed;
-    bottom: 180px;
-    right: 7.5px;
-    border-radius: 12px;
-    padding: 8px;
-    z-index: 9999 !important;
-    transform: translateY(20px);
-    opacity: 0;
-    transition: all 0.3s ease;
-    display: none;
 }
 
 .add-menu.show {
@@ -3127,7 +3078,7 @@ body.m3-expressive nav {
 body.m3-expressive .add-menu {
     position: fixed;
     bottom: 110px;
-    right: 24px;
+    right: 100px;
     border-radius: var(--shape-corner-medium);
     padding: 8px;
     z-index: 9999;
