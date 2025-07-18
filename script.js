@@ -86,7 +86,7 @@ const translations = {
             hours: "HH",
             minutes: "MM",
             seconds: "SS",
-            groupAll: "Tutti i timer",
+            groupAll: "Tutti",
             groupWork: "Lavoro",
             groupPersonal: "Personale",
             groupFitness: "Fitness",
@@ -95,7 +95,8 @@ const translations = {
             time: "Tempo",
             started: "avviato",
             completed: "completato",
-            unnamed: "Senza nome"
+            unnamed: "Senza nome",
+            timer: "Timer"
         },
         alarm: {
             createFirst: "Crea la tua prima sveglia",
@@ -110,7 +111,8 @@ const translations = {
             repeatingAlarms: "Sveglie ripetute",
             noRepeatingAlarms: "Nessuna sveglia ripetuta",
             invalidTime: "Orario non valido",
-            time: "Orario"
+            time: "Orario",
+            alarm: "Sveglia"
         },
         stopwatch: {
             start: "Avvia",
@@ -152,7 +154,7 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Verde",
             themeRed: "Rosso",
-            themePurple: "Viola",
+            themePurple: "Blu",
             resetAll: "Ripristina tutto",
             resetWarning: "Cancella tutti i dati e ripristina ogni impostazione e preferenza dell'utente",
             resetConfirm: "Sicuro di voler cancellare tutti i dati?",
@@ -160,7 +162,9 @@ const translations = {
             resetComplete: "Reset completato!",
             resetNo: "No, torna indietro!",
             resetDetails: "Verranno rimossi: <br>-Timer <br>-Sveglie <br>-Cronometri <br>-Impostazioni e dettagli utente",
-            user: "Utente"
+            user: "Utente",
+            searchPlaceholder: "Cerca nelle impostazioni",
+            noResults: "Nessun risultato trovato"
         },
         weather: {
             current: "Meteo Attuale",
@@ -250,7 +254,7 @@ const translations = {
             hours: "HH",
             minutes: "MM",
             seconds: "SS",
-            groupAll: "All timers",
+            groupAll: "All",
             groupWork: "Work",
             groupPersonal: "Personal",
             groupFitness: "Fitness",
@@ -259,7 +263,8 @@ const translations = {
             time: "Time",
             started: "started",
             completed: "completed",
-            unnamed: "Unnamed"
+            unnamed: "Unnamed",
+            timer: "Timer"
         },
         alarm: {
             createFirst: "Create your first alarm",
@@ -274,7 +279,8 @@ const translations = {
             repeatingAlarms: "Repeating alarms",
             noRepeatingAlarms: "No repeating alarms",
             invalidTime: "Invalid time",
-            time: "Time"
+            time: "Time",
+            alarm: "Alarm"
         },
         stopwatch: {
             start: "Start",
@@ -316,7 +322,7 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Green",
             themeRed: "Red",
-            themePurple: "Purple",
+            themePurple: "Blue",
             resetAll: "Full reset",
             resetWarning: "Delete all data and reset any user settings and preferencies",
             resetConfirm: "Are you sure about deleting every data?",
@@ -324,7 +330,9 @@ const translations = {
             resetComplete: "Reset completed successfully!",
             resetSlide: "Slide to confirm",
             resetDetails: "Removed data: <br>-Timers <br>-Alarms <br>-Stopwatches <br>-Settings and user details",
-            user: "User"
+            user: "User",
+            searchPlaceholder: "Search settings",
+            noResults: "No results found"
         },
         weather: {
             current: "Current Weather",
@@ -415,7 +423,7 @@ const translations = {
             hours: "Horas",
             minutes: "Minutos",
             seconds: "Segundos",
-            groupAll: "Todos los temporizadores",
+            groupAll: "Todos",
             groupWork: "Trabajo",
             groupPersonal: "Personal",
             groupFitness: "Fitness",
@@ -424,7 +432,8 @@ const translations = {
             time: "Tiempo",
             started: "iniciado",
             completed: "completado",
-            unnamed: "Sin nombre"
+            unnamed: "Sin nombre",
+            timer: "Temporizadores"
         },
         alarm: {
             createFirst: "Crea tu primera alarma",
@@ -439,7 +448,8 @@ const translations = {
             repeatingAlarms: "Alarmas repetitivas",
             noRepeatingAlarms: "No hay alarmas repetitivas",
             invalidTime: "Hora inválida",
-            time: "Hora"
+            time: "Hora",
+            alarm: "Alarma"
         },
         stopwatch: {
             start: "Iniciar",
@@ -481,7 +491,7 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Verde",
             themeRed: "Rojo",
-            themePurple: "Púrpura",
+            themePurple: "Azul",
             resetAll: "Restaura todo",
             resetWarning: "Borrar todos los datos y restaurar la configuración predeterminada",
             resetConfirm: "¿Estás seguro de que quieres eliminar todos los datos?",
@@ -489,7 +499,9 @@ const translations = {
             resetSlide: "Desliza el dedo para confirmar",
             resetNo: "No, vuelve atrás",
             resetDetails: "Se eliminarán: <br>- Temporizadores <br>- Alarmas <br>- Cronómetros <br>- Ajustes y detalles del usuario",
-            user: "Usuario"
+            user: "Usuario",
+            searchPlaceholder: "Buscar en ajustes",
+            noResults: "No se encontraron resultados"
         },
         weather: {
             current: "Tiempo Actual",
@@ -580,7 +592,7 @@ const translations = {
             hours: "Heures",
             minutes: "Minutes",
             seconds: "Secondes",
-            groupAll: "Tous les minuteurs",
+            groupAll: "Tous",
             groupWork: "Travail",
             groupPersonal: "Personnel",
             groupFitness: "Fitness",
@@ -589,7 +601,8 @@ const translations = {
             time: "Temps",
             started: "démarré",
             completed: "terminé",
-            unnamed: "Sans nom"
+            unnamed: "Sans nom",
+            timer: "Minuteur"
         },
         alarm: {
             createFirst: "Créez votre première alarme",
@@ -604,7 +617,8 @@ const translations = {
             repeatingAlarms: "Alarmes répétitives",
             noRepeatingAlarms: "Pas d'alarmes répétitives",
             invalidTime: "Heure invalide",
-            time: "Heure"
+            time: "Heure",
+            alarm: "Alarme"
         },
         stopwatch: {
             start: "Démarrer",
@@ -645,7 +659,7 @@ const translations = {
             themeDefault: "Faire défaut",
             themeGreen: "Vert",
             themeRed: "Rouge",
-            themePurple: "Pourpre",
+            themePurple: "Bleu",
             resetAll: "Restaurer",
             resetWarning: "Effacer toutes les données et restaurer les paramètres par défaut",
             resetConfirm: "Êtes-vous sûr de vouloir supprimer toutes les données?",
@@ -654,7 +668,8 @@ const translations = {
             resetNo: "Non, retournez",
             personalize: "Personnalisez votre expérience",
             removeDetails: "Les éléments suivants seront supprimés :<br>- Minuteurs<br>- Alarmes<br>- Chronomètres<br>- Paramètres et détails de l'utilisateur",
-            user: "Utilisateur"
+            user: "Utilisateur",
+            searchPlaceholder: "Rechercher dans les paramètres",
         },
         weather: {
             current: "Météo Actuelle",
@@ -745,7 +760,7 @@ const translations = {
             hours: "Stunden",
             minutes: "Minuten",
             seconds: "Sekunden",
-            groupAll: "Alle Timer",
+            groupAll: "Alle",
             groupWork: "Arbeit",
             groupPersonal: "Persönlich",
             groupFitness: "Fitness",
@@ -754,7 +769,8 @@ const translations = {
             time: "Zeit",
             started: "gestartet",
             completed: "abgeschlossen",
-            unnamed: "Unbenannt"
+            unnamed: "Unbenannt",
+            timer: "Timer"
         },
         alarm: {
             createFirst: "Erstellen Sie Ihren ersten Alarm",
@@ -769,7 +785,8 @@ const translations = {
             repeatingAlarms: "Wiederholende Alarme",
             noRepeatingAlarms: "Keine wiederholenden Alarme",
             invalidTime: "Ungültige Zeit",
-            time: "Zeit"
+            time: "Zeit",
+            alarm: "Alarm"
         },
         stopwatch: {
             start: "Starten",
@@ -810,7 +827,7 @@ const translations = {
             themeDefault: "Vorgabe",
             themeRed: "Rot",
             themeGreen: "grün",
-            themePurple: "Violett",
+            themePurple: "blau",
             resetAll: "Wiederherstellen",
             resetWarning: "Löschen Sie alle Daten und stellen Sie die Standardeinstellungen wieder her",
             resetConfirm: "Sind Sie sicher, dass Sie alle Daten löschen möchten?",
@@ -819,7 +836,9 @@ const translations = {
             resetNo: "Nein, zurück",
             personalize: "Passen Sie Ihr Erlebnis an ",
             resetDetails: "Folgendes wird entfernt: <br>- Timer <br>- Wecker <br>- Stoppuhren <br>- Einstellungen und Benutzerdetails",
-            user: "Benutzer"
+            user: "Benutzer",
+            searchPlaceholder: "Einstellungen durchsuchen",
+            noResults: "Keine Ergebnisse gefunden"
         },
         weather: {
             current: "Aktuelles Wetter",
@@ -903,37 +922,51 @@ document.addEventListener('DOMContentLoaded', function() {
             window.stopAlarmSound();
         }
     })
-    // Handle PWA installation prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
     });
     
-    // Load active timer if exists
     const savedActiveTimer = localStorage.getItem('activeTimer');
     if (savedActiveTimer) {
         activeTimer = JSON.parse(savedActiveTimer);
         startTimerCountdown(activeTimer);
     }
     
-    // Load stopwatch state if exists
     const savedStopwatch = localStorage.getItem('stopwatch');
     if (savedStopwatch) {
         const parsed = JSON.parse(savedStopwatch);
         stopwatch = {
-            running: false, // Always start as not running
+            running: false,
             startTime: parsed.startTime,
             elapsed: parsed.elapsed,
             laps: parsed.laps || []
         };
     }
     
-    // Start checking alarms
     checkAlarms();
 });
 
+function updateThemeColor() {
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+    const metaThemeColor = document.querySelector('#theme-color-meta');
+    
+    if (metaThemeColor && primaryColor) {
+        metaThemeColor.setAttribute('content', primaryColor);
+    }
+}
+
+updateThemeColor();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const observer = new MutationObserver(updateThemeColor);
+    observer.observe(document.body, { 
+        attributes: true, 
+        attributeFilter: ['class'] 
+    });
+});
+
 function updateModalTexts() {
-    // Update timer modal
     const timerModal = document.getElementById('timer-modal');
     if (timerModal) {
         timerModal.querySelectorAll('[data-translate]').forEach(el => {
@@ -944,8 +977,10 @@ function updateModalTexts() {
                 el.textContent = t(key);
             }
         });
-        
-        // Update select options
+        const accountBtnText = accountBtn.querySelector('[data-translate]');
+        if (accountBtnText) {
+            accountBtnText.textContent = t('sections.settings');
+        }
         const groupSelect = timerModal.querySelector('#timer-group');
         if (groupSelect) {
             Array.from(groupSelect.options).forEach(option => {
@@ -956,7 +991,6 @@ function updateModalTexts() {
         }
     }
     
-    // Update alarm modal
     const alarmModal = document.getElementById('alarm-modal');
     if (alarmModal) {
         alarmModal.querySelectorAll('[data-translate]').forEach(el => {
@@ -968,14 +1002,12 @@ function updateModalTexts() {
             }
         });
         
-        // Update day buttons in alarm modal
         const dayNames = translations[currentLanguage]?.alarm?.days || ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
         alarmModal.querySelectorAll('.days button').forEach((btn, index) => {
             btn.textContent = dayNames[index];
         });
     }
     
-    // Update reset modal
     const resetModal = document.getElementById('reset-modal');
     if (resetModal) {
         resetModal.querySelectorAll('[data-translate]').forEach(el => {
@@ -997,8 +1029,6 @@ function saveTimerGroups() {
 
 function showUsernamePrompt() {
     const isEditing = !!currentUser;
-    
-    // Nascondi gli elementi della UI
     document.querySelector('nav').style.display = 'none';
     document.getElementById('add-btn').style.display = 'none';
     document.getElementById('account-btn').style.display = 'none';
@@ -1140,7 +1170,6 @@ function showUsernamePrompt() {
         saveButton.disabled = !currentUser;
     }
 
-    // Handle image upload
     avatarUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -1161,7 +1190,6 @@ function showUsernamePrompt() {
         }
     });
 
-    // Validate username input
     usernameInput.addEventListener('input', function() {
         const username = this.value.trim();
         saveButton.disabled = !username;
@@ -1175,7 +1203,6 @@ function showUsernamePrompt() {
         currentUser = username;
         localStorage.setItem('username', username);
         
-        // Handle avatar update
         if (avatarFile) {
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -1183,35 +1210,31 @@ function showUsernamePrompt() {
                 userAvatar = event.target.result;
                 restoreUI();
                 if (isEditing) {
-                    loadSection('settings'); // Torna alle impostazioni se stava modificando
+                    loadSection('settings');
                 } else {
                     loadSection('home');
                 }
             };
             reader.readAsDataURL(avatarFile);
         } else {
-            // Se stiamo modificando e non selezioniamo una nuova immagine, mantieni quella esistente
             if (!isEditing) {
                 localStorage.removeItem('userAvatar');
                 userAvatar = null;
             }
             restoreUI();
             if (isEditing) {
-                loadSection('settings'); // Torna alle impostazioni se stava modificando
+                loadSection('settings');
             } else {
                 loadSection('home');
             }
         }
     });
 
-    // Skip username setup o torna indietro
     document.getElementById('skip-username-btn').addEventListener('click', function() {
         if (isEditing) {
-            // Torna alle impostazioni se stava modificando
             restoreUI();
             loadSection('settings');
         } else {
-            // Comportamento originale per nuovo utente
             currentUser = 'Guest';
             localStorage.setItem('username', 'Guest');
             localStorage.removeItem('userAvatar');
@@ -1286,7 +1309,15 @@ function setupEventListeners() {
             loadSection(section);
         });
     });
-
+    document.getElementById('add-timer-menu').addEventListener('click', () => {
+        toggleAddMenu();
+        timerModal.style.display = 'block';
+        const currentGroup = localStorage.getItem('currentTimerGroup') || 'all';
+        const groupSelect = document.getElementById('timer-group');
+        if (groupSelect) {
+            groupSelect.value = currentGroup;
+        }
+    });
     backBtn.addEventListener('click', () => {
         loadSection('home');
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -1302,50 +1333,53 @@ function setupEventListeners() {
         initResetSlider();
     });
 
-    addBtn.addEventListener('click', toggleAddMenu);
-    addTimerMenu.addEventListener('click', () => {
+    document.getElementById('add-timer-menu').addEventListener('click', () => {
+            toggleAddMenu();
+            timerModal.style.display = 'block';
+        });
+
+    document.getElementById('add-alarm-menu').addEventListener('click', () => {
+        toggleAddMenu();
+        alarmModal.style.display = 'block';
+    });
+    document.getElementById('add-btn').addEventListener('click', toggleAddMenu);
+
+    document.getElementById('add-timer-menu').addEventListener('click', () => {
+        toggleAddMenu();
         timerModal.style.display = 'block';
-        addMenu.classList.remove('show');
-        addBtn.classList.remove('menu-open');
     });
 
-    addAlarmMenu.addEventListener('click', () => {
+    document.getElementById('add-alarm-menu').addEventListener('click', () => {
+        toggleAddMenu();
         alarmModal.style.display = 'block';
-        addMenu.classList.remove('show');
-        addBtn.classList.remove('menu-open');
     });
-    
-    // Close modal buttons
     Array.from(document.getElementsByClassName('close')).forEach(button => {
         button.addEventListener('click', function() {
             this.closest('.modal').style.display = 'none';
         });
     });
     
-    // Timer and alarm creation
     document.getElementById('start-timer').addEventListener('click', createNewTimer);
     document.getElementById('save-alarm').addEventListener('click', createNewAlarm);
     
-    // Alarm days selection
     document.querySelectorAll('.days button').forEach(button => {
         button.addEventListener('click', function() {
             this.classList.toggle('active');
         });
     });
     
-    // Close modals when clicking outside
     window.addEventListener('click', function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
+        if (event.target.classList.contains('add-menu-overlay')) {
+            toggleAddMenu();
         }
         
         if (!event.target.closest('#add-btn') && !event.target.closest('.add-menu')) {
-            addMenu.classList.remove('show');
+            document.querySelector('.add-menu').classList.remove('show');
+            document.querySelector('.add-menu-overlay').classList.remove('show');
             addBtn.classList.remove('menu-open');
         }
     });
     
-    // Account button
     accountBtn.addEventListener('click', () => {
         loadSection('settings');
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -1362,7 +1396,6 @@ function initResetSlider() {
     let startX = 0;
     let currentX = 0;
     
-    // Reset slider to initial position
     sliderThumb.style.transform = 'translateX(0)';
     sliderThumb.style.backgroundColor = 'var(--primary-color)';
     
@@ -1384,7 +1417,6 @@ function initResetSlider() {
         currentX = Math.min(Math.max(0, deltaX), maxX);
         sliderThumb.style.transform = `translateX(${currentX}px)`;
         
-        // Change color when reaching the end
         if (currentX >= maxX - 10) {
             sliderThumb.style.backgroundColor = '#e53935';
         } else {
@@ -1399,17 +1431,14 @@ function initResetSlider() {
         const maxX = sliderTrack.offsetWidth - sliderThumb.offsetWidth;
         
         if (currentX >= maxX - 10) {
-            // Confirmed - perform reset
             performFullReset();
         } else {
-            // Cancel - return to initial position
             sliderThumb.style.transition = 'transform 0.3s ease';
             sliderThumb.style.transform = 'translateX(0)';
             sliderThumb.style.backgroundColor = 'var(--primary-color)';
         }
     };
     
-    // Add event listeners
     sliderThumb.addEventListener('mousedown', startDrag);
     sliderThumb.addEventListener('touchstart', startDrag);
     
@@ -1418,7 +1447,6 @@ function initResetSlider() {
     document.addEventListener('mouseup', endDrag);
     document.addEventListener('touchend', endDrag);
     
-    // Cleanup function to remove event listeners
     return () => {
         sliderThumb.removeEventListener('mousedown', startDrag);
         sliderThumb.removeEventListener('touchstart', startDrag);
@@ -1430,10 +1458,7 @@ function initResetSlider() {
 }
 
 function performFullReset() {
-    // Reset all settings
     localStorage.clear();
-    
-    // Reset variables
     currentUser = null;
     timers = [];
     alarms = [];
@@ -1447,21 +1472,29 @@ function performFullReset() {
     showTimerGroups = false;
     timerGroups = [{ id: 'all', name: 'Tutti i timer', isDefault: true }];
     
-    // Close modal
     document.getElementById('reset-modal').style.display = 'none';
     
-    // Show notification
     showNotification(t('settings.resetComplete'), '', false);
     
-    // Reload page
     setTimeout(() => {
         location.reload();
     }, 1500);
 }
 
 function toggleAddMenu() {
-    addMenu.classList.toggle('show');
-    addBtn.classList.toggle('menu-open');
+    const addMenu = document.querySelector('.add-menu');
+    const overlay = document.querySelector('.add-menu-overlay');
+    const addBtn = document.getElementById('add-btn');
+    
+    if (addMenu.classList.contains('show')) {
+        addMenu.classList.remove('show');
+        overlay.classList.remove('show');
+        addBtn.classList.remove('menu-open');
+    } else {
+        addMenu.classList.add('show');
+        overlay.classList.add('show');
+        addBtn.classList.add('menu-open');
+    }
 }
 
 function loadSection(section) {
@@ -1532,15 +1565,15 @@ function loadHomeSection() {
                     <div class="card-content">
                         <div class="timer-info">
                            ${timer.group && timer.group !== 'all' ? 
-                                `<span class="timer-badge">${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}</span>` : ''}
+                                `<span class="timer-badge" style="background-color:${getGroupColor(timer.group)}">${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}</span>` : ''}
                             <h3>${timer.name || t('timer.timer')}</h3>
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <button class="icon-btn play-btn">
-                            <span class="material-icons">${timer.id === activeTimer?.id ? 'pause' : 'play_arrow'}</span>
+                            <span class="material-icons">${timer.id === activeTimer?.id ? (activeTimer?.isPaused ? 'play_arrow' : 'pause') : 'play_arrow'}</span>
                         </button>
                     </div>
-                    ${timer.id === activeTimer?.id ? 
+                    ${(timer.id === activeTimer?.id && !activeTimer?.isPaused) ? 
                         `<div class="progress-bar">
                             <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
                         </div>` : ''
@@ -1619,7 +1652,6 @@ function loadHomeSection() {
 function loadTimersSection() {
     document.querySelector('.fab').style.display = 'flex';
     
-    // Ottieni il gruppo filtrato se esiste, altrimenti mostra tutti
     const groupFilter = localStorage.getItem('currentTimerGroup') || 'all';
     const timersToShow = groupFilter === 'all' ? timers : timers.filter(t => t.group === groupFilter);
     
@@ -1630,20 +1662,16 @@ function loadTimersSection() {
             <div class="group-selector">
                 ${timerGroups.map(group => `
                     <button class="group-btn ${groupFilter === group.id ? 'active' : ''}" data-group="${group.id}">
-                        ${group.id === 'all' ? t('timer.groupAll') : t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`)}
+                        ${group.id === 'all' ? t('timer.groupAll') : 
+                          group.id === 'work' ? t('timer.groupWork') :
+                          group.id === 'personal' ? t('timer.groupPersonal') :
+                          group.id === 'fitness' ? t('timer.groupFitness') :
+                          group.id === 'study' ? t('timer.groupStudy') : 
+                          group.name}
                     </button>
                 `).join('')}
             </div>
         `;
-        
-        // Aggiungi event listener per i pulsanti dei gruppi
-        document.querySelectorAll('.group-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const group = this.dataset.group;
-                localStorage.setItem('currentTimerGroup', group);
-                loadTimersSection();
-            });
-        });
     }
     
     mainContent.innerHTML += `
@@ -1654,27 +1682,30 @@ function loadTimersSection() {
                         <div class="timer-info">
                             ${timer.group && timer.group !== 'all' ? 
                                 `<span class="timer-badge" style="background-color: ${getGroupColor(timer.group)}">
-                                    ${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}
+                                    ${timerGroups.find(g => g.id === timer.group)?.name || timer.group}
                                 </span>` : ''}
                             <h3>${timer.name || t('timer.timer')}</h3>
                             <p class="time-display">${formatTime(timer.duration)}</p>
                         </div>
                         <div class="timer-actions">
                             <button class="icon-btn play-btn">
-                                <span class="material-icons">${timer.id === activeTimer?.id ? 'pause' : 'play_arrow'}</span>
+                                <span class="material-icons">${timer.id === activeTimer?.id ? (activeTimer?.isPaused ? 'play_arrow' : 'pause') : 'play_arrow'}</span>
+                            </button>
+                            <button class="icon-btn reset-timer-btn">
+                                <span class="material-icons">replay</span>
                             </button>
                             <button class="icon-btn delete-timer-btn">
                                 <span class="material-icons">delete</span>
                             </button>
                         </div>
                     </div>
-                    ${timer.id === activeTimer?.id ? 
+                    ${(timer.id === activeTimer?.id && !activeTimer?.isPaused) ? 
                         `<div class="progress-bar">
                             <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
                         </div>` : ''
                     }
                 </div>
-            `).join('') : 
+            `).join('') :
             `<div class="empty-state">
                 <span class="material-icons">timer</span>
                 <p>${t('timer.noTimers')}</p>
@@ -1686,7 +1717,14 @@ function loadTimersSection() {
         }
     `;
     
-    // Timer controls
+    document.querySelectorAll('.group-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const group = this.dataset.group;
+            localStorage.setItem('currentTimerGroup', group);
+            loadTimersSection();
+        });
+    });
+    
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -1695,7 +1733,13 @@ function loadTimersSection() {
         });
     });
 
-    // Delete timer
+    document.querySelectorAll('.reset-timer-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const timerId = this.closest('.card').dataset.id;
+            resetTimer(timerId);
+        });
+    });
+
     document.querySelectorAll('.delete-timer-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
@@ -1703,20 +1747,34 @@ function loadTimersSection() {
         });
     });
 
-    // Create first timer button
     document.getElementById('create-first-timer')?.addEventListener('click', function() {
         timerModal.style.display = 'block';
+        const currentGroup = localStorage.getItem('currentTimerGroup') || 'all';
+        const groupSelect = document.getElementById('timer-group');
+        if (groupSelect) {
+            groupSelect.value = currentGroup;
+        }
     });
 }
 
 function getGroupColor(groupId) {
-    const colors = {
-        'work': '#4CAF50',
-        'personal': '#9C27B0',
-        'fitness': '#FF9800',
-        'study': '#2196F3'
-    };
-    return colors[groupId] || '#607D8B';
+        if (m3ExpressiveMode) {
+        const m3Colors = {
+            'work': '#6750A4',
+            'personal': '#625B71',
+            'fitness': '#7D5260',
+            'study': '#958DA5'
+        };
+        return m3Colors[groupId] || '#6750A4';
+    } else {
+        const colors = {
+            'work': '#4CAF50',
+            'personal': '#9C27B0',
+            'fitness': '#FF9800',
+            'study': '#2196F3'
+        };
+        return colors[groupId] || '#607D8B';
+    }
 }
 
 function loadAlarmsSection() {
@@ -1735,7 +1793,6 @@ function loadAlarmsSection() {
         </div>
     `;
     
-    // Filtra le sveglie in base alla selezione
     const alarmsToShow = currentAlarmFilter === alarmFilters.all ? 
         alarms : 
         alarms.filter(alarm => alarm.days && alarm.days.length > 0);
@@ -1773,7 +1830,6 @@ function loadAlarmsSection() {
         }
     `;
 
-    // Aggiungi event listener per i filtri
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const filter = this.dataset.filter;
@@ -1782,7 +1838,6 @@ function loadAlarmsSection() {
         });
     });
 
-    // Il resto del codice rimane uguale...
     document.querySelectorAll('.toggle-alarm-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const alarmId = this.closest('.card').dataset.id;
@@ -1813,10 +1868,8 @@ function setLanguage(lang) {
 }
 
 function updateUITexts() {
-    // Aggiorna i testi statici nella UI
     headerTitle.textContent = getSectionTitle(currentSection);
     
-    // Aggiorna i testi dei pulsanti di navigazione
     document.querySelectorAll('.nav-btn span:last-child').forEach((span, index) => {
         const sections = ['home', 'timers', 'alarms', 'cronometers', 'feed', 'settings'];
         if (index < sections.length) {
@@ -1824,7 +1877,6 @@ function updateUITexts() {
         }
     });
     
-    // Aggiorna altri elementi testuali se necessario
     if (currentSection === 'settings') {
         document.querySelectorAll('.section-title').forEach(el => {
             const section = el.textContent.trim();
@@ -1871,10 +1923,8 @@ function loadStopwatchSection() {
     `;
     
 
-    // Start/stop button
     document.getElementById('stopwatch-start-stop').addEventListener('click', toggleStopwatch);
     
-    // Lap/reset button
     document.getElementById('stopwatch-lap-reset').addEventListener('click', function() {
         if (stopwatch.running) {
             addLap();
@@ -1883,7 +1933,6 @@ function loadStopwatchSection() {
         }
     });
 
-    // Update display if running
     if (stopwatch.running) {
         startStopwatchUpdate();
     }
@@ -1905,17 +1954,14 @@ function formatStopwatchTimeShort(ms) {
 function calculateUsageDays() {
     const timestamps = [];
     
-    // Aggiungi timestamp da timer
     timers.forEach(timer => {
         timestamps.push(new Date(timer.createdAt).getTime());
     });
     
-    // Aggiungi timestamp da sveglie
     alarms.forEach(alarm => {
         timestamps.push(new Date(alarm.createdAt).getTime());
     });
     
-    // Aggiungi timestamp da cronometro se usato
     if (stopwatch.elapsed > 0) {
         const now = new Date().getTime();
         timestamps.push(now - stopwatch.elapsed);
@@ -2055,7 +2101,6 @@ async function loadWeatherForecast() {
         const data = await response.json();
         if (data.cod !== "200") throw new Error(data.message || 'Errore nel recupero previsioni');
 
-        // Group forecasts by day and find the most representative forecast for each day
         const dailyForecasts = {};
         data.list.forEach(forecast => {
             const date = new Date(forecast.dt * 1000);
@@ -2073,14 +2118,10 @@ async function loadWeatherForecast() {
                 };
             }
             
-            // Update min/max temps
             dailyForecasts[dayKey].minTemp = Math.min(dailyForecasts[dayKey].minTemp, forecast.main.temp_min);
             dailyForecasts[dayKey].maxTemp = Math.max(dailyForecasts[dayKey].maxTemp, forecast.main.temp_max);
-            
-            // Keep track of forecasts for this day
             dailyForecasts[dayKey].forecasts.push(forecast);
-            
-            // For the icon, use the forecast at 12:00 if available, or the first one
+             
             const hours = date.getHours();
             if (hours === 12 || !dailyForecasts[dayKey].icon) {
                 dailyForecasts[dayKey].mainCondition = forecast.weather[0].main;
@@ -2402,7 +2443,6 @@ async function loadWeatherData() {
             condition: data.weather[0].main.toLowerCase()
         };
         
-        // Aggiorna l'effetto meteorologico
         updateWeatherEffect(weather.condition);
         
         weatherContainer.innerHTML = `
@@ -2457,7 +2497,6 @@ function updateWeatherEffect(condition) {
     effectElement.innerHTML = '';
     effectElement.className = 'weather-effect';
     
-    // Aggiungi la classe appropriata in base alle condizioni
     if (condition.includes('rain')) {
         effectElement.classList.add('rain');
         addRainDrops(30);
@@ -2474,7 +2513,6 @@ function updateWeatherEffect(condition) {
     }
 }
 
-// Funzioni helper per elementi dinamici
 function addRainDrops(count) {
     const effectElement = document.getElementById('weather-effect');
     
@@ -2539,6 +2577,12 @@ function loadSettingsSection() {
     
     mainContent.innerHTML = `
         <div class="settings-page">
+        <div class="search-settings-container">
+                <div class="search-box">
+                    <span class="material-icons">search</span>
+                    <input type="text" id="settings-search" placeholder="${t('settings.searchPlaceholder')}" autocomplete="off">
+                </div>
+            </div>
             <div class="settings-section">
                 <h2 class="section-title">${t('settings.account')}</h2>
                 <div class="section-content">
@@ -2579,7 +2623,7 @@ function loadSettingsSection() {
                                 <div class="theme-preview red"></div>
                                 <span>${t('settings.themeRed')}</span>
                             </button>
-                            <button class="theme-option ${currentTheme === 'purple' ? 'active' : ''}" data-theme="purple">
+                            <button class="theme-option ${currentTheme === 'blue' ? 'active' : ''}" data-theme="blue">
                                 <div class="theme-preview purple"></div>
                                 <span>${t('settings.themePurple')}</span>
                             </button>
@@ -2718,7 +2762,7 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>${t('settings.version')}</span>
-                            <span>1.4.7</span>
+                            <span>1.4.8</span>
                         </div>
                         <div class="info-item">
                             <span>Release Source:</span>
@@ -2754,276 +2798,324 @@ function loadSettingsSection() {
     `;
     
     const style = document.createElement('style');
-style.textContent = `
-    .settings-page {
-        padding: 0;
-    }
-    
-    .settings-header {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 24px;
-        padding-bottom: 12px;
-    }
-    
-    .settings-header h3 {
-        margin: 0;
-        font-size: 1.5rem;
-        color: var(--text-primary);
-    }
-    
-    #settings-back-btn {
-        background: none;
-        border: none;
-        color: var(--primary-color);
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 50%;
-        transition: background-color 0.3s;
-        background-color: white;
-    }
-    
-    .settings-section {
-        padding: 1.5rem 1rem;
-        margin-bottom: 0;
-    }
-    
-    .settings-divider {
-        height: 8px;
-        background-color: #2a2a2a;
-        margin: 0;
-        border-radius: 2vh;
-    }
-    
-    .section-title {
-        font-size: 1.1rem;
-        margin-bottom: 1.2rem;
-        color: var(--primary-color);
-        display: flex;
-        align-items: center;
-    }
-    
-    .section-title::before {
-        content: '';
-        display: inline-block;
-        width: 4px;
-        height: 1.1rem;
-        background-color: var(--primary-color);
-        margin-right: 0.8rem;
-        border-radius: 2px;
-    }
-    
-    .section-content {
-        padding: 0 0.5rem;
-    }
-    
-    .account-details {
-        display: flex;
-        align-items: center;
-        gap: 3vh;
-        margin-bottom: 16px;
-    }
-    
-    .user-avatar, #icon_account {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        object-fit: cover;
-        font-size: 60px;
-        color: var(--primary-color);
-    }
-    
-    #icon_account {
-        margin-right: 5vh;
-    }
-    
-    .account-text h3 {
-        margin: 0;
-        font-size: 1.2rem;
-    }
-    
-    .account-type {
-        margin: 0;
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-    }
-    
-    .settings-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .settings-group:last-child {
-        margin-bottom: 0;
-    }
-    
-    .group-title {
-        font-size: 1rem;
-        margin: 0 0 0.3rem 0;
-        color: white;
-    }
-    
-    .group-description {
-        font-size: 0.85rem;
-        color: #aaa;
-        margin: 0;
-    }
-    
-    .theme-options {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    
-    .theme-option {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        background: none;
-        cursor: pointer;
-    }
-    
-    .theme-preview {
-        border-radius: 2vh;
-    }
-    
-    .theme-preview.default {
-        background-color: #5782c9;
-    }
-    
-    .theme-preview.green {
-        background-color: #2E7D32;
-    }
-    
-    .theme-preview.red {
-        background-color: #C62828;
-    }
-    
-    .theme-preview.purple {
-        background-color: #6A1B9A;
-    }
-    
-    .switch-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.8rem 0;
-    }
-    
-    .switch-container:last-child {
-        border-bottom: none;
-    }
-    
-    .switch-info {
-        flex: 1;
-        margin-right: 1rem;
-    }
-    
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 30px;
-    }
-    
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-    }
-    
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 24px;
-        width: 24px;
-        left: 4px;
-        top: 3px;
-        background-color: white;
-        transition: .4s;
-    }
-    
-    input:checked + .slider {
-        background-color: var(--primary-color);
-    }
-    
-    input:checked + .slider:before {
-        transform: translateX(16px);
-    }
-    
-    .slider.round {
-        border-radius: 34px;
-    }
-    
-    .slider.round:before {
-        border-radius: 50%;
-    }
-    
-    .location-hint {
-        margin-top: 8px;
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-    }
-    
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-    }
-    
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.8rem 0;
-        border-bottom: 1px solid #444;
-    }
-    
-    .info-item:last-child {
-        border-bottom: none;
-    }
-    
-    .info-item span:first-child {
-        color: #aaa;
-    }
-    
-    .info-item span:last-child {
-        color: white;
-        font-weight: normal;
-    }
-    
-    .segnala, .segnala a {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 1.5rem;
-        padding: 8px 16px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        text-decoration: none;
-        width: 100%;
-        justify-content: center;
-    }
-`;
-document.head.appendChild(style);
+    style.textContent = `
+        .search-settings-container {
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            background-color: var(--background-color);
+            z-index: 10;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: #2a2a2a;
+            border-radius: 24px;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:focus-within {
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        
+        .search-box .material-icons {
+            color: #aaa;
+            margin-right: 8px;
+        }
+        
+        #settings-search {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            padding: 8px 0;
+        }
+        
+        #settings-search::placeholder {
+            color: #666;
+        }
+        
+        .settings-section.hidden {
+            display: none;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #aaa;
+        }
+        .settings-page {
+            padding: 0;
+        }
+        
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+        }
+        
+        .settings-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+        
+        #settings-back-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            background-color: white;
+        }
+        
+        .settings-section {
+            padding: 1.5rem 1rem;
+            margin-bottom: 0;
+        }
+        
+        .settings-divider {
+            height: 8px;
+            background-color: #2a2a2a;
+            margin: 0;
+            border-radius: 2vh;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.1rem;
+            background-color: var(--primary-color);
+            margin-right: 0.8rem;
+            border-radius: 2px;
+        }
+        
+        .section-content {
+            padding: 0 0.5rem;
+        }
+        
+        .account-details {
+            display: flex;
+            align-items: center;
+            gap: 3vh;
+            margin-bottom: 16px;
+        }
+        
+        .user-avatar, #icon_account {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            font-size: 60px;
+            color: var(--primary-color);
+        }
+        
+        #icon_account {
+            margin-right: 5vh;
+        }
+        
+        .account-text h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .account-type {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .settings-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .group-title {
+            font-size: 1rem;
+            margin: 0 0 0.3rem 0;
+            color: white;
+        }
+        
+        .group-description {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin: 0;
+        }
+        
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .theme-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: none;
+            cursor: pointer;
+        }
+        
+        .theme-preview {
+            border-radius: 2vh;
+        }
+        
+        .theme-preview.default {
+            background-color: #5782c9;
+        }
+        
+        .theme-preview.green {
+            background-color: #2E7D32;
+        }
+        
+        .theme-preview.red {
+            background-color: #C62828;
+        }
+        
+        .theme-preview.purple {
+            background-color: #6A1B9A;
+        }
+        
+        .switch-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+        }
+        
+        .switch-container:last-child {
+            border-bottom: none;
+        }
+        
+        .switch-info {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            top: 3px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        .location-hint {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #444;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-item span:first-child {
+            color: #aaa;
+        }
+        
+        .info-item span:last-child {
+            color: white;
+            font-weight: normal;
+        }
+        
+        .segnala, .segnala a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            width: 100%;
+            justify-content: center;
+        }
+    `;
+    document.head.appendChild(style);
 
     document.getElementById('account-btn').style.display = 'none';
     document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -3032,6 +3124,52 @@ document.head.appendChild(style);
             btn.classList.add('active');
         }
     });
+
+    document.getElementById('settings-search')?.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const sections = document.querySelectorAll('.settings-section');
+        let hasResults = false;
+        let previousVisibleSection = null;
+
+        sections.forEach(section => {
+            const title = section.querySelector('.section-title')?.textContent.toLowerCase() || '';
+            const content = section.textContent.toLowerCase();
+            
+            if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                section.classList.remove('hidden');
+                hasResults = true;
+                
+                const divider = section.previousElementSibling;
+                if (divider && divider.classList.contains('settings-divider')) {
+                    divider.style.display = previousVisibleSection ? 'block' : 'none';
+                }
+                
+                previousVisibleSection = section;
+            } else {
+                section.classList.add('hidden');
+                
+                const divider = section.previousElementSibling;
+                if (divider && divider.classList.contains('settings-divider')) {
+                    divider.style.display = 'none';
+                }
+            }
+        });
+
+    const noResults = document.querySelector('.no-results');
+    if (!hasResults) {
+        if (!noResults) {
+            const noResultsEl = document.createElement('div');
+            noResultsEl.className = 'no-results';
+            noResultsEl.innerHTML = `
+                <span class="material-icons">search_off</span>
+                <p>${t('settings.noResults')}</p>
+            `;
+            document.querySelector('.settings-page').appendChild(noResultsEl);
+        }
+    } else if (noResults) {
+        noResults.remove();
+    }
+});
 document.getElementById('liquid-glass-toggle')?.addEventListener('change', function() {
     liquidGlassMode = this.checked;
     localStorage.setItem('liquidGlassMode', liquidGlassMode);
@@ -3046,7 +3184,6 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         }
     });
 
-    // Theme selection
     document.querySelectorAll('.theme-option').forEach(option => {
         option.addEventListener('click', function() {
             const theme = this.dataset.theme;
@@ -3057,19 +3194,17 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         document.getElementById('reset-modal').style.display = 'block';
         const cleanup = initResetSlider();
         
-        // Add click listener to close modal when clicking outside
         const modal = document.getElementById('reset-modal');
         const closeModal = (e) => {
             if (e.target === modal) {
                 modal.style.display = 'none';
-                cleanup(); // Cleanup event listeners
+                cleanup();
                 modal.removeEventListener('click', closeModal);
             }
         };
         modal.addEventListener('click', closeModal);
     });
     document.getElementById('amoled-toggle').checked = amoledMode;
-    // Notifications toggle
     document.getElementById('notifications-toggle')?.addEventListener('change', function() {
         if (this.checked) {
             Notification.requestPermission().then(permission => {
@@ -3095,18 +3230,15 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         applyTheme();
     });
     
-    // Change username button
     document.getElementById('change-username-btn')?.addEventListener('click', function() {
         showUsernamePrompt();
     });
     
-    // Request location permission
     document.getElementById('request-location-btn')?.addEventListener('click', function() {
         requestLocationPermission();
     });
     document.getElementById('liquid-glass-toggle')?.addEventListener('change', function() {
         if (this.checked) {
-            // Disattiva M3 Expressive se Liquid Glass è attivato
             document.getElementById('m3-expressive-toggle').checked = false;
             m3ExpressiveMode = false;
             localStorage.setItem('m3ExpressiveMode', false);
@@ -3118,10 +3250,8 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         applyLiquidGlassEffect();
     });
 
-    // Aggiungi questo nel setup degli event listener
     document.getElementById('m3-expressive-toggle')?.addEventListener('change', function() {
         if (this.checked) {
-            // Disattiva Liquid Glass se M3 Expressive è attivato
             document.getElementById('liquid-glass-toggle').checked = false;
             liquidGlassMode = false;
             localStorage.setItem('liquidGlassMode', false);
@@ -3141,12 +3271,10 @@ function applyLiquidGlassEffect() {
     if (liquidGlassMode) {
         body.classList.add('liquid-glass-mode');
         
-        // Crea elementi per l'effetto fluido
         const liquidEffect = document.createElement('div');
         liquidEffect.className = 'liquid-effect';
         document.body.appendChild(liquidEffect);
         
-        // Animazione casuale per l'effetto
         setInterval(() => {
             liquidEffect.style.setProperty('--x', `${Math.random() * 100}%`);
             liquidEffect.style.setProperty('--y', `${Math.random() * 100}%`);
@@ -3290,7 +3418,13 @@ function createNewTimer() {
     const minutes = parseInt(document.getElementById('minutes').value) || 0;
     const seconds = parseInt(document.getElementById('seconds').value) || 0;
     const name = document.getElementById('timer-name').value;
+    const currentGroup = localStorage.getItem('currentTimerGroup') || 'all';
     const groupSelect = document.getElementById('timer-group');
+    
+    if (groupSelect) {
+        groupSelect.value = currentGroup;
+    }
+    
     const group = groupSelect ? groupSelect.value : 'all';
     
     if (hours === 0 && minutes === 0 && seconds === 0) {
@@ -3335,15 +3469,23 @@ function filterTimersByGroup(groupId) {
 function initializeTimerGroups() {
     if (!localStorage.getItem('timerGroups')) {
         timerGroups = [
-            { id: 'all', name: 'Tutti i timer', isDefault: true },
-            { id: 'work', name: 'Lavoro', isDefault: false },
-            { id: 'personal', name: 'Personale', isDefault: false },
-            { id: 'fitness', name: 'Fitness', isDefault: false },
-            { id: 'study', name: 'Studio', isDefault: false }
+            { id: 'all', name: t('timer.groupAll'), isDefault: true },
+            { id: 'work', name: t('timer.groupWork'), isDefault: false },
+            { id: 'personal', name: t('timer.groupPersonal'), isDefault: false },
+            { id: 'fitness', name: t('timer.groupFitness'), isDefault: false },
+            { id: 'study', name: t('timer.groupStudy'), isDefault: false }
         ];
         localStorage.setItem('timerGroups', JSON.stringify(timerGroups));
     } else {
         timerGroups = JSON.parse(localStorage.getItem('timerGroups'));
+        // Update names with translations if they exist
+        timerGroups.forEach(group => {
+            if (group.id !== 'all') {
+                group.name = t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`);
+            } else {
+                group.name = t('timer.groupAll');
+            }
+        });
     }
     showTimerGroups = localStorage.getItem('showTimerGroups') === 'true' || false;
 }
@@ -3387,36 +3529,122 @@ function createNewAlarm() {
 
 function toggleTimer(timer) {
     if (activeTimer && activeTimer.id === timer.id) {
-        clearInterval(activeTimer.interval);
-        activeTimer = null;
-        localStorage.removeItem('activeTimer');
-        closeAllNotifications();
+        // Pause the timer if it's running
+        if (!activeTimer.isPaused) {
+            clearInterval(activeTimer.interval);
+            activeTimer.pausedAt = Date.now();
+            activeTimer.isPaused = true;
+            localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
+            
+            showNotification(t('notifications.timerPaused'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.paused')}`);
+        } 
+        // Resume the timer if it's paused
+        else {
+            const remaining = activeTimer.endTime - activeTimer.pausedAt;
+            activeTimer.endTime = Date.now() + remaining;
+            activeTimer.isPaused = false;
+            activeTimer.interval = setInterval(() => updateTimerCountdown(activeTimer), 1000);
+            localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
+            
+            showNotification(t('notifications.timerResumed'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.resumed')}`);
+        }
     } else {
+        // Start a new timer
         if (activeTimer) {
             clearInterval(activeTimer.interval);
             closeAllNotifications();
         }
         
-        const now = new Date().getTime();
-        const endTime = now + (timer.duration * 1000);
+        const endTime = Date.now() + (timer.duration * 1000);
         
         activeTimer = {
             id: timer.id,
             name: timer.name,
             endTime: endTime,
-            duration: timer.duration
+            duration: timer.duration,
+            interval: setInterval(() => updateTimerCountdown(activeTimer), 1000),
+            isPaused: false
         };
         
         localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
-        startTimerCountdown(activeTimer);
+        showNotification(t('notifications.timerStart'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.started')}`);
     }
+    
+    // Update the UI immediately
+    updateTimerIcon(timer.id);
     
     if (currentSection === 'home' || currentSection === 'timers') {
         loadSection(currentSection);
     }
 }
 
+// Helper function to update the timer icon
+function updateTimerIcon(timerId) {
+    const playButtons = document.querySelectorAll(`.card[data-id="${timerId}"] .play-btn .material-icons`);
+    playButtons.forEach(icon => {
+        if (activeTimer && activeTimer.id === timerId) {
+            icon.textContent = activeTimer.isPaused ? 'play_arrow' : 'pause';
+        } else {
+            icon.textContent = 'play_arrow';
+        }
+    });
+}
+function resetTimer(timerId) {
+    const timer = timers.find(t => t.id === timerId);
+    if (!timer) return;
+
+    if (activeTimer && activeTimer.id === timerId) {
+        clearInterval(activeTimer.interval);
+        activeTimer = null;
+        localStorage.removeItem('activeTimer');
+        closeAllNotifications();
+    }
+
+    // Aggiorna l'interfaccia utente
+    updateTimerIcon(timerId);
+    
+    // Aggiorna la barra di progresso se visibile
+    const progressBars = document.querySelectorAll(`.card[data-id="${timerId}"] .progress`);
+    progressBars.forEach(bar => {
+        bar.style.width = '0%';
+    });
+
+    // Ricarica la sezione corrente
+    if (currentSection === 'home' || currentSection === 'timers') {
+        loadSection(currentSection);
+    }
+}
+function updateTimerCountdown(timer) {
+    const now = Date.now();
+    const remaining = timer.endTime - now;
+    
+    if (remaining <= 0) {
+        clearInterval(timer.interval);
+        activeTimer = null;
+        localStorage.removeItem('activeTimer');
+        
+        showNotification(t('notifications.timerComplete'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.completed')}`, true);
+        
+        if (currentSection === 'home' || currentSection === 'timers') {
+            loadSection(currentSection);
+        }
+    }
+    
+    if (currentSection === 'home' || currentSection === 'timers') {
+        const progressBars = document.querySelectorAll(`.card[data-id="${timer.id}"] .progress`);
+        progressBars.forEach(bar => {
+            bar.style.width = `${calculateProgress(timer)}%`;
+        });
+    }
+    
+    if (document.hidden) {
+        updateTimerNotification(timer, remaining);
+    }
+}
+
 function startTimerCountdown(timer) {
+    if (timer.isPaused) return; // Non avviare il countdown se in pausa
+    
     showNotification(t('notifications.timerStart'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.started')}`);
     
     timer.interval = setInterval(() => {
@@ -3461,12 +3689,10 @@ function checkAlarms() {
         
         if (alarmHours === currentHours && alarmMinutes === currentMinutes) {
             if (!alarm.days || alarm.days.includes(currentDay)) {
-                // Controlla se la sveglia è già stata attivata oggi
                 const lastTriggered = alarm.lastTriggeredDate;
                 const today = now.toDateString();
                 
                 if (!lastTriggered || lastTriggered !== today) {
-                    // Aggiorna la data dell'ultimo trigger
                     alarm.lastTriggeredDate = today;
                     saveAlarms();
                     
@@ -3474,12 +3700,10 @@ function checkAlarms() {
                     showNotification(
                         alarm.name || t('notifications.alarm'), 
                         `${t('alarm.time')}: ${alarm.time}`,
-                        true,  // requireInteraction
-                        true,  // isAlarm
+                        true,
+                        true,
                         alarm.id
                     );
-                    
-                    // Riproduci il suono dell'allarme
                     playAlarmSound();
                 }
             }
@@ -3532,9 +3756,9 @@ function showNotification(title, body, requireInteraction = false, isAlarm = fal
 }
 
 function calculateProgress(timer) {
-    const now = new Date().getTime();
+    const now = Date.now();
     const elapsed = timer.duration * 1000 - (timer.endTime - now);
-    return Math.min(100, (elapsed / (timer.duration * 1000)) * 100);
+    return Math.min(100, Math.max(0, (elapsed / (timer.duration * 1000)) * 100));
 }
 
 function toggleAlarm(alarmId) {
@@ -3618,7 +3842,6 @@ function applyTheme() {
     const root = document.documentElement;
     const body = document.body;
     
-    // Applica la modalità AMOLED
     if (amoledMode) {
         body.style.backgroundColor = '#000000';
         body.classList.add('amoled-mode');
@@ -3627,14 +3850,31 @@ function applyTheme() {
         body.classList.remove('amoled-mode');
     }
     
-    // Se M3 Expressive è attivo, usa la sua palette di colori
     if (m3ExpressiveMode) {
-        // Applica la palette M3 Expressive
-        root.style.setProperty('--primary-color', '#6750A4');
-        root.style.setProperty('--secondary-color', '#625B71');
-        root.style.setProperty('--accent-color', '#7D5260');
+        switch(currentTheme) {
+            case 'green':
+                body.style.setProperty('--primary-color', '#4CAF50');
+                body.style.setProperty('--secondary-color', '#81C784');
+                body.style.setProperty('--accent-color', '#FF8A65');
+                body.style.setProperty('color', 'white');
+                break;
+            case 'red':
+                body.style.setProperty('--primary-color', '#F44336');
+                body.style.setProperty('--secondary-color', '#E57373');
+                body.style.setProperty('--accent-color', '#FFB74D');
+                break;
+            case 'blue':
+                body.style.setProperty('--primary-color', '#60adddff');
+                body.style.setProperty('--secondary-color', '#BA68C8');
+                body.style.setProperty('--accent-color', '#15609dff');
+                break;
+            default:
+                body.style.setProperty('--primary-color', '#6750A4');
+                body.style.setProperty('--secondary-color', '#958DA5');
+                body.style.setProperty('--accent-color', '#7D5260');
+        }
     } else {
-        // Altrimenti usa la palette normale in base al tema selezionato
+        // Palette standard
         switch(currentTheme) {
             case 'green':
                 root.style.setProperty('--primary-color', '#2E7D32');
@@ -3651,12 +3891,7 @@ function applyTheme() {
                 root.style.setProperty('--secondary-color', '#AB47BC');
                 root.style.setProperty('--accent-color', '#26C6DA');
                 break;
-            case 'dark':
-                root.style.setProperty('--primary-color', '#121212');
-                root.style.setProperty('--secondary-color', '#1E1E1E');
-                root.style.setProperty('--accent-color', '#BB86FC');
-                break;
-            default:
+            default: // default theme
                 root.style.setProperty('--primary-color', '#5782c9');
                 root.style.setProperty('--secondary-color', '#34A853');
                 root.style.setProperty('--accent-color', '#EA4335');
@@ -3685,7 +3920,6 @@ function showNotification(title, body, requireInteraction = false, isAlarm = fal
             }
         };
         
-        // Aggiungi azioni per le sveglie
         if (isAlarm) {
             options.actions = [
                 { action: 'snooze', title: t('buttons.snooze') },

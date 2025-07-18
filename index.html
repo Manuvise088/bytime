@@ -16,6 +16,7 @@
         <div id="account-section">
             <button id="account-btn">
                 <span class="material-icons">settings</span>
+                <span data-translate="sections.settings">Impostazioni</span>
             </button>
         </div>
     </header>
@@ -46,16 +47,18 @@
     </button>
 </nav>
 
-    <div id="add-menu" class="add-menu">
+<div class="add-menu-overlay">
+    <div class="add-menu">
         <button class="add-menu-item" id="add-timer-menu">
             <span class="material-icons">timer</span>
-            <span>Timer</span>
+            <span>Timer</span>                
         </button>
         <button class="add-menu-item" id="add-alarm-menu">
             <span class="material-icons">alarm_add</span>
             <span>Sveglia</span>
         </button>
     </div>
+</div>
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
@@ -109,11 +112,11 @@
                 <h3>Informazioni</h3>
                 <div class="info-item">
                     <span>Versione</span>
-                    <span>1.2.0</span>
+                    <span>1.4.8</span>
                 </div>
                 <div class="info-item">
                     <span>Sviluppatore</span>
-                    <span>Visentin Manuel</span>
+                    <span>bytime devTeam</span>
                     <a href="mailto:mvisentin2008@gmail.com"<button class="segnala"><span class="material-icons">bug_report</span>Segnala un bug</button></a>
                 </div>
             </div>
