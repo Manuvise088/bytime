@@ -1,30 +1,52 @@
-const CACHE_NAME = 'my-cache-v1';
+const CACHE_NAME = 'bytime-cache-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/styles/main.css',
-  '/scripts/main.js',
-  '/images/logo.png'
+  '/scripts/script.js',
+  '/icons/icon-192x192.png',
+  '/icons/badge-72x72.png',
+  '/sounds/alarm_sound.mp3'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(ASSETS_TO_CACHE))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Gestione unificata delle notifiche push
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
+});
+
 self.addEventListener('push', (event) => {
   let data;
   try {
     data = event.data.json();
   } catch (e) {
-    console.error('Push data not in JSON format');
     data = {
-      title: 'Alarm',
-      body: 'Time is up!',
-      type: 'alarm'
+      title: 'Notification',
+      body: 'New notification',
+      type: 'generic'
     };
   }
 
@@ -37,10 +59,9 @@ self.addEventListener('push', (event) => {
     vibrate: isAlarm ? [200, 100, 200, 100, 200] : [200, 100, 200],
     requireInteraction: isAlarm,
     data: { 
-      url: '/',
-      alarmId: data.alarmId || null
-    },
-    tag: isAlarm ? 'alarm-notification' : 'timer-notification'
+      alarmId: data.alarmId || null,
+      type: data.type || 'generic'
+    }
   };
 
   if (isAlarm) {
@@ -55,149 +76,108 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// Gestione unificata dei click sulle notifiche
 self.addEventListener('notificationclick', (event) => {
   const { notification, action } = event;
-  const alarmId = notification.data.alarmId;
+  const { alarmId, type } = notification.data;
   
   notification.close();
 
-  if (action === 'snooze') {
+  if (type === 'alarm') {
     event.waitUntil(
-      self.clients.matchAll().then(clients => {
-        if (clients.length > 0) {
-          clients.forEach(client => {
-            client.postMessage({
-              type: 'snoozeAlarm',
-              alarmId: alarmId
-            });
-          });
-        } else {
-          return self.clients.openWindow(`alarms.html?id=${alarmId}`);
-        }
-      })
-    );
-  } else if (action === 'dismiss') {
-    event.waitUntil(
-      self.clients.matchAll().then(clients => {
-        clients.forEach(client => {
-          client.postMessage({
-            type: 'dismissAlarm',
-            alarmId: alarmId
-          });
-        });
-      })
+      handleAlarmNotificationClick(action, alarmId)
     );
   } else {
-    // Default click handler
     event.waitUntil(
-      self.clients.matchAll({type: 'window'}).then(clientList => {
-        if (clientList.length > 0) {
-          return clientList[0].focus();
-        }
-        return self.clients.openWindow('/');
-      })
+      handleDefaultNotificationClick()
     );
   }
 });
 
-// Gestione della chiusura della notifica
 self.addEventListener('notificationclose', (event) => {
-  const notification = event.notification;
-  if (notification.data.alarmId) {
+  const { notification } = event;
+  if (notification.data.type === 'alarm') {
     event.waitUntil(
-      self.clients.matchAll().then(clientList => {
-        clientList.forEach(client => {
-          client.postMessage({ type: 'stopAlarm' });
-        });
+      sendMessageToClients({
+        type: 'stopAlarm'
       })
     );
   }
 });
 
-// Gestione messaggi dai client
 self.addEventListener('message', (event) => {
   const { data } = event;
   
   switch(data.type) {
-    case 'alarmWindowOpen':
-      // Ferma la notifica quando la finestra è aperta
-      self.registration.getNotifications({ tag: 'alarm-notification' })
-        .then(notifications => {
-          notifications.forEach(n => n.close());
-        });
+    case 'stopAlarm':
+      // Stop any ongoing alarm sounds
+      sendMessageToClients({ type: 'stopAlarm' });
       break;
       
     case 'snoozeAlarm':
-      // Posticipa la sveglia
-      event.waitUntil(
-        self.clients.matchAll().then(clients => {
-          if (clients.length > 0) {
-            clients.forEach(client => {
-              client.postMessage({
-                type: 'snoozeAlarm',
-                alarmId: data.alarmId,
-                minutes: data.minutes || 5
-              });
-            });
-          }
-        })
-      );
+      sendMessageToClients({
+        type: 'snoozeAlarm',
+        alarmId: data.alarmId,
+        minutes: data.minutes || 5
+      });
       break;
       
     case 'dismissAlarm':
-      // Termina la sveglia
-      event.waitUntil(
-        self.clients.matchAll().then(clients => {
-          if (clients.length > 0) {
-            clients.forEach(client => {
-              client.postMessage({
-                type: 'dismissAlarm',
-                alarmId: data.alarmId,
-                dismissPermanently: data.dismissPermanently || false
-              });
-            });
-          }
-        })
-      );
+      sendMessageToClients({
+        type: 'dismissAlarm',
+        alarmId: data.alarmId,
+        dismissPermanently: data.dismissPermanently || false
+      });
       break;
   }
 });
 
-// Funzioni helper per la gestione delle azioni (mantenute per compatibilità)
-async function handleSnooze(notification) {
-  const clients = await self.clients.matchAll();
-  if (clients.length > 0) {
-    clients.forEach(client => {
-      client.postMessage({
+// Helper functions
+async function handleAlarmNotificationClick(action, alarmId) {
+  switch(action) {
+    case 'snooze':
+      await sendMessageToClients({
         type: 'snoozeAlarm',
-        alarmId: notification.data.alarmId
+        alarmId: alarmId,
+        minutes: 5
       });
-    });
-  } else {
-    await self.clients.openWindow(`alarms.html=${notification.data.alarmId}`);
-  }
-}
-
-async function handleDismiss(notification) {
-  const clients = await self.clients.matchAll();
-  if (clients.length > 0) {
-    clients.forEach(client => {
-      client.postMessage({ 
+      break;
+      
+    case 'dismiss':
+      await sendMessageToClients({
         type: 'dismissAlarm',
-        alarmId: notification.data.alarmId
+        alarmId: alarmId,
+        dismissPermanently: false
       });
-    });
-  } else {
-    notification.close();
+      break;
+      
+    default:
+      // Default click behavior for alarm
+      await sendMessageToClients({
+        type: 'focusApp'
+      });
+      break;
   }
 }
 
-async function handleDefaultClick(notification) {
-  const clients = await self.clients.matchAll();
+async function handleDefaultNotificationClick() {
+  const clients = await self.clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true
+  });
+  
   if (clients.length > 0) {
     await clients[0].focus();
   } else {
     await self.clients.openWindow('/');
   }
+}
+
+async function sendMessageToClients(message) {
+  const clients = await self.clients.matchAll({
+    includeUncontrolled: true
+  });
+  
+  clients.forEach(client => {
+    client.postMessage(message);
+  });
 }
