@@ -15,12 +15,13 @@ let stopwatch = {
     elapsed: 0,
     laps: []
 };
+let locationEnabled = localStorage.getItem('locationEnabled') === 'true' || false;
 let autoplayEnabled = localStorage.getItem('autoplayEnabled') !== 'false';
 let amoledMode = localStorage.getItem('amoledMode') === 'true' || false;
 let currentSection = 'home';
 let userAvatar = localStorage.getItem('userAvatar') || null;
 let currentTheme = localStorage.getItem('theme') || 'default';
-let notificationPermission = false;
+let notificationPermission = localStorage.getItem('notificationPermission') === 'true' || false;
 let serviceWorkerRegistration = null;
 let deferredPrompt = null;
 
@@ -86,7 +87,7 @@ const translations = {
             hours: "HH",
             minutes: "MM",
             seconds: "SS",
-            groupAll: "Tutti i timer",
+            groupAll: "Tutti",
             groupWork: "Lavoro",
             groupPersonal: "Personale",
             groupFitness: "Fitness",
@@ -154,7 +155,7 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Verde",
             themeRed: "Rosso",
-            themePurple: "Viola",
+            themePurple: "Blu",
             resetAll: "Ripristina tutto",
             resetWarning: "Cancella tutti i dati e ripristina ogni impostazione e preferenza dell'utente",
             resetConfirm: "Sicuro di voler cancellare tutti i dati?",
@@ -254,7 +255,7 @@ const translations = {
             hours: "HH",
             minutes: "MM",
             seconds: "SS",
-            groupAll: "All timers",
+            groupAll: "All",
             groupWork: "Work",
             groupPersonal: "Personal",
             groupFitness: "Fitness",
@@ -322,7 +323,7 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Green",
             themeRed: "Red",
-            themePurple: "Purple",
+            themePurple: "Blue",
             resetAll: "Full reset",
             resetWarning: "Delete all data and reset any user settings and preferencies",
             resetConfirm: "Are you sure about deleting every data?",
@@ -423,7 +424,7 @@ const translations = {
             hours: "Horas",
             minutes: "Minutos",
             seconds: "Segundos",
-            groupAll: "Todos los temporizadores",
+            groupAll: "Todos",
             groupWork: "Trabajo",
             groupPersonal: "Personal",
             groupFitness: "Fitness",
@@ -491,7 +492,7 @@ const translations = {
             themeDefault: "Default",
             themeGreen: "Verde",
             themeRed: "Rojo",
-            themePurple: "Púrpura",
+            themePurple: "Azul",
             resetAll: "Restaura todo",
             resetWarning: "Borrar todos los datos y restaurar la configuración predeterminada",
             resetConfirm: "¿Estás seguro de que quieres eliminar todos los datos?",
@@ -592,7 +593,7 @@ const translations = {
             hours: "Heures",
             minutes: "Minutes",
             seconds: "Secondes",
-            groupAll: "Tous les minuteurs",
+            groupAll: "Tous",
             groupWork: "Travail",
             groupPersonal: "Personnel",
             groupFitness: "Fitness",
@@ -659,7 +660,7 @@ const translations = {
             themeDefault: "Faire défaut",
             themeGreen: "Vert",
             themeRed: "Rouge",
-            themePurple: "Pourpre",
+            themePurple: "Bleu",
             resetAll: "Restaurer",
             resetWarning: "Effacer toutes les données et restaurer les paramètres par défaut",
             resetConfirm: "Êtes-vous sûr de vouloir supprimer toutes les données?",
@@ -760,7 +761,7 @@ const translations = {
             hours: "Stunden",
             minutes: "Minuten",
             seconds: "Sekunden",
-            groupAll: "Alle Timer",
+            groupAll: "Alle",
             groupWork: "Arbeit",
             groupPersonal: "Persönlich",
             groupFitness: "Fitness",
@@ -827,7 +828,7 @@ const translations = {
             themeDefault: "Vorgabe",
             themeRed: "Rot",
             themeGreen: "grün",
-            themePurple: "Violett",
+            themePurple: "blau",
             resetAll: "Wiederherstellen",
             resetWarning: "Löschen Sie alle Daten und stellen Sie die Standardeinstellungen wieder her",
             resetConfirm: "Sind Sie sicher, dass Sie alle Daten löschen möchten?",
@@ -896,8 +897,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (m3ExpressiveMode) {
         document.body.classList.add('m3-expressive');
     }
-
-
+    notificationPermission = localStorage.getItem('notificationPermission') === 'true' || false;
+    if (document.getElementById('notifications-toggle')) {
+        document.getElementById('notifications-toggle').checked = notificationPermission;
+    }
+    locationEnabled = localStorage.getItem('locationEnabled') === 'true' || false;
+    if (locationEnabled && currentSection === 'feed') {
+        loadWeatherData();
+    }
     if (!currentUser) {
         showUsernamePrompt();
     } else {
@@ -1309,7 +1316,15 @@ function setupEventListeners() {
             loadSection(section);
         });
     });
-
+    document.getElementById('add-timer-menu').addEventListener('click', () => {
+        toggleAddMenu();
+        timerModal.style.display = 'block';
+        const currentGroup = localStorage.getItem('currentTimerGroup') || 'all';
+        const groupSelect = document.getElementById('timer-group');
+        if (groupSelect) {
+            groupSelect.value = currentGroup;
+        }
+    });
     backBtn.addEventListener('click', () => {
         loadSection('home');
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -1557,15 +1572,15 @@ function loadHomeSection() {
                     <div class="card-content">
                         <div class="timer-info">
                            ${timer.group && timer.group !== 'all' ? 
-                                `<span class="timer-badge">${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}</span>` : ''}
+                                `<span class="timer-badge" style="background-color:${getGroupColor(timer.group)}">${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}</span>` : ''}
                             <h3>${timer.name || t('timer.timer')}</h3>
-                            <p class="time-display">${formatTime(timer.duration)}</p>
+                            <p class="time-display">${formatTime(timer.duration, true)}</p>
                         </div>
                         <button class="icon-btn play-btn">
-                            <span class="material-icons">${timer.id === activeTimer?.id ? 'pause' : 'play_arrow'}</span>
+                            <span class="material-icons">${timer.id === activeTimer?.id ? (activeTimer?.isPaused ? 'play_arrow' : 'pause') : 'play_arrow'}</span>
                         </button>
                     </div>
-                    ${timer.id === activeTimer?.id ? 
+                    ${(timer.id === activeTimer?.id && !activeTimer?.isPaused) ? 
                         `<div class="progress-bar">
                             <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
                         </div>` : ''
@@ -1654,19 +1669,16 @@ function loadTimersSection() {
             <div class="group-selector">
                 ${timerGroups.map(group => `
                     <button class="group-btn ${groupFilter === group.id ? 'active' : ''}" data-group="${group.id}">
-                        ${group.id === 'all' ? t('timer.groupAll') : t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`)}
+                        ${group.id === 'all' ? t('timer.groupAll') : 
+                          group.id === 'work' ? t('timer.groupWork') :
+                          group.id === 'personal' ? t('timer.groupPersonal') :
+                          group.id === 'fitness' ? t('timer.groupFitness') :
+                          group.id === 'study' ? t('timer.groupStudy') : 
+                          group.name}
                     </button>
                 `).join('')}
             </div>
         `;
-        
-        document.querySelectorAll('.group-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const group = this.dataset.group;
-                localStorage.setItem('currentTimerGroup', group);
-                loadTimersSection();
-            });
-        });
     }
     
     mainContent.innerHTML += `
@@ -1677,27 +1689,30 @@ function loadTimersSection() {
                         <div class="timer-info">
                             ${timer.group && timer.group !== 'all' ? 
                                 `<span class="timer-badge" style="background-color: ${getGroupColor(timer.group)}">
-                                    ${t(`timer.group${timer.group.charAt(0).toUpperCase() + timer.group.slice(1)}`)}
+                                    ${timerGroups.find(g => g.id === timer.group)?.name || timer.group}
                                 </span>` : ''}
                             <h3>${timer.name || t('timer.timer')}</h3>
-                            <p class="time-display">${formatTime(timer.duration)}</p>
+                            <p class="time-display">${formatTime(timer.duration, true)}</p>
                         </div>
                         <div class="timer-actions">
                             <button class="icon-btn play-btn">
-                                <span class="material-icons">${timer.id === activeTimer?.id ? 'pause' : 'play_arrow'}</span>
+                                <span class="material-icons">${timer.id === activeTimer?.id ? (activeTimer?.isPaused ? 'play_arrow' : 'pause') : 'play_arrow'}</span>
+                            </button>
+                            <button class="icon-btn reset-timer-btn">
+                                <span class="material-icons">replay</span>
                             </button>
                             <button class="icon-btn delete-timer-btn">
                                 <span class="material-icons">delete</span>
                             </button>
                         </div>
                     </div>
-                    ${timer.id === activeTimer?.id ? 
+                    ${(timer.id === activeTimer?.id && !activeTimer?.isPaused) ? 
                         `<div class="progress-bar">
                             <div class="progress" style="width: ${calculateProgress(activeTimer)}%;"></div>
                         </div>` : ''
                     }
                 </div>
-            `).join('') : 
+            `).join('') :
             `<div class="empty-state">
                 <span class="material-icons">timer</span>
                 <p>${t('timer.noTimers')}</p>
@@ -1709,11 +1724,26 @@ function loadTimersSection() {
         }
     `;
     
+    document.querySelectorAll('.group-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const group = this.dataset.group;
+            localStorage.setItem('currentTimerGroup', group);
+            loadTimersSection();
+        });
+    });
+    
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const timerId = this.closest('.card').dataset.id;
             const timer = timers.find(t => t.id === timerId);
             toggleTimer(timer);
+        });
+    });
+
+    document.querySelectorAll('.reset-timer-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const timerId = this.closest('.card').dataset.id;
+            resetTimer(timerId);
         });
     });
 
@@ -1726,17 +1756,32 @@ function loadTimersSection() {
 
     document.getElementById('create-first-timer')?.addEventListener('click', function() {
         timerModal.style.display = 'block';
+        const currentGroup = localStorage.getItem('currentTimerGroup') || 'all';
+        const groupSelect = document.getElementById('timer-group');
+        if (groupSelect) {
+            groupSelect.value = currentGroup;
+        }
     });
 }
 
 function getGroupColor(groupId) {
-    const colors = {
-        'work': '#4CAF50',
-        'personal': '#9C27B0',
-        'fitness': '#FF9800',
-        'study': '#2196F3'
-    };
-    return colors[groupId] || '#607D8B';
+        if (m3ExpressiveMode) {
+        const m3Colors = {
+            'work': '#6750A4',
+            'personal': '#625B71',
+            'fitness': '#7D5260',
+            'study': '#958DA5'
+        };
+        return m3Colors[groupId] || '#6750A4';
+    } else {
+        const colors = {
+            'work': '#4CAF50',
+            'personal': '#9C27B0',
+            'fitness': '#FF9800',
+            'study': '#2196F3'
+        };
+        return colors[groupId] || '#607D8B';
+    }
 }
 
 function loadAlarmsSection() {
@@ -2585,7 +2630,7 @@ function loadSettingsSection() {
                                 <div class="theme-preview red"></div>
                                 <span>${t('settings.themeRed')}</span>
                             </button>
-                            <button class="theme-option ${currentTheme === 'purple' ? 'active' : ''}" data-theme="purple">
+                            <button class="theme-option ${currentTheme === 'blue' ? 'active' : ''}" data-theme="blue">
                                 <div class="theme-preview purple"></div>
                                 <span>${t('settings.themePurple')}</span>
                             </button>
@@ -2724,7 +2769,7 @@ function loadSettingsSection() {
                     <div class="info-grid">
                         <div class="info-item">
                             <span>${t('settings.version')}</span>
-                            <span>1.4.7</span>
+                            <span>1.4.8</span>
                         </div>
                         <div class="info-item">
                             <span>Release Source:</span>
@@ -3086,7 +3131,19 @@ function loadSettingsSection() {
             btn.classList.add('active');
         }
     });
-
+    document.getElementById('location-toggle').checked = locationEnabled;
+    document.getElementById('location-toggle')?.addEventListener('change', function() {
+        locationEnabled = this.checked;
+        localStorage.setItem('locationEnabled', locationEnabled);
+        
+        if (locationEnabled) {
+            if (currentSection === 'feed') {
+                loadWeatherData();
+                loadWeatherForecast();
+                loadSunTimesWithFallback();
+            }
+        }
+    });
     document.getElementById('settings-search')?.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         const sections = document.querySelectorAll('.settings-section');
@@ -3171,12 +3228,14 @@ document.getElementById('liquid-glass-toggle')?.addEventListener('change', funct
         if (this.checked) {
             Notification.requestPermission().then(permission => {
                 notificationPermission = permission === 'granted';
+                localStorage.setItem('notificationPermission', notificationPermission);
                 if (!notificationPermission) {
                     this.checked = false;
                 }
             });
         } else {
             notificationPermission = false;
+            localStorage.setItem('notificationPermission', false);
         }
     });
     document.getElementById('language-select')?.addEventListener('change', function() {
@@ -3380,7 +3439,13 @@ function createNewTimer() {
     const minutes = parseInt(document.getElementById('minutes').value) || 0;
     const seconds = parseInt(document.getElementById('seconds').value) || 0;
     const name = document.getElementById('timer-name').value;
+    const currentGroup = localStorage.getItem('currentTimerGroup') || 'all';
     const groupSelect = document.getElementById('timer-group');
+    
+    if (groupSelect) {
+        groupSelect.value = currentGroup;
+    }
+    
     const group = groupSelect ? groupSelect.value : 'all';
     
     if (hours === 0 && minutes === 0 && seconds === 0) {
@@ -3425,15 +3490,22 @@ function filterTimersByGroup(groupId) {
 function initializeTimerGroups() {
     if (!localStorage.getItem('timerGroups')) {
         timerGroups = [
-            { id: 'all', name: 'Tutti i timer', isDefault: true },
-            { id: 'work', name: 'Lavoro', isDefault: false },
-            { id: 'personal', name: 'Personale', isDefault: false },
-            { id: 'fitness', name: 'Fitness', isDefault: false },
-            { id: 'study', name: 'Studio', isDefault: false }
+            { id: 'all', name: t('timer.groupAll'), isDefault: true },
+            { id: 'work', name: t('timer.groupWork'), isDefault: false },
+            { id: 'personal', name: t('timer.groupPersonal'), isDefault: false },
+            { id: 'fitness', name: t('timer.groupFitness'), isDefault: false },
+            { id: 'study', name: t('timer.groupStudy'), isDefault: false }
         ];
         localStorage.setItem('timerGroups', JSON.stringify(timerGroups));
     } else {
         timerGroups = JSON.parse(localStorage.getItem('timerGroups'));
+        timerGroups.forEach(group => {
+            if (group.id !== 'all') {
+                group.name = t(`timer.group${group.id.charAt(0).toUpperCase() + group.id.slice(1)}`);
+            } else {
+                group.name = t('timer.groupAll');
+            }
+        });
     }
     showTimerGroups = localStorage.getItem('showTimerGroups') === 'true' || false;
 }
@@ -3477,36 +3549,126 @@ function createNewAlarm() {
 
 function toggleTimer(timer) {
     if (activeTimer && activeTimer.id === timer.id) {
-        clearInterval(activeTimer.interval);
-        activeTimer = null;
-        localStorage.removeItem('activeTimer');
-        closeAllNotifications();
+        if (!activeTimer.isPaused) {
+            clearInterval(activeTimer.interval);
+            activeTimer.pausedAt = Date.now();
+            activeTimer.isPaused = true;
+            localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
+            
+            showNotification(t('notifications.timerPaused'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.paused')}`);
+        } 
+        else {
+            const remaining = activeTimer.endTime - activeTimer.pausedAt;
+            activeTimer.endTime = Date.now() + remaining;
+            activeTimer.isPaused = false;
+            activeTimer.interval = setInterval(() => updateTimerCountdown(activeTimer), 1000);
+            localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
+            
+            showNotification(t('notifications.timerResumed'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.resumed')}`);
+        }
     } else {
         if (activeTimer) {
             clearInterval(activeTimer.interval);
             closeAllNotifications();
         }
         
-        const now = new Date().getTime();
-        const endTime = now + (timer.duration * 1000);
+        const endTime = Date.now() + (timer.duration * 1000);
         
         activeTimer = {
             id: timer.id,
             name: timer.name,
             endTime: endTime,
-            duration: timer.duration
+            duration: timer.duration,
+            interval: setInterval(() => updateTimerCountdown(activeTimer), 1000),
+            isPaused: false
         };
         
         localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
-        startTimerCountdown(activeTimer);
+        showNotification(t('notifications.timerStart'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.started')}`);
     }
+    
+    updateTimerIcon(timer.id);
     
     if (currentSection === 'home' || currentSection === 'timers') {
         loadSection(currentSection);
     }
 }
 
+function updateTimerIcon(timerId) {
+    const playButtons = document.querySelectorAll(`.card[data-id="${timerId}"] .play-btn .material-icons`);
+    playButtons.forEach(icon => {
+        if (activeTimer && activeTimer.id === timerId) {
+            icon.textContent = activeTimer.isPaused ? 'play_arrow' : 'pause';
+        } else {
+            icon.textContent = 'play_arrow';
+        }
+    });
+}
+function resetTimer(timerId) {
+    const timer = timers.find(t => t.id === timerId);
+    if (!timer) return;
+
+    if (activeTimer && activeTimer.id === timerId) {
+        clearInterval(activeTimer.interval);
+        activeTimer = null;
+        localStorage.removeItem('activeTimer');
+        closeAllNotifications();
+    }
+
+    updateTimerIcon(timerId);
+    
+    const progressBars = document.querySelectorAll(`.card[data-id="${timerId}"] .progress`);
+    progressBars.forEach(bar => {
+        bar.style.width = '0%';
+    });
+
+    if (currentSection === 'home' || currentSection === 'timers') {
+        loadSection(currentSection);
+    }
+}
+function updateTimerCountdown(timer) {
+    const now = Date.now();
+    const remaining = timer.endTime - now;
+    
+    updateTimerDisplay(timer.id);
+    
+    if (remaining <= 0) {
+        clearInterval(timer.interval);
+        activeTimer = null;
+        localStorage.removeItem('activeTimer');
+        
+        showNotification(t('notifications.timerComplete'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.completed')}`, true);
+        
+        if (currentSection === 'home' || currentSection === 'timers') {
+            loadSection(currentSection);
+        }
+    }
+    
+    if (currentSection === 'home' || currentSection === 'timers') {
+        const progressBars = document.querySelectorAll(`.card[data-id="${timer.id}"] .progress`);
+        progressBars.forEach(bar => {
+            bar.style.width = `${calculateProgress(timer)}%`;
+        });
+    }
+    
+    if (document.hidden) {
+        updateTimerNotification(timer, remaining);
+    }
+}
+
+function updateTimerDisplay(timerId, remaining) {
+    const displays = document.querySelectorAll(`.card[data-id="${timerId}"] .time-display`);
+    displays.forEach(display => {
+        display.textContent = formatTime(Math.floor(remaining / 1000));
+        
+        display.classList.toggle('countdown', true);
+        display.classList.toggle('warning', remaining < 30000);
+    });
+}
+
 function startTimerCountdown(timer) {
+    if (timer.isPaused) return;
+    
     showNotification(t('notifications.timerStart'), `${t('timer.timer')} "${timer.name || t('timer.unnamed')}" ${t('timer.started')}`);
     
     timer.interval = setInterval(() => {
@@ -3558,7 +3720,6 @@ function checkAlarms() {
                     alarm.lastTriggeredDate = today;
                     saveAlarms();
                     
-                    // Mostra la notifica
                     showNotification(
                         alarm.name || t('notifications.alarm'), 
                         `${t('alarm.time')}: ${alarm.time}`,
@@ -3618,9 +3779,9 @@ function showNotification(title, body, requireInteraction = false, isAlarm = fal
 }
 
 function calculateProgress(timer) {
-    const now = new Date().getTime();
+    const now = Date.now();
     const elapsed = timer.duration * 1000 - (timer.endTime - now);
-    return Math.min(100, (elapsed / (timer.duration * 1000)) * 100);
+    return Math.min(100, Math.max(0, (elapsed / (timer.duration * 1000)) * 100));
 }
 
 function toggleAlarm(alarmId) {
@@ -3663,25 +3824,34 @@ function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-function formatTime(time) {
-    if (typeof time === 'number') {
-        const hours = Math.floor(time / 3600);
-        const minutes = Math.floor((time % 3600) / 60);
-        const seconds = time % 60;
-        
-        return [
-            hours.toString().padStart(2, '0'),
-            minutes.toString().padStart(2, '0'),
-            seconds.toString().padStart(2, '0')
-        ].join(':');
-    } else if (time instanceof Date) {
-        return time.toLocaleTimeString('it-IT', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+function formatTime(seconds, isCountdown = false) {
+    if (isCountdown && activeTimer && activeTimer.id) {
+        const remaining = Math.max(0, Math.floor((activeTimer.endTime - Date.now()) / 1000));
+        seconds = remaining;
     }
-    return '00:00:00';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    return [
+        hours.toString().padStart(2, '0'),
+        minutes.toString().padStart(2, '0'),
+        secs.toString().padStart(2, '0')
+    ].join(':');
+}
+
+function updateTimerDisplay(timerId) {
+    if (!activeTimer || activeTimer.id !== timerId) return;
+    
+    const remaining = Math.max(0, activeTimer.endTime - Date.now());
+    const displays = document.querySelectorAll(`.card[data-id="${timerId}"] .time-display`);
+    
+    displays.forEach(display => {
+        display.textContent = formatTime(Math.floor(remaining / 1000));
+        display.classList.toggle('countdown', true);
+        display.classList.toggle('warning', remaining < 30000);
+    });
 }
 
 function formatAlarmTime(timeStr) {
@@ -3713,9 +3883,28 @@ function applyTheme() {
     }
     
     if (m3ExpressiveMode) {
-        root.style.setProperty('--primary-color', '#6750A4');
-        root.style.setProperty('--secondary-color', '#625B71');
-        root.style.setProperty('--accent-color', '#7D5260');
+        switch(currentTheme) {
+            case 'green':
+                body.style.setProperty('--primary-color', '#4CAF50');
+                body.style.setProperty('--secondary-color', '#81C784');
+                body.style.setProperty('--accent-color', '#FF8A65');
+                body.style.setProperty('color', 'white');
+                break;
+            case 'red':
+                body.style.setProperty('--primary-color', '#F44336');
+                body.style.setProperty('--secondary-color', '#E57373');
+                body.style.setProperty('--accent-color', '#FFB74D');
+                break;
+            case 'blue':
+                body.style.setProperty('--primary-color', '#60adddff');
+                body.style.setProperty('--secondary-color', '#BA68C8');
+                body.style.setProperty('--accent-color', '#15609dff');
+                break;
+            default:
+                body.style.setProperty('--primary-color', '#6750A4');
+                body.style.setProperty('--secondary-color', '#958DA5');
+                body.style.setProperty('--accent-color', '#7D5260');
+        }
     } else {
         switch(currentTheme) {
             case 'green':
@@ -3728,20 +3917,15 @@ function applyTheme() {
                 root.style.setProperty('--secondary-color', '#EF5350');
                 root.style.setProperty('--accent-color', '#FFA000');
                 break;
-            case 'purple':
-                root.style.setProperty('--primary-color', '#6A1B9A');
-                root.style.setProperty('--secondary-color', '#AB47BC');
-                root.style.setProperty('--accent-color', '#26C6DA');
-                break;
-            case 'dark':
-                root.style.setProperty('--primary-color', '#121212');
-                root.style.setProperty('--secondary-color', '#1E1E1E');
-                root.style.setProperty('--accent-color', '#BB86FC');
-                break;
-            default:
+            case 'blue':
                 root.style.setProperty('--primary-color', '#5782c9');
                 root.style.setProperty('--secondary-color', '#34A853');
                 root.style.setProperty('--accent-color', '#EA4335');
+                break;
+            default:
+                root.style.setProperty('--primary-color', '#b258ebff');
+                root.style.setProperty('--secondary-color', '#ec84ffff');
+                root.style.setProperty('--accent-color', '#26C6DA');
         }
     }
 }

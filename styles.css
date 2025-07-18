@@ -535,7 +535,7 @@ a {
 }
 
 .theme-preview.purple {
-    background: linear-gradient(135deg, #6A1B9A 0%, #AB47BC 100%);
+    background: linear-gradient(135deg, #2d80bc 0%, #275fa9 100%);
 }
 
 .settings-select {
@@ -2957,7 +2957,24 @@ nav {
 .liquid-glass-mode .username-page {
     background-color: transparent;
 }
-.filter-btn, .group-btn {
+.filter-btn {
+    background-color: var(--primary-color);
+    padding-left: 2vh;
+    padding-right: 2vh;
+    padding-top: 1.5vh;
+    padding-bottom: 1.5vh;
+    border-radius: 100px;
+    margin-right: 1vh;
+    margin-left: 1vh;
+    color: white;
+    transition-duration: 0.3s;
+    border: none;
+}
+.group-selector {
+    padding-top: 0.5vh;
+    margin-bottom: 1vh;
+}
+.group-btn {
     background-color: var(--primary-color);
     padding-left: 2vh;
     padding-right: 2vh;
@@ -2974,7 +2991,7 @@ nav {
     border: 1.5px solid white;
     font-weight: bold;
 }
-.filter-btn.active, .group-btn:active {
+.filter-btn.active, .group-btn.active {
     background-color: var(--accent-color) !important;
     transform: scale(1.1);
     font-weight: bold;
@@ -3027,8 +3044,14 @@ body.m3-expressive {
     --elevation-2: 0 2px 6px 2px rgba(0, 0, 0, 0.15);
     --elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.15);
     --elevation-4: 0 6px 10px 4px rgba(0, 0, 0, 0.15);
+    color: white !important;
 }
-
+body.m3-expressive .section-btn, body.m3-expressive header button {
+    background-color: var(--accent-color) !important;
+}
+body.m3-expressive button, body.m3-expressive a, body.m3-expressive .material-icons {
+    color: white !important;
+}
 body.m3-expressive header {
     background-color: var(--primary-color);
     color: var(--on-primary);
@@ -3039,6 +3062,7 @@ body.m3-expressive header {
     border-bottom-right-radius: 2vh;
     font-size: 1.5vh;
     font-weight: bold;
+    color: white !important;
 }
 
 body.m3-expressive nav {
@@ -3087,6 +3111,7 @@ body.m3-expressive .add-menu {
     transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
     display: none;
     min-width: 200px;
+    transition-duration: 0.3s !important;
 }
 
 body.m3-expressive .add-menu.show {
@@ -3103,7 +3128,7 @@ body.m3-expressive .add-menu-item {
     width: 100%;
     border: none;
     color: var(--on-surface);
-    background-color: #b79dff;
+    background-color: var(--secondary-color) !important;
     border-radius: 100px;
     text-align: left;
     font-size: 0.9rem;
@@ -3114,7 +3139,7 @@ body.m3-expressive .add-menu-item {
 body.m3-expressive .add-menu-item .material-icons {
     font-size: 20px;
     color: var(--primary-color);
-    background-color: var(--primary-container);
+    background-color: var(--accent-color);
     padding: 8px;
     border-radius: var(--shape-corner-extra-small);
 }
@@ -3264,11 +3289,16 @@ body.m3-expressive .modal-content {
     box-shadow: var(--elevation-3);
 }
 
-body.m3-expressive button {
+body.m3-expressive .nav-btn .material-icons {
     border-radius: 2vh;
     font-weight: 500;
     letter-spacing: 0.1px;
+    background-color: var(--primary-color);
     color: white;
+}
+body.m3-expressive .nav-btn.active .material-icons {
+    background-color: var(--secondary-color);
+    border-radius: 100px;
 }
 body.m3-expressive #create-first-timer, 
 body.m3-expressive #create-first-alarm {
@@ -3288,7 +3318,6 @@ body.m3-expressive #create-first-alarm {
 
 body.m3-expressive #create-first-timer span, 
 body.m3-expressive #create-first-alarm span {
-    color: var(--surface-container-highest) !important;
     margin-top: 5px !important;
     margin-right: 5px !important;
     font-size: 3vh;
@@ -3386,19 +3415,16 @@ body.m3-expressive #add-btn {
     height: 80px;
     border-radius: var(--shape-corner-extra-large);
     background-color: var(--primary-color);
-    color:#1D192B !important;
+    color: white !important;
     box-shadow: var(--elevation-3);
     bottom: 110px;
     z-index: 2000;
 }
 body.m3-expressive .filter-btn {
-    color:#1D192B !important;
+    color:white !important;
 }
 body.m3-expressive .filter-btn.active {
     color: white !important;
-}
-body.m3-expressive #add-btn span {
-    color: #1D192B !important;
 }
 @media screen and (max-width:768px) {
     body.m3-expressive #add-btn {
@@ -3473,9 +3499,6 @@ body.m3-expressive .analog-clock {
         --inverse-on-surface: #313033;
         --inverse-primary: #6750A4;
     }
-}
-body.m3-expressive .section-btn {
-    background-color: #6750A4 !important;
 }
 
 body.m3-expressive .section-btn span {
